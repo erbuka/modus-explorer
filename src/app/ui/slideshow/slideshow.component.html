@@ -36,9 +36,14 @@
                                 <div *ngIf="it.video" class="w-100 h-100 cn-relative">
                                     <video autoplay controls disablePictureInPicture controlsList="nodownload" class="w-100 h-100" [src]="it.video | cnUrl : item"></video>
                                 </div>
+
+                                <!-- Image -->
+                                <div *ngIf="it.image" class="cn-bg-contain w-100 h-100"
+                                    [appBgImage]="it.image | cnUrl : item">
+                                </div>
                                 
                                 <!-- Fallback to preview image if there's nothing else -->
-                                <div *ngIf="!(it.href || it.video)" class="cn-bg-contain w-100 h-100"
+                                <div *ngIf="!(it.href || it.video || !it.image)" class="cn-bg-contain w-100 h-100"
                                     [appBgImage]="it.previewImage | cnUrl : item">
                                 </div>
                             </div>
