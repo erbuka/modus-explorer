@@ -1,0 +1,68 @@
+$cn-dz-tools-height: 4rem;
+
+.cn-deep-zoom-container {
+  @extend .cn-relative;
+  user-select: none;
+}
+
+.cn-dz-show-layers {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
+
+.cn-dz-layer-controls {
+  @extend .cn-absolute;
+  @extend .bg-background;
+  @extend .rounded;
+  @extend .mat-elevation-z4;
+  overflow: hidden;
+  left: -100%;
+  top: 16px;
+  transition: left 0.2s;
+
+  &.cn-show {
+    left: 16px;
+  }
+
+  .cn-dz-layer {
+    &:not(:last-child) {
+      @extend .border-bottom;
+    }
+
+    .cn-dz-layer-preview {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+}
+
+.cn-dz-minimap {
+  @extend .cn-absolute;
+  width: 10rem;
+  top: 16px;
+  right: 16px;
+
+  .cn-dz-minimap-image {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    background-size: 100% 100%;
+
+    .cn-dz-minimap-track {
+      position: absolute;
+      border: 2px solid theme-color("primary");
+      background-color: transparentize($color: theme-color("primary"), $amount: 0.9);
+    }
+  }
+}
+
+.cn-dz-tools {
+  @extend .cn-absolute;
+  @extend .w-100;
+  bottom: 0;
+  left: 0;
+  height: $cn-dz-tools-height;
+  background: rgba(0,0,0,.5);
+  color: white;
+}
