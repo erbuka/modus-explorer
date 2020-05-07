@@ -1,0 +1,33 @@
+
+.cn-slideshow-carousel {
+    @extend .h-100;
+    @extend .mat-elevation-z1;
+    position: relative;
+  
+    .cn-slideshow-slides-wrapper {
+      position: relative;
+      overflow: show;
+      background-color: rgba(0, 0, 0, 0.5);
+  
+      .cn-slideshow-slides {
+        @extend .cn-relative;
+        @extend .h-100;
+        @extend .w-100;
+        z-index: 0;
+        overflow: hidden;
+  
+        .cn-slideshow-slide {
+          position: absolute;
+          overflow: auto;
+          @extend .h-100;
+          @extend .w-100;
+        }
+      }
+    }
+  
+    .cn-slideshow-controls {
+      @extend .bg-background;
+      @extend .text-foreground;
+    }
+  }
+  

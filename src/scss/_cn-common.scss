@@ -19,8 +19,6 @@ body {
   animation-duration: 0.5s;
 }
 
-$cn-header-height: 8rem;
-
 .cn-bg-contain {
   background-repeat: no-repeat;
   background-size: contain;
@@ -66,55 +64,3 @@ $cn-header-height: 8rem;
   }
 }
 
-.cn-app-header {
-  @extend .p-2;
-  @extend .mat-elevation-z4;
-
-  background-color: transparentize(theme-color("background"), 0.5);
-
-  position: relative;
-  width: 100%;
-  height: $cn-header-height;
-  z-index: 1;
-}
-
-.cn-app-content {
-  @extend .cn-bg-cover;
-  position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
-  //margin-top: $cn-header-height;
-  height: calc(100vh - #{$cn-header-height});
-}
-
-.cn-slideshow-carousel {
-  @extend .h-100;
-  @extend .mat-elevation-z1;
-  position: relative;
-
-  .cn-slideshow-slides-wrapper {
-    position: relative;
-    overflow: show;
-    background-color: rgba(0, 0, 0, 0.5);
-
-    .cn-slideshow-slides {
-      @extend .cn-relative;
-      @extend .h-100;
-      @extend .w-100;
-      z-index: 0;
-      overflow: hidden;
-
-      .cn-slideshow-slide {
-        position: absolute;
-        overflow: auto;
-        @extend .h-100;
-        @extend .w-100;
-      }
-    }
-  }
-
-  .cn-slideshow-controls {
-    @extend .bg-background;
-    @extend .text-foreground;
-  }
-}

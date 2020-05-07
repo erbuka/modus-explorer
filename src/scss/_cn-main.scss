@@ -1,0 +1,25 @@
+$cn-header-height: 8rem;
+
+.cn-app-container {
+    @extend .cn-bg-cover;
+
+    .cn-app-header {
+        @extend .p-2;
+        @extend .mat-elevation-z4;
+
+        background-color: transparentize(theme-color("background"), 0.5);
+
+        position: relative;
+        width: 100%;
+        height: $cn-header-height;
+        z-index: 1;
+    }
+
+    .cn-app-content {
+        position: relative;
+        overflow-x: hidden;
+        overflow-y: auto;
+        //margin-top: $cn-header-height;
+        height: calc(100vh - #{$cn-header-height});
+    }
+}

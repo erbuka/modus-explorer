@@ -35,6 +35,7 @@ export interface ConfigLocale {
 }
 
 export interface Config {
+  name:string;
   backgroundImage: string;
   entry: string;
   internationalization?: {
