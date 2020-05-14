@@ -1,5 +1,5 @@
 <ng-container *ngIf="item">
-    <div class="p-4" *ngIf="currentSlideIndex === null">
+    <div class="p-4" *ngIf="currentSlideIndex === null && !simpleMode">
         <div *ngFor="let grp of item.groups" class="mb-3">
             <h3 class="mb-0"><strong>{{ grp.title | cnLocalizedText }}</strong></h3>
             <div class="d-flex flex-wrap mx-n1 cn-block-list"  >
@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <div class="cn-absolute" style="right: 0.5rem; top: 0.5rem;z-index: 1;">
+                <div class="cn-absolute" style="right: 0.5rem; top: 0.5rem;z-index: 1;" *ngIf="!simpleMode">
                     <button mat-mini-fab color="primary" (click)="clearSlide()" class="cn-absolute">
                         <mat-icon>close</mat-icon>
                     </button>
@@ -69,7 +69,7 @@
 
 
             </div>
-            <div class="cn-slideshow-controls mat-elevation-z1 p-4">
+            <div class="cn-slideshow-controls mat-elevation-z1 p-4" *ngIf="!simpleMode">
                 <span><strong>{{ getSlideGroup(currentSlideIndex).title | cnLocalizedText }}</strong></span>
                 <span *ngIf="item.slides[currentSlideIndex].title"> - {{ item.slides[currentSlideIndex].title | cnLocalizedText }}</span>
             </div>

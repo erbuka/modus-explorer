@@ -77,9 +77,13 @@ export class SlideshowComponent implements OnInit {
         }
 
       } else {
-        this.currentSlideIndex = null;
+        this.currentSlideIndex = this.simpleMode ? 0 : null;
       }
     });
+  }
+
+  get simpleMode():boolean {
+    return this.item.options.mode === "simple";
   }
 
   clearSlide(): void {

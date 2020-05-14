@@ -1,5 +1,7 @@
 import { ItemBase, LocalizedText } from './item';
 
+export type SlideShowItemMode = "normal" | "simple";
+
 export interface SlideShowItemGroup {
   name: string;
   title: LocalizedText;
@@ -9,6 +11,7 @@ export interface SlideShowItemGroup {
 export interface SlideshowItem extends ItemBase {
   type: "slideshow",
   options: {
+    mode?: SlideShowItemMode,
     itemWidth: string,
     itemAspectRatio: number
   },
