@@ -3,7 +3,6 @@ const path = require("path");
 const nw = require("node-watch");
 const fs = require("fs");
 
-
 const settings = {
     required: true,
     noExtraProps: true
@@ -50,11 +49,12 @@ const generateJsonTemplate = function (rootDir, watchCallback) {
             let current = toExplore.shift();
 
             for (let f of fs.readdirSync(current)) {
-                let p = path.resolve(p);
+                let p = path.resolve(current, f);
                 let stats = fs.statSync(p);
 
                 if (stats.isFile() && p.match(/^.+\.html$/)) {
-                    let tmplName = path.basename(p, ".html");
+                    let tmplName = path.relative(path.resolve(rootDir), p).replace("\\", "/");
+                    tmplName = tmplName.substr(0, tmplName.length - 5);
                     let tmplContents = fs.readFileSync(p, { encoding: "utf-8" });
                     result.push({
                         name: tmplName,
@@ -73,7 +73,7 @@ const generateJsonTemplate = function (rootDir, watchCallback) {
 
     if (watchCallback) {
         watchCallback(getTemplates());
-        nq(path.resolve(rootDir), { recursive: true }, (evt, filename) => watchCallback(getTemplates()));
+        nw(path.resolve(rootDir), { recursive: true }, (evt, filename) => watchCallback(getTemplates()));
     } else {
         return getTemplates();
     }

@@ -7,7 +7,6 @@
     "start:dev-server": "node ./scripts/dev-server.js",
     "build": "ng build --prod --base-href=/ --output-path build-prod",
     "build:ghpages": "ng build --prod --output-path docs --base-href /cultura-nuova/ && ncp ./assets ./docs/assets",
-    "build:type-schema": "node ./scripts/build-type-schemas.js",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -44,6 +43,7 @@
     "@types/node": "^12.12.29",
     "ajv": "^6.12.2",
     "codelyzer": "^5.1.2",
+    "colors": "^1.4.0",
     "express": "^4.17.1",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",

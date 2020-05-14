@@ -2,9 +2,10 @@ import { Component, ViewChildren, QueryList, TemplateRef, AfterViewInit, Rendere
 import { ContextService } from '../context.service';
 import { TemplateDefDirective } from '../template-def.directive';
 
+
 @Component({
   selector: 'app-templates',
-  templateUrl: './templates.component.html'
+  templateUrl: "./templates.component.html"
 })
 export class TemplatesComponent implements AfterViewInit {
 

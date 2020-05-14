@@ -2,43 +2,88 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const rimraf = require("rimraf");
+const colors = require("colors");
 
 const app = express();
 const port = 8080;
 
-app.delete("/assets/*", (req, res) => {
-    let dirPath = path.resolve(path.join("./", req.url));
+const common = require("./common");
 
-    if (fs.lstatSync(dirPath).isDirectory()) {
-        let files = path.join(dirPath, "*");
-        rimraf(files, (error) => {
-            if (error) {
-                res.statusCode = 400;
-                res.send(error);
-            } else {
-                res.statusCode = 200;
-                res.send(dirPath);
-            }
-        });
-    } else {
-        res.statusCode = 400;
-        res.send(`Not a valid directory: ${dirPath}`);
-    }
 
-});
 
-app.post("/assets/*", express.raw({ type: ["text/html", "application/octet-stream"], limit: "512mb" }), (req, res, next) => {
-    let filePath = path.resolve(path.join("./", req.url));
-    fs.writeFile(filePath, req.body, () => {
-        res.statusCode = 200;
-        res.send();
+/** Development Server */
+{
+    app.delete("/assets/*", (req, res) => {
+        let dirPath = path.resolve(path.join("./", req.url));
+
+        if (fs.lstatSync(dirPath).isDirectory()) {
+            let files = path.join(dirPath, "*");
+            rimraf(files, (error) => {
+                if (error) {
+                    res.statusCode = 400;
+                    res.send(error);
+                } else {
+                    res.statusCode = 200;
+                    res.send(dirPath);
+                }
+            });
+        } else {
+            res.statusCode = 400;
+            res.send(`Not a valid directory: ${dirPath}`);
+        }
+
     });
-});
-app.use("/assets", express.static("assets"), (req, res) => {
-    res.sendFile(path.resolve("./build-dev/index.html"))
-});
-app.use("/", express.static("build-dev"));
 
-app.listen(port);
+    app.post("/assets/*", express.raw({ type: ["text/html", "application/octet-stream"], limit: "512mb" }), (req, res, next) => {
+        let filePath = path.resolve(path.join("./", req.url));
+        fs.writeFile(filePath, req.body, () => {
+            res.statusCode = 200;
+            res.send();
+        });
+    });
+    app.use("/assets", express.static("assets"), (req, res) => {
+        res.sendFile(path.resolve("./build-dev/index.html"))
+    });
+    app.use("/", express.static("build-dev"));
 
-console.log(`Development server listening on port ${port}`);
+    app.listen(port);
+
+    console.log(`${colors.green("[Dev-Server]")} - Listening on port ${port}`);
+}
+
+
+/** Type Schema Generator */
+{
+
+    const files = [
+        "./src/app/types/item.ts",
+        "./src/app/types/deep-zoom-item.ts",
+        "./src/app/types/block-list-item.ts",
+        "./src/app/types/page-item.ts",
+        "./src/app/types/slideshow-item.ts",
+        "./src/app/types/three-viewer-item.ts"
+    ];
+
+    const types = [
+        { name: "Item", dest: "./src/app/types/schema.json" }
+    ]
+
+    common.generateJsonSchema(files, types.map(t => t.name), r => {
+        for (let typeName in r) {
+            let p = path.resolve(types.find(t => t.name === typeName).dest);
+            fs.writeFileSync(p, JSON.stringify(r[typeName]));
+            console.log(`${colors.green("[Types]")} - Rebuild ${colors.yellow(path.basename(p))}`);
+        }
+    });
+}
+
+/** Template Generator */
+{
+    const dest = "./src/app/templates/templates.component.html";
+
+    common.generateJsonTemplate("./templates", function(result) {
+        let templates = result.reduce((prev, curr) => prev + `<ng-template let-data let-item="item" appTemplateDef="${curr.name}">${curr.contents}</ng-template>`, "");
+        fs.writeFileSync(path.resolve(dest), templates, { encoding: "utf-8" });
+        console.log(`${colors.green("[Templates]")} - Rebuild ${colors.yellow(path.basename(dest))}`);
+    });
+}
