@@ -2,7 +2,6 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import {
   trigger,
-  state,
   style,
   animate,
   transition,
@@ -10,7 +9,7 @@ import {
   group
 } from '@angular/animations';
 import { Item } from 'src/app/types/item';
-import { SlideshowItem } from 'src/app/types/slideshow-item';
+import { SlideshowItem, SlideShowItemGroup } from 'src/app/types/slideshow-item';
 import { LocationRouterService } from 'src/app/location-router.service';
 
 
@@ -103,8 +102,12 @@ export class SlideshowComponent implements OnInit {
     this.router.navigate(`${this.item.uri}?s=${idx}`);
   }
 
-  getSlidesForGroup(group: string) {
-    return this.item.slides.filter(s => s.group === group);
+  getSlidesForGroup(groupName: string) {
+    return this.item.slides.filter(s => s.group === groupName);
+  }
+
+  getSlideGroup(s:number):SlideShowItemGroup {
+    return this.item.groups.find(x => x.name === this.item.slides[s].group);
   }
 
   trackByIdx(idx: number): number {
