@@ -161,4 +161,123 @@
             </div>
         </div>
     </div>
+</div></ng-template><ng-template let-data let-item="item" appTemplateDef="page-examples"><div class="container">
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>Testo statico</h2>
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer sed venenatis lectus. Vivamus vestibulum
+            posuere massa, eleifend egestas urna pretium a. Morbi hendrerit blandit mauris, eget pulvinar odio vulputate
+            sit amet. Phasellus a nulla a turpis ornare tristique. Fusce laoreet, turpis eu venenatis rhoncus, est enim
+            mattis arcu, eget scelerisque nulla lectus sed nulla. Sed luctus eu sem vel tincidunt. Integer interdum ante
+            ac orci commodo, a semper turpis tempor. Sed aliquam rutrum risus a tincidunt. Sed eget magna leo.
+        </p>
+    </div>
+
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>Testo dinamico</h2>
+        <p>{{ data.dynamicText | cnLocalizedText }}</p>
+    </div>
+
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>HTML dinamico</h2>
+        <p [innerHtml]="data.dynamicHtml | cnLocalizedText"></p>
+    </div>
+
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>Stili dinamici</h2>
+        <p [style.background-color]="data.bgColor">Il background di questo elemento è: {{ data.bgColor }}</p>
+    </div>
+
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>Url e link</h2>
+        <p>
+            Tutti gli url, che siano link o immagini, vanno formattati usando la pipe "cnUrl". Questo permette al
+            sistema di valutare gli url relativi, interni ed esterni.
+            La direttiva [cnLink] permette di definire un elemento della pagina come link. Funziona in modo simile
+            all'attributo "href", con la differenza che può essere utilizzato in qualsiasi tipo di elemento (quindi
+            anche su
+            pulsanti, immagini, ecc), e in caso di url interno all'applicazione, non ricarica l'intera pagina.
+        </p>
+        <div>
+            <a [cnLink]="'assets/main/deep-zoom-0' | cnUrl:item">Link statico</a> - Link statico al deepzoom
+        </div>
+        <div>
+            <a [cnLink]="data.link0 | cnUrl:item">Link dinamico</a> - Link il cui percorso è specificato nel file
+            item.json
+        </div>
+        <div>
+            <a [cnLink]="'..' | cnUrl:item">Vai su</a> - Questo link torna al livello superiore (come la freccia su)
+        </div>
+    </div>
+
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>Lista semplice</h2>
+        <p>
+            Nei template è possibile sfruttare tutte le direttive Angular. In questo caso si usa la direttiva *ngFor,
+            che permette di creare elementi html a partire da un array (data.simpleList) definito nel file item.json.
+            In questo caso vengono generati di blocchi di tipo <strong>&lt;li&gt;</strong>, uno per ogni elemento
+            dell'array.
+            La sintassi di base della direttiva è: <em>let [nome_variabile] of [array]</em>. Ad ogni iterazione è
+            possibile
+            accedere all'elemento corrente tramite il nome della variabile (in questo caso "myListElement")
+        </p>
+        <ul>
+            <li *ngFor="let myListElement of data.simpleList">{{ myListElement | cnLocalizedText }}</li>
+        </ul>
+    </div>
+
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>Lista complessa</h2>
+        <p>
+            Sempre sfruttando la direttiva *ngFor è possibile definire una lista (data.complexList) in cui ogni elemento
+            ha diversi campi
+            che poi possono essere utilizzati per definire contenuti, stili, ecc.
+        </p>
+        <ul>
+            <li *ngFor="let it of data.complexList">
+                <span [style.color]="it.color">{{ it.title | cnLocalizedText }}</span>
+                <span> - {{ it.text | cnLocalizedText }}</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>Lista con links</h2>
+        <p>
+            Questa lista usa la stessa struttura dati della lista complessa riportata sopra, ma utilizza i campi in
+            modo diverso
+        </p>
+        <ul>
+            <li *ngFor="let it of data.complexList" [style.background-color]="it.color">
+                <span>{{ it.title | cnLocalizedText }}</span>
+                <span> - {{ it.text | cnLocalizedText }}</span>
+                (<a [cnLink]="it.link | cnUrl: item">Wiki</a>)
+            </li>
+        </ul>
+    </div>
+
+    <div class="mat-elevation-z4 mt-4 p-4 bg-background">
+        <h2>Lista con links e immagini</h2>
+        <p>
+            Sempre utilizzando la stessa struttura dati, posso anche creare elementi più complessi
+        </p>
+        <div class="row nogutters mx-n2">
+            <div class="col-md-4 p-2" *ngFor="let it of data.complexList">
+                <div class="p-4 mat-elevation-z1">
+                    <img class="w-100" style="height: 10rem;" [src]="it.image | cnUrl : item">
+                    <h3 [style.color]="it.color"><strong>{{ it.title | cnLocalizedText }}</strong></h3>
+                    <p>{{ it.text | cnLocalizedText }}</p>
+                    <p class="text-right">
+                        <a [cnLink]="it.link | cnUrl :item">Wiki</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
 </div></ng-template>
