@@ -48,6 +48,11 @@ const generateJsonTemplate = function (rootDir, watchCallback) {
 
             let current = toExplore.shift();
 
+            if(!fs.existsSync(current)) {
+                throw new Error(`File doesn't exist: ${current}`);
+            }
+
+
             for (let f of fs.readdirSync(current)) {
                 let p = path.resolve(current, f);
                 let stats = fs.statSync(p);

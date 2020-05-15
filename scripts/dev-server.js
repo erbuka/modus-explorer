@@ -81,9 +81,14 @@ const common = require("./common");
 {
     const dest = "./src/app/templates/templates.component.html";
 
-    common.generateJsonTemplate("./templates", function(result) {
-        let templates = result.reduce((prev, curr) => prev + `<ng-template let-data let-item="item" appTemplateDef="${curr.name}">${curr.contents}</ng-template>`, "");
-        fs.writeFileSync(path.resolve(dest), templates, { encoding: "utf-8" });
-        console.log(`${colors.green("[Templates]")} - Rebuild ${colors.yellow(path.basename(dest))}`);
-    });
+    try {
+        common.generateJsonTemplate("./templates", function (result) {
+            let templates = result.reduce((prev, curr) => prev + `<ng-template let-data let-item="item" appTemplateDef="${curr.name}">${curr.contents}</ng-template>`, "");
+            fs.writeFileSync(path.resolve(dest), templates, { encoding: "utf-8" });
+            console.log(`${colors.green("[Templates]")} - Rebuild ${colors.yellow(path.basename(dest))}`);
+        });
+    }
+    catch(e) {
+        console.log(`${colors.red("[Templates]")} - ${e}`);
+    }
 }
