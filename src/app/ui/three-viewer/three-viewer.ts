@@ -698,6 +698,12 @@ export type ThreeViewerObject3D = (ThreeViewerModel | ThreeViewerLight | ThreeVi
 export class ThreeViewerGroup<T extends ThreeViewerObject3D> extends Group {
     constructor() { super(); }
     children: T[];
-    add(...o: T[]): this { super.add(...o); return this; }
-    remove(...o: T[]): this { super.remove(...o); return this; }
+    add(...o: T[]): this { 
+        super.add(...o); 
+        return this; 
+    }
+    remove(...o: T[]): this { 
+        super.remove(...o); 
+        return this; 
+    }
 }

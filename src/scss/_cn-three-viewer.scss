@@ -1,3 +1,6 @@
+$cn-three-viewer-layer-height: 2.5rem;
+$cn-three-viewer-visible-layers: 12;
+
 .cn-three-viewer {
   @extend .cn-relative;
   @extend .w-100;
@@ -46,11 +49,17 @@
       display: none;
     }
 
+    .cn-three-viewer-layers-scrollpane {
+      max-height: $cn-three-viewer-layer-height * $cn-three-viewer-visible-layers;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
 
     .cn-three-viewer-layer {
       @extend .pr-2;
       position: relative;
-      height: 2.5rem;
+      height: $cn-three-viewer-layer-height;
 
       &.cn-indent {
         background-color: #eee;
@@ -66,8 +75,8 @@
 
     
     .cn-three-viewer-layer-preview {
-      width: 2.5rem;
-      height: 2.5rem;
+      width: $cn-three-viewer-layer-height;
+      height: $cn-three-viewer-layer-height;
     }
   }
 }

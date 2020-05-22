@@ -63,56 +63,60 @@
             </button>
         </mat-toolbar>
 
-        <ng-container *ngFor="let model of this.models.children">
-            <div class="cn-three-viewer-layer d-flex align-items-center">
-                <div *ngIf="model.previewImage" [appBgImage]="model.previewImage | cnUrl : item"
-                    class="cn-three-viewer-layer-preview cn-bg-cover"></div>
-                <span class="px-2">{{ model.title | cnLocalizedText }}</span>
-                <div class="ml-auto"></div>
-                <div>
-                    <mat-slider color="primary" min="0" max="1" step="0.01" [value]="model.opacity"
-                        (change)="model.opacity=$event.value"></mat-slider>
-                </div>
-                <div class="ml-2">
-                    <button mat-icon-button (click)="model.visible=!model.visible">
-                        <mat-icon *ngIf="model.visible">visibility</mat-icon>
-                        <mat-icon *ngIf="!model.visible" style="opacity: 0.25;">visibility_off</mat-icon>
-                    </button>
-                </div>
-            </div>
+        <div class="cn-three-viewer-layers-scrollpane">
 
-
-            <div *ngIf="model.materials.length > 1" class="border-bottom">
-                <div *ngFor="let material of model.materials; index as i"
-                    class="cn-three-viewer-layer cn-indent align-items-center d-flex">
-                    <div *ngIf="material.previewImage" class="cn-three-viewer-layer-preview"></div>
-                    <span class="px-2">{{ material.title | cnLocalizedText }}</span>
+            <ng-container *ngFor="let model of this.models.children">
+                <div class="cn-three-viewer-layer d-flex align-items-center">
+                    <div *ngIf="model.previewImage" [appBgImage]="model.previewImage | cnUrl : item"
+                        class="cn-three-viewer-layer-preview cn-bg-cover"></div>
+                    <span class="px-2">{{ model.title | cnLocalizedText }}</span>
                     <div class="ml-auto"></div>
+                    <div>
+                        <mat-slider color="primary" min="0" max="1" step="0.01" [value]="model.opacity"
+                            (change)="model.opacity=$event.value"></mat-slider>
+                    </div>
                     <div class="ml-2">
-                        <button mat-icon-button (click)="model.currentMaterial=i">
-                            <mat-icon *ngIf="model.currentMaterial===i">radio_button_checked</mat-icon>
-                            <mat-icon *ngIf="!(model.currentMaterial===i)">radio_button_unchecked</mat-icon>
+                        <button mat-icon-button (click)="model.visible=!model.visible">
+                            <mat-icon *ngIf="model.visible">visibility</mat-icon>
+                            <mat-icon *ngIf="!model.visible" style="opacity: 0.25;">visibility_off</mat-icon>
                         </button>
                     </div>
                 </div>
-            </div>
 
-        </ng-container>
 
-        <ng-container *ngFor="let pinLayer of this.pinLayers">
-            <div class="cn-three-viewer-layer d-flex align-items-center">
-                <div class="cn-three-viewer-layer-preview cn-bg-cover" [appBgImage]="pinLayer.previewImage.src"></div>
-                <span class="px-2">{{ pinLayer.title | cnLocalizedText }}</span>
-                <div class="ml-auto"></div>
-                <div class="ml-2">
-                    <button mat-icon-button (click)="pinLayer.visible=!pinLayer.visible">
-                        <mat-icon *ngIf="pinLayer.visible">visibility</mat-icon>
-                        <mat-icon *ngIf="!pinLayer.visible" style="opacity: 0.25;">visibility_off</mat-icon>
-                    </button>
+                <div *ngIf="model.materials.length > 1" class="border-bottom">
+                    <div *ngFor="let material of model.materials; index as i"
+                        class="cn-three-viewer-layer cn-indent align-items-center d-flex">
+                        <div *ngIf="material.previewImage" class="cn-three-viewer-layer-preview"></div>
+                        <span class="px-2">{{ material.title | cnLocalizedText }}</span>
+                        <div class="ml-auto"></div>
+                        <div class="ml-2">
+                            <button mat-icon-button (click)="model.currentMaterial=i">
+                                <mat-icon *ngIf="model.currentMaterial===i">radio_button_checked</mat-icon>
+                                <mat-icon *ngIf="!(model.currentMaterial===i)">radio_button_unchecked</mat-icon>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </ng-container>
 
+            </ng-container>
+
+            <ng-container *ngFor="let pinLayer of this.pinLayers">
+                <div class="cn-three-viewer-layer d-flex align-items-center">
+                    <div class="cn-three-viewer-layer-preview cn-bg-cover" [appBgImage]="pinLayer.previewImage.src">
+                    </div>
+                    <span class="px-2">{{ pinLayer.title | cnLocalizedText }}</span>
+                    <div class="ml-auto"></div>
+                    <div class="ml-2">
+                        <button mat-icon-button (click)="pinLayer.visible=!pinLayer.visible">
+                            <mat-icon *ngIf="pinLayer.visible">visibility</mat-icon>
+                            <mat-icon *ngIf="!pinLayer.visible" style="opacity: 0.25;">visibility_off</mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </ng-container>
+
+        </div>
     </div>
 
     <div class="cn-three-viewer-editor cn-inspector" *ngIf="allowEditorMode" [class.cn-hidden]="!editorMode">

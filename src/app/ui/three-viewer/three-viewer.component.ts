@@ -437,8 +437,10 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 
   onObjectAdded(obj: ThreeViewerObject3D) {
-    if (obj.onAdd)
+    if (obj.onAdd) {
       obj.onAdd(this.scene);
+      obj.setEditorMode(this.editorMode);
+    }
   }
 
   onObjectRemoved(obj: ThreeViewerObject3D) {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterContentInit } from '@angular/core';
 import { ContextService, ConfigLocale } from 'src/app/context.service';
 import { Item } from 'src/app/types/item';
 import { LocationRouterService } from 'src/app/location-router.service';
@@ -9,6 +9,8 @@ import { LocationRouterService } from 'src/app/location-router.service';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
+
+  @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
   locales: ConfigLocale[] = null;
   item: Item = null;
@@ -22,8 +24,10 @@ export class MainComponent implements OnInit {
     this.router.subscribe(v => {
 
       this.context.getItem(v.path, false).subscribe({
-        next: item => this.item = item,
-        error: (e) => {
+        next: item => {
+          this.item = item;
+          this.resetContentScrollTop();
+        }, error: (e) => {
           this.router.navigate(this.context.config.entry, true);
           console.error(e.message);
         }
@@ -41,6 +45,13 @@ export class MainComponent implements OnInit {
   }
 
   goUp(): void {
+    this.router.navigate(this.router.resolve("..", this.item));
+  }
+
+  resetContentScrollTop():void {
+    if(this.appContentElmt != null) {
+      this.appContentElmt.nativeElement.scrollTop = 0;
+    }
   }
 
 }
