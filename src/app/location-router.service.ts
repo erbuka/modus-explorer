@@ -29,7 +29,7 @@ export class LocationRouterService extends BehaviorSubject<LocationRoute> {
   }
 
   navigate(uri: string, replace: boolean = false): void {
-
+    
     uri = this.normalize(uri);
 
     if (this.isExternal(uri)) {

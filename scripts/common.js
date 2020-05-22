@@ -8,29 +8,23 @@ const settings = {
     noExtraProps: true
 }
 
-const generateJsonSchema = function (files, types, watchCallback) {
+const generateJsonSchema = function (files, type, watchCallback) {
 
     files = files.map(f => path.resolve(f));
 
-
-    const getSchemas = function () {
+    const getSchema = function () {
         const program = tjs.getProgramFromFiles(files);
         const generator = tjs.buildGenerator(program, settings);
-        
-        let result = {};
-        for (let t of types) {
-            result[t] = generator.getSchemaForSymbol(t);
-        }
-        return result;
+        return generator.getSchemaForSymbol(type);
     }
 
-
     if (watchCallback) {
-        watchCallback(getSchemas());
+        watchCallback(getSchema());
+
         for (let f of files)
-            nw(f, (evt, filename) => { watchCallback(getSchemas()) });
+            nw(f, (evt, filename) => { watchCallback(getSchema()) });
     } else {
-        return getSchemas();
+        return getSchema();
     }
 
 

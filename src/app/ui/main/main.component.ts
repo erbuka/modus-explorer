@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterContentInit } from '@angular/core';
-import { ContextService, ConfigLocale } from 'src/app/context.service';
+import { ContextService } from 'src/app/context.service';
 import { Item } from 'src/app/types/item';
 import { LocationRouterService } from 'src/app/location-router.service';
+import { ConfigLocale } from 'src/app/types/config';
 
 @Component({
   selector: 'app-main',

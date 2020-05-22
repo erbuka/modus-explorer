@@ -52,29 +52,38 @@ const common = require("./common");
 }
 
 
-/** Type Schema Generator */
+/** Item Type Schema Generator */
 {
 
-    const files = [
-        "./src/app/types/item.ts",
-        "./src/app/types/deep-zoom-item.ts",
-        "./src/app/types/block-list-item.ts",
-        "./src/app/types/page-item.ts",
-        "./src/app/types/slideshow-item.ts",
-        "./src/app/types/three-viewer-item.ts"
-    ];
 
     const types = [
-        { name: "Item", dest: "./src/app/types/schema.json" }
-    ]
+        {
+            name: "Item",
+            dest: "./src/app/types/item-schema.json",
+            files: [
+                "./src/app/types/item.ts",
+                "./src/app/types/deep-zoom-item.ts",
+                "./src/app/types/block-list-item.ts",
+                "./src/app/types/page-item.ts",
+                "./src/app/types/slideshow-item.ts",
+                "./src/app/types/three-viewer-item.ts",
+            ]
+        },
+        {
+            name: "Config",
+            dest: "./src/app/types/config-schema.json",
+            files: ["./src/app/types/config.ts"]
+        },
+    ];
 
-    common.generateJsonSchema(files, types.map(t => t.name), r => {
-        for (let typeName in r) {
-            let p = path.resolve(types.find(t => t.name === typeName).dest);
-            fs.writeFileSync(p, JSON.stringify(r[typeName]));
+    for(let type of types) {
+        common.generateJsonSchema(type.files, type.name, r => {
+            let p = path.resolve(type.dest);
+            fs.writeFileSync(p, JSON.stringify(r));
             console.log(`${colors.green("[Types]")} - Rebuild ${colors.yellow(path.basename(p))}`);
-        }
-    });
+        });
+    }
+
 }
 
 /** Template Generator */
@@ -88,7 +97,7 @@ const common = require("./common");
             console.log(`${colors.green("[Templates]")} - Rebuild ${colors.yellow(path.basename(dest))}`);
         });
     }
-    catch(e) {
+    catch (e) {
         console.log(`${colors.red("[Templates]")} - ${e}`);
     }
 }

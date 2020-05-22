@@ -6,8 +6,11 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import * as ajv from "ajv";
 import { Item, LocalizedText } from './types/item';
 import { LocationRouterService } from './location-router.service';
+import { ConfigLocale, Config } from './types/config';
+import { DOCUMENT } from '@angular/common';
 
-const ITEM_SCHEMA = require('./types/schema.json');
+const ITEM_SCHEMA = require('./types/item-schema.json');
+const CONFIG_SCHEMA = require('./types/config-schema.json');
 
 const SS_LOCALE_ID_KEY = "cn-locale-id";
 
@@ -27,22 +30,6 @@ export type FileChooserEvent = {
   reject: () => void
 }
 
-
-export interface ConfigLocale {
-  id: string;
-  flagIcon?: string;
-  description: string;
-}
-
-export interface Config {
-  name:string;
-  backgroundImage: string;
-  entry: string;
-  internationalization?: {
-    defaultLocale: string,
-    locales: ConfigLocale[]
-  }
-}
 
 
 export type ErrorEvent = {
@@ -76,7 +63,7 @@ export class ContextService {
   private jsonValidator: ajv.Ajv = null;
   private initializeSubject: BehaviorSubject<boolean>;
 
-  constructor(private httpClient: HttpClient, private router: LocationRouterService) {
+  constructor(private httpClient: HttpClient, private router: LocationRouterService, @Inject(DOCUMENT) private document: Document) {
     this.jsonValidator = new ajv();
   }
 
@@ -126,27 +113,43 @@ export class ContextService {
 
 
   initialize(): BehaviorSubject<boolean> {
+
     if (!this.initializeSubject) {
+
       this.initializeSubject = new BehaviorSubject(false);
-      this.httpClient.get<Config>(this.router.normalize("assets/config.json")).subscribe({
-        next: v => {
-          this.config = v;
 
-          if (this.config.internationalization) {
-
-            try {
-              this.setCurrentLocale(sessionStorage.getItem(SS_LOCALE_ID_KEY));
-            }
-            catch (e) {
-              this.setCurrentLocale(this.config.internationalization.defaultLocale);
-            }
-
+      this.httpClient.get<Config>(this.router.normalize("assets/config.json"))
+        .pipe(map((config: Config) => {
+          let valid = this.jsonValidator.validate(CONFIG_SCHEMA, config);
+          if (!valid) {
+            throw new Error(`Config file doesn't validate against the schema:<br> ${
+              this.jsonValidator.errors.reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
+              }`);
           }
+          return config;
+        }))
+        .subscribe({
+          next: (config: Config) => {
 
-          this.initializeSubject.next(true);
-        }
-      })
+            this.config = config;
+
+            if (this.config.internationalization) {
+
+              try {
+                this.setCurrentLocale(sessionStorage.getItem(SS_LOCALE_ID_KEY));
+              }
+              catch (e) {
+                this.setCurrentLocale(this.config.internationalization.defaultLocale);
+              }
+
+            }
+
+            this.initializeSubject.next(true);
+          },
+          error: e => this.document.write(e)
+        })
     }
+
     return this.initializeSubject;
   }
 

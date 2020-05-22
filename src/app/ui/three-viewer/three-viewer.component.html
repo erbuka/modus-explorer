@@ -32,7 +32,7 @@
     <div class="cn-three-viewer-container" #containerRef (tap)="onCanvasClick($event.srcEvent)"></div>
 
     <div class="cn-three-viewer-pin-popup" *ngIf="selectedPinStyle" [ngStyle]="selectedPinStyle">
-        <div class="float-right" (click)="selectedPin=null">
+        <div class="float-right" (click)="selectedPin=null" style="cursor: pointer;">
             <mat-icon>close</mat-icon>
         </div>
         <h3>{{ selectedPin.title | cnLocalizedText }}</h3>
