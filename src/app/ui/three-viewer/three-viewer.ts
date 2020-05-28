@@ -68,7 +68,7 @@ interface OnRemove {
 
 
 
-type ThreeViewerResource = Texture | BufferGeometry | MeshStandardMaterial | string;
+export type ThreeViewerResource = Texture | BufferGeometry | MeshStandardMaterial | string;
 
 export class ThreeViewerResources {
 

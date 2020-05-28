@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, ChangeDetectorRef, OnChanges, DoCheck } from '@angular/core';
 import { ThreeViewerItem, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
-import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper, BufferGeometry } from 'three';
+import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper, BufferGeometry, Texture } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService, FileChooserResult } from 'src/app/context.service';
 
@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, ThreeViewerLight, ThreeViewerPinLayer, ThreeViewerPin, ThreeViewerResources } from './three-viewer';
+import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, ThreeViewerLight, ThreeViewerPinLayer, ThreeViewerPin, ThreeViewerResources, ThreeViewerResource } from './three-viewer';
 import { PinLayerEditorComponent, PinLayerEditorData } from './pin-layer-editor/pin-layer-editor.component';
 
 import { moveItemInArray } from '@angular/cdk/drag-drop'
@@ -208,6 +208,33 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.camera.position.fromArray(this.item.camera.position);
     this.camera.lookAt(this.item.camera.lookAt[0], this.item.camera.lookAt[1], this.item.camera.lookAt[2]);
 
+    // Parallel asset loading
+    let resourcePromises: { [name: string]: Promise<ThreeViewerResource> } = {};
+
+    if (this.item.models) {
+      for (let modelDef of this.item.models) {
+
+        for (let meshDef of modelDef.meshes)
+          resourcePromises[meshDef.file] = resources.loadPlyMesh(this.router.resolve(meshDef.file, this.item));
+
+        for (let materialDef of modelDef.materials) {
+          for (let meshMaterialDef of materialDef.meshMaterials) {
+            if (meshMaterialDef.map) 
+              resourcePromises[meshMaterialDef.map] = resources.loadTexture(this.router.resolve(meshMaterialDef.map, this.item));
+
+            if (meshMaterialDef.normalMap) 
+              resourcePromises[meshMaterialDef.normalMap] = resources.loadTexture(this.router.resolve(meshMaterialDef.normalMap, this.item));
+          }
+        }
+
+      }
+    }
+
+    if (this.item.pinLayers)
+      for (let pinLayerDef of this.item.pinLayers) 
+        resourcePromises[pinLayerDef.geometry] = resources.loadPlyMesh(this.router.resolve(pinLayerDef.geometry, this.item));
+
+
     // Load models
     this.models.remove(...this.models.children);
 
@@ -238,7 +265,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
           model.scale.fromArray(scl);
 
         for (let meshDef of modelDef.meshes) {
-          let geometry = await resources.loadPlyMesh(this.router.resolve(meshDef.file, this.item));
+          let geometry = (await resourcePromises[meshDef.file]) as BufferGeometry;
           let mesh = new Mesh(geometry, resources.createStandardMaterial());
 
           mesh.castShadow = true;
@@ -255,13 +282,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
           for (let meshMaterialDef of materialDef.meshMaterials) {
             let mat = resources.createStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
 
-            if (meshMaterialDef.map) {
-              mat.map = await resources.loadTexture(this.router.resolve(meshMaterialDef.map, this.item));
-            }
+            if (meshMaterialDef.map)
+              mat.map = (await resourcePromises[meshMaterialDef.map]) as Texture;
 
-            if (meshMaterialDef.normalMap) {
-              mat.normalMap = await resources.loadTexture(this.router.resolve(meshMaterialDef.normalMap, this.item));
-            }
+            if (meshMaterialDef.normalMap)
+              mat.normalMap = (await resourcePromises[meshMaterialDef.normalMap]) as Texture;
+            
             materials.push(mat);
           }
 
@@ -345,7 +371,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         // Instead, since all the pins share of a layer share the same geometry, we need each layer to have
         // a unique geometry
         // We have also to track the new geometry as well
-        let geom = await resources.loadPlyMesh(this.router.resolve(pinLayerDef.geometry, this.item));
+        let geom = (await resourcePromises[pinLayerDef.geometry]) as BufferGeometry;
         layer.geometry = this.resources.track(new BufferGeometry()).copy(geom);
 
         layer.createPreviewPicture();
