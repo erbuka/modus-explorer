@@ -180,8 +180,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.scene.add(this.pins);
 
     // Wait for item to load
+    let c = new Clock();
+    c.start();
     await this.loadItem();
-
+    console.log(c.getDelta());
+    
     // Disable the loading overlay and turn off editor mode by default
     this.showLoading = false;
     this.editorMode = false;
