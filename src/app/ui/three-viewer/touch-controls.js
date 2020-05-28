@@ -159,10 +159,7 @@ export class TouchControls {
 
         // Setup hammer
         this.hammer.get("pan").set({ direction: hammer.DIRECTION_ALL });
-        this.hammer.get('pinch').set({ enable: true });
-
         this.hammer.on("pan", this.onPan.bind(this));
-        this.hammer.on("pinch", this.onPinch.bind(this));
 
         // Setup mouse/keyboard events
         this.eventHandlers.bind("wheel", this.domElement, this.onMouseWheel.bind(this));
@@ -267,17 +264,6 @@ export class TouchControls {
 
         }
 
-    }
-
-    /**
-     * @private
-     * @param {hammer.Event} evt 
-     * @returns {void}
-     */
-    onPinch(evt) {
-        if (this.enabled) {
-            console.log(evt);
-        }
     }
 
     /**
