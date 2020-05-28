@@ -54,14 +54,14 @@
                     </button>
                 </div>
 
-                <div class="cn-absolute" style="left: 0.5rem; top:50%; transform: translateY(-50%); z-index: 1;">
+                <div class="cn-absolute" style="left: 0.5rem; top:50%; transform: translateY(-50%); z-index: 1;" *ngIf="currentSlideIndex !== 0">
                     <button mat-mini-fab color="primary" (click)="previousSlide()" class="cn-absolute">
                         <mat-icon>chevron_left</mat-icon>
                     </button>
                 </div>
 
 
-                <div class="cn-absolute" style="right: 0.5rem; top:50%; transform: translateY(-50%);">
+                <div class="cn-absolute" style="right: 0.5rem; top:50%; transform: translateY(-50%);" *ngIf="currentSlideIndex !== item.slides.length - 1">
                     <button mat-mini-fab color="primary" (click)="nextSlide()" class="cn-absolute">
                         <mat-icon>chevron_right</mat-icon>
                     </button>

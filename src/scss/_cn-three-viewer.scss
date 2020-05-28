@@ -60,6 +60,7 @@ $cn-three-viewer-visible-layers: 12;
       @extend .pr-2;
       position: relative;
       height: $cn-three-viewer-layer-height;
+      overflow-y: hidden;
 
       &.cn-indent {
         background-color: #eee;

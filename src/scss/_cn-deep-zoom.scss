@@ -1,4 +1,6 @@
 $cn-dz-tools-height: 4rem;
+$cn-dz-layer-height: 2.5rem;
+$cn-dz-layer-count: 12;
 
 .cn-deep-zoom-container {
   @extend .cn-relative;
@@ -10,6 +12,7 @@ $cn-dz-tools-height: 4rem;
   top: 16px;
   left: 16px;
 }
+
 
 .cn-dz-layer-controls {
   @extend .cn-absolute;
@@ -25,14 +28,24 @@ $cn-dz-tools-height: 4rem;
     left: 16px;
   }
 
-  .cn-dz-layer {
-    &:not(:last-child) {
-      @extend .border-bottom;
-    }
+  .cn-dz-layers {
 
-    .cn-dz-layer-preview {
-      width: 3rem;
-      height: 3rem;
+    overflow-y: auto;
+    max-height: $cn-dz-layer-count * $cn-dz-layer-height;
+
+    .cn-dz-layer {
+
+      overflow-y: hidden;
+      height: $cn-dz-layer-height;
+
+      &:not(:last-child) {
+        @extend .border-bottom;
+      }
+
+      .cn-dz-layer-preview {
+        width: $cn-dz-layer-height;
+        height: $cn-dz-layer-height;
+      }
     }
   }
 }
@@ -63,6 +76,6 @@ $cn-dz-tools-height: 4rem;
   bottom: 0;
   left: 0;
   height: $cn-dz-tools-height;
-  background: rgba(0,0,0,.5);
+  background: rgba(0, 0, 0, 0.5);
   color: white;
 }
