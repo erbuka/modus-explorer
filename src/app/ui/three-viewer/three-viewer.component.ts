@@ -167,10 +167,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     this.orbitControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
 
-    this.touchControls = new TouchControls(this.camera, this.containterRef.nativeElement);
+    this.touchControls = new TouchControls(this.camera, this.containterRef.nativeElement, {
+      rotationSpeed: this.item.camera.rotatationSpeed,
+      zoomStep: this.item.camera.zoomStep,
+      zoomDamping: this.item.camera.zoomDamping
+    });
     this.touchControls.enabled = false;
-    this.touchControls.wheelZoomStep = 5;
-    this.touchControls.zoomSpeed = 500;
 
     // Add everything to the scene
     this.scene.add(this.transformControls);
@@ -184,7 +186,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     c.start();
     await this.loadItem();
     console.log(c.getDelta());
-    
+
     // Disable the loading overlay and turn off editor mode by default
     this.showLoading = false;
     this.editorMode = false;
@@ -211,7 +213,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.camera.position.fromArray(this.item.camera.position);
     this.camera.lookAt(this.item.camera.lookAt[0], this.item.camera.lookAt[1], this.item.camera.lookAt[2]);
 
-    // Parallel asset loading
+    // Parallel asset loading. Set up all the promises immediatley without waiting. Might speed up things.
     let resourcePromises: { [name: string]: Promise<ThreeViewerResource> } = {};
 
     if (this.item.models) {
@@ -222,10 +224,10 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
         for (let materialDef of modelDef.materials) {
           for (let meshMaterialDef of materialDef.meshMaterials) {
-            if (meshMaterialDef.map) 
+            if (meshMaterialDef.map)
               resourcePromises[meshMaterialDef.map] = resources.loadTexture(this.router.resolve(meshMaterialDef.map, this.item));
 
-            if (meshMaterialDef.normalMap) 
+            if (meshMaterialDef.normalMap)
               resourcePromises[meshMaterialDef.normalMap] = resources.loadTexture(this.router.resolve(meshMaterialDef.normalMap, this.item));
           }
         }
@@ -234,7 +236,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     }
 
     if (this.item.pinLayers)
-      for (let pinLayerDef of this.item.pinLayers) 
+      for (let pinLayerDef of this.item.pinLayers)
         resourcePromises[pinLayerDef.geometry] = resources.loadPlyMesh(this.router.resolve(pinLayerDef.geometry, this.item));
 
 
@@ -290,7 +292,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
             if (meshMaterialDef.normalMap)
               mat.normalMap = (await resourcePromises[meshMaterialDef.normalMap]) as Texture;
-            
+
             materials.push(mat);
           }
 
@@ -428,7 +430,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     let geometries = await this.resources.loadGeometryFromWavefront(fileChooserResult.data as ArrayBuffer);
     let result = new ThreeViewerModel(this.resources);
 
-    result.title = "Object";
+    result.title = fileChooserResult.file.name;
 
     geometries.forEach(g => {
       let mesh = new Mesh(g.geometry);
@@ -625,7 +627,10 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       type: "3d",
       camera: {
         position: [this.camera.position.x, this.camera.position.y, this.camera.position.z],
-        lookAt: [lookAt.x, lookAt.y, lookAt.z]
+        lookAt: [lookAt.x, lookAt.y, lookAt.z],
+        rotatationSpeed: this.item.camera.rotatationSpeed,
+        zoomStep: this.item.camera.zoomStep,
+        zoomDamping: this.item.camera.zoomDamping
       },
       models: await Promise.all(this.models.children.map(model => model.serialize(binFiles))),
       lights: await Promise.all(this.lights.children.map(light => light.serialize(binFiles))),

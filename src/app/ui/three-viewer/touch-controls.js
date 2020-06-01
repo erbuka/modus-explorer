@@ -65,7 +65,10 @@ export class TouchControls {
      * @param {HTMLElement} domElement 
      * @param {NgZone} zone
      */
-    constructor(camera, domElement) {
+    constructor(camera, domElement, options) {
+
+        if (!options)
+            options = {}
 
         /**
          * @property {PerspectiveCamera} camera
@@ -93,24 +96,13 @@ export class TouchControls {
         });
 
         /**
-         * @property {number} rotationSpeed
+         * @property {object} options
          */
-        this.rotationSpeed = Math.PI;
-
-        /**
-         * @property {number} zoomSpeed
-         */
-        this.zoomSpeed = Number.POSITIVE_INFINITY;
-
-        /**
-         * @property {number} wheelZoomStep
-         */
-        this.wheelZoomStep = 1;
-
-        /**
-         * @property {number} keyboardMovementSpeed
-         */
-        this.keyboardMovementSpeed = 5;
+        this.options = {
+            rotationSpeed: options.rotationSpeed || Math.PI,
+            zoomDamping: options.zoomDamping || Number.POSITIVE_INFINITY,
+            zoomStep: options.zoomStep || 1
+        }
 
         /**
          * @private
@@ -146,26 +138,17 @@ export class TouchControls {
 
         /**
          * @private
-         * @property {object} keyState
-         */
-        this.keyState = {};
-
-
-        /**
-         * @private
          * @property {hammer.Hammer} hammer
          */
         this.hammer = new hammer(this.domElement);
 
         // Setup hammer
-        this.hammer.get("pan").set({ direction: hammer.DIRECTION_ALL });
-        this.hammer.on("pan", this.onPan.bind(this));
+        this.hammer.get("pan").set({ direction: hammer.DIRECTION_ALL, pointers: 0 });
+
+        this.hammer.on("panstart panend panup pandown panleft panright", this.onPan.bind(this));
 
         // Setup mouse/keyboard events
         this.eventHandlers.bind("wheel", this.domElement, this.onMouseWheel.bind(this));
-        this.eventHandlers.bind("keydown", window, this.onKeyDown.bind(this));
-        this.eventHandlers.bind("keyup", window, this.onKeyUp.bind(this));
-
 
         this.forward = new Vector3();
         this.right = new Vector3();
@@ -185,26 +168,9 @@ export class TouchControls {
         let dt = this.clock.getDelta();
 
         if (this.enabled) {
-
-            let fw = this.camera.getWorldDirection(this.forward);
-            let rt = this.right.copy(fw).cross(this.up)
-
-            if (this.keyState["KeyW"]) {
-                this.targetPosition.add(fw.multiplyScalar(this.keyboardMovementSpeed * dt));
-            } else if (this.keyState["KeyS"]) {
-                this.targetPosition.add(fw.multiplyScalar(this.keyboardMovementSpeed * -dt));
-            }
-
-            if (this.keyState["KeyA"]) {
-                this.targetPosition.add(rt.multiplyScalar(this.keyboardMovementSpeed * -dt));
-            } else if (this.keyState["KeyD"]) {
-                this.targetPosition.add(rt.multiplyScalar(this.keyboardMovementSpeed * dt));
-            }
-
-
-
             // Move the camera towards target location
-            moveTowards(this.camera.position, this.targetPosition, this.zoomSpeed * dt);
+            let fw = this.camera.getWorldDirection(this.forward);
+            moveTowards(this.camera.position, this.targetPosition, this.options.zoomDamping * dt);
         }
 
     }
@@ -216,29 +182,11 @@ export class TouchControls {
     onMouseWheel(evt) {
 
         if (this.enabled) {
-
-            let delta = -Math.sign(evt.deltaY) * this.wheelZoomStep;
-
+            let delta = -Math.sign(evt.deltaY) * this.options.zoomStep;
             let dir = new Vector3();
-
             this.camera.getWorldDirection(dir);
-
             this.targetPosition.copy(dir.multiplyScalar(delta).add(this.camera.position));
         }
-    }
-
-    /**
-     * @param {KeyboardEvent} evt 
-     */
-    onKeyDown(evt) {
-        this.keyState[evt.code] = true;
-    }
-
-    /**
-     * @param {KeybaordEvent} evt 
-     */
-    onKeyUp(evt) {
-        delete this.keyState[evt.code];
     }
 
     /**
@@ -250,18 +198,27 @@ export class TouchControls {
 
         if (this.enabled) {
 
-            let srcEvent = evt.srcEvent;
+            if (evt.pointers.length === 1) {
 
-            let dx = -srcEvent.movementX / (this.domElement.clientWidth / 2) * this.rotationSpeed;
-            let dy = srcEvent.movementY / (this.domElement.clientHeight / 2) * this.rotationSpeed;
+                let srcEvent = evt.srcEvent;
 
-            this.raycaster.setFromCamera({
-                x: dx,
-                y: dy
-            }, this.camera);
+                let dx = -srcEvent.movementX / (this.domElement.clientWidth * window.devicePixelRatio * 0.5) * this.options.rotationSpeed;
+                let dy = srcEvent.movementY / (this.domElement.clientHeight * window.devicePixelRatio * 0.5) * this.options.rotationSpeed;
 
-            this.camera.lookAt(this.camera.position.clone().add(this.raycaster.ray.direction));
+                this.raycaster.setFromCamera({
+                    x: dx,
+                    y: dy
+                }, this.camera);
 
+                this.camera.lookAt(this.camera.position.clone().add(this.raycaster.ray.direction));
+
+            } else if (evt.type === "panup" || evt.type === "pandown") {
+                let delta = (evt.type === "panup" ? -1 : 1) * this.options.zoomStep;
+                let dir = new Vector3();
+                this.camera.getWorldDirection(dir);
+                this.targetPosition.copy(dir.multiplyScalar(delta).add(this.camera.position));
+                console.log(delta);
+            }
         }
 
     }

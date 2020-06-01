@@ -1,14 +1,16 @@
 import { PerspectiveCamera } from "three";
 import { NgZone } from "@angular/core";
 
+export type TouchControlsOptions = {
+    rotationSpeed: number;
+    zoomDamping: number;
+    zoomStep: number;
+}
+
 export declare class TouchControls {
     camera: PerspectiveCamera;
     domElement: HTMLElement;
     enabled: boolean;
-    rotationSpeed: number;
-    zoomSpeed: number;
-    wheelZoomStep: number;
-    keyboardMovementSpeed: number;
-    constructor(camera: PerspectiveCamera, domElement: HTMLElement);
+    constructor(camera: PerspectiveCamera, domElement: HTMLElement, options?: Partial<TouchControlsOptions>);
     dispose(): void;
 }

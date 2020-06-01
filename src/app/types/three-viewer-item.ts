@@ -82,7 +82,10 @@ export interface ThreeViewerItem extends ItemBase {
     type: "3d",
     camera: {
         position: ThreeViewerItemVector3,
-        lookAt: ThreeViewerItemVector3
+        lookAt: ThreeViewerItemVector3,
+        rotatationSpeed?: number,
+        zoomStep?: number,
+        zoomDamping?: number
     },
     models?: ThreeViewerItemModel[],
     lights?: ThreeViewerItemLight[],
