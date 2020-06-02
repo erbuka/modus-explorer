@@ -83,7 +83,7 @@ export interface ThreeViewerItem extends ItemBase {
     camera: {
         position: ThreeViewerItemVector3,
         lookAt: ThreeViewerItemVector3,
-        rotatationSpeed?: number,
+        rotationSpeed?: number,
         zoomStep?: number,
         zoomDamping?: number
     },

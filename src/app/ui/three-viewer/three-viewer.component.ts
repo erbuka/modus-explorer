@@ -168,7 +168,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.orbitControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
 
     this.touchControls = new TouchControls(this.camera, this.containterRef.nativeElement, {
-      rotationSpeed: this.item.camera.rotatationSpeed,
+      rotationSpeed: this.item.camera.rotationSpeed,
       zoomStep: this.item.camera.zoomStep,
       zoomDamping: this.item.camera.zoomDamping
     });
@@ -257,8 +257,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
         model.title = modelDef.title;
         model.description = modelDef.description || "";
-        model.previewImage = modelDef.previewImage;
-
+        model.previewImage = modelDef.previewImage ? this.router.resolve(modelDef.previewImage, this.item) : null;
 
         if (pos)
           model.position.fromArray(pos);
@@ -628,7 +627,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       camera: {
         position: [this.camera.position.x, this.camera.position.y, this.camera.position.z],
         lookAt: [lookAt.x, lookAt.y, lookAt.z],
-        rotatationSpeed: this.item.camera.rotatationSpeed,
+        rotationSpeed: this.item.camera.rotationSpeed,
         zoomStep: this.item.camera.zoomStep,
         zoomDamping: this.item.camera.zoomDamping
       },
