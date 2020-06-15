@@ -45,10 +45,10 @@ export class MaterialEditorComponent implements OnInit {
       material[texture] = null;
       material.needsUpdate = true;
     } else {
-      let fileResult = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg,.tga" });
+      let fileResult = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg,.tga,.dds" });
       let url = await this.data.resources.loadArrayBuffer(fileResult.data as ArrayBuffer);
-      let tex = await this.data.resources.loadTexture(url);
-
+      let tex = await this.data.resources.loadTexture(url, fileResult.file.name.endsWith(".dds"));
+      
       material[texture] = tex;
       material.needsUpdate = true;
       tex.premultiplyAlpha = false;

@@ -1,7 +1,8 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, Material, MeshStandardMaterialParameters } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
+import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader';
 import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType, ThreeViewerItemPinLayer, ThreeViewerItemPin } from 'src/app/types/three-viewer-item';
 import { LocalizedText } from 'src/app/types/item';
 import { ErrorEvent } from 'src/app/context.service';
@@ -15,6 +16,7 @@ const computeHash: (data: ArrayBuffer) => Promise<string> = async (data) => {
         (x: number) => x.toString(16).padStart(2, "0")
     ).reduce((prev, curr) => prev + curr, "");
 }
+
 
 export const exportPlyMesh: (meshOrGeometry: Mesh | BufferGeometry) => Promise<ArrayBuffer> = (meshOrGeometry) => {
     let plyExporter = new PLYExporter();
@@ -40,6 +42,14 @@ interface Serializable<T> {
 export class BinaryFiles {
 
     files: Map<string, ArrayBuffer> = new Map();
+
+    async storeTexture(tex: Texture | CompressedTexture): Promise<string> {
+        if (tex && tex.sourceFile) {
+            let ext = tex instanceof CompressedTexture ? "dds" : "bin";
+            return this.store(await (await fetch(tex.sourceFile)).arrayBuffer(), ext);
+        }
+        return Promise.reject(<ErrorEvent>{ description: "Invalid texture or sourceFile property is not set" });
+    }
 
     async store(data: ArrayBuffer, ext: string = "bin"): Promise<string> {
 
@@ -75,10 +85,12 @@ export class ThreeViewerResources {
     private mappedResources: Map<string, Promise<ThreeViewerResource>> = new Map();
     private resources: ThreeViewerResource[] = [];
 
+    private ddsLoader: DDSLoader;
     private textureLoader: TextureLoader;
     private plyLoader: PLYLoader;
 
     constructor() {
+        this.ddsLoader = new DDSLoader();
         this.textureLoader = new TextureLoader();
         this.plyLoader = new PLYLoader();
     }
@@ -129,15 +141,23 @@ export class ThreeViewerResources {
         }
     }
 
-    async loadTexture(url: string): Promise<Texture> {
+    async loadTexture(url: string, compressed?: boolean): Promise<Texture> {
 
         if (this.mappedResources.has(url) && this.mappedResources.get(url)) {
             return this.mappedResources.get(url) as Promise<Texture>;
         } else {
+
+            let loader: TextureLoader | CompressedTextureLoader = null;
+
+            if (compressed === undefined)
+                compressed = url.endsWith(".dds");
+
+            loader = compressed ? this.ddsLoader : this.textureLoader;
+
             let p = new Promise<Texture>((resolve, reject) => {
-                this.textureLoader.load(
+                loader.load(
                     url,
-                    (texture) => resolve(this.track(texture)),
+                    (texture) => { texture.sourceFile = url; resolve(this.track(texture)); },
                     null,
                     (error) => reject(<ErrorEvent>{ description: error.message }));
             });
@@ -604,9 +624,9 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
                 transparent: true,
                 color: 0xffffff
             }));
-        } 
+        }
 
-        if(meshMaterials.length !== this.meshes.length) {
+        if (meshMaterials.length !== this.meshes.length) {
             throw new Error(`Incorrect material count. Expected ${this.meshes.length}, got ${meshMaterials.length}`)
         }
 
@@ -637,15 +657,8 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
         let materials = this._materials.map(async m => {
 
             let meshMaterials = m.meshMaterials.map(async x => {
-                let map = x.map && x.map.image instanceof HTMLImageElement ?
-                    await binFiles.store(await (await fetch(x.map.image.src)).arrayBuffer()) :
-                    undefined;
-
-                let normalMap = x.normalMap && x.normalMap.image instanceof HTMLImageElement ?
-                    await binFiles.store(await (await fetch(x.normalMap.image.src)).arrayBuffer()) :
-                    undefined;
-
-
+                let map = x.map && x.map.sourceFile ? await binFiles.storeTexture(x.map) : undefined;
+                let normalMap = x.normalMap && x.normalMap.sourceFile ? await binFiles.storeTexture(x.normalMap) : undefined;
                 return {
                     color: x.color.getHex(),
                     map: map,
@@ -698,12 +711,12 @@ export type ThreeViewerObject3D = (ThreeViewerModel | ThreeViewerLight | ThreeVi
 export class ThreeViewerGroup<T extends ThreeViewerObject3D> extends Group {
     constructor() { super(); }
     children: T[];
-    add(...o: T[]): this { 
-        super.add(...o); 
-        return this; 
+    add(...o: T[]): this {
+        super.add(...o);
+        return this;
     }
-    remove(...o: T[]): this { 
-        super.remove(...o); 
-        return this; 
+    remove(...o: T[]): this {
+        super.remove(...o);
+        return this;
     }
 }
