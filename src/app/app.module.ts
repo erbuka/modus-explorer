@@ -16,7 +16,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCheckboxModule, MAT_CHECKBOX_DEFAULT_OPTIONS } from '@angular/material/checkbox';
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { AppComponent } from './app.component';
 import { BlockListComponent } from './ui/block-list/block-list.component';
@@ -85,7 +85,7 @@ import { LinkDirective } from './link.directive';
     MatInputModule,
     MatCheckboxModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule,
+    MatProgressBarModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "outline", floatLabel: "always" } },

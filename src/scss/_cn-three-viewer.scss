@@ -1,16 +1,33 @@
 $cn-three-viewer-layer-height: 2.5rem;
 $cn-three-viewer-visible-layers: 12;
 
+.cn-three-viewer-loading {
+  z-index: 1;
+
+  .cn-three-viewer-loading-progress {
+    @extend .cn-absolute;
+    @extend .cn-center;
+    @extend .bg-white;
+    @extend .p-4;
+    @extend .rounded;
+    @extend .mat-elevation-z4;
+
+    width: 15rem;
+
+    .cn-three-viewer-loading-text {
+      @extend .text-primary;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+  }
+}
+
 .cn-three-viewer {
   @extend .cn-relative;
   @extend .w-100;
   @extend .h-100;
   overflow: hidden;
   z-index: 0;
-
-  .cn-three-viewer-loading {
-    z-index: 1;
-  }
 
   .cn-three-viewer-container {
     @extend .cn-absolute;
@@ -55,7 +72,6 @@ $cn-three-viewer-visible-layers: 12;
       overflow-y: auto;
     }
 
-
     .cn-three-viewer-layer {
       @extend .pr-2;
       position: relative;
@@ -67,14 +83,11 @@ $cn-three-viewer-visible-layers: 12;
         border-bottom: none !important;
       }
 
-
       &:not(:last-child) {
         @extend .border-bottom;
       }
-
     }
 
-    
     .cn-three-viewer-layer-preview {
       width: $cn-three-viewer-layer-height;
       height: $cn-three-viewer-layer-height;

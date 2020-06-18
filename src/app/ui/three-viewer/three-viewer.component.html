@@ -27,7 +27,7 @@
     </button>
 </mat-menu>
 
-<div class="cn-three-viewer">
+<div class="cn-three-viewer" [style.display]="loadingScreen.show ? 'none' : 'block'">
 
     <div class="cn-three-viewer-container" #containerRef (tap)="onCanvasClick($event.srcEvent)"></div>
 
@@ -325,9 +325,6 @@
 
     <div class="cn-three-viewer-editor cn-hierarchy" *ngIf="allowEditorMode" [class.cn-hidden]="!editorMode">
 
-
-
-
         <div class="p-2 bg-primary text-primary-contrast d-flex align-items-center">
             <button mat-icon-button [matMenuTriggerFor]="mainMenu">
                 <mat-icon>menu</mat-icon>
@@ -373,19 +370,16 @@
                 </ng-container>
             </div>
 
-
-
         </div>
-
-
 
     </div>
 
+</div>
 
-    <div class="cn-overlay bg-background cn-three-viewer-loading" *ngIf="showLoading">
-        <div class="cn-absolute cn-center">
-            <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
-        </div>
+<div class="cn-overlay cn-three-viewer-loading" *ngIf="loadingScreen.show">
+    <div class="cn-three-viewer-loading-progress">
+        <div class="cn-three-viewer-loading-text text-center mb-2">{{ loadingScreen.text }}</div>
+        <mat-progress-bar [mode]="loadingScreen.mode" [value]="loadingScreen.current / loadingScreen.total * 100">
+        </mat-progress-bar>
     </div>
-
 </div>

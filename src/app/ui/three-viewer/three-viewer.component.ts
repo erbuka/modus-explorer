@@ -21,6 +21,15 @@ import { LocationRouterService } from 'src/app/location-router.service';
 
 type EditorTab = "models" | "lights" | "pins";
 
+type LoadingScreenData = {
+  mode: "determinate" | "indeterminate";
+  show: boolean;
+  text: string;
+  current: number;
+  total: number;
+}
+
+
 @Component({
   selector: 'app-three-viewer',
   templateUrl: './three-viewer.component.html',
@@ -61,10 +70,18 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   height: number = 0;
 
   allowEditorMode: boolean = false;
-  showLoading: boolean = true;
   showLayers: boolean = true;
   selectedPin: ThreeViewerPin = null;
   selectedPinStyle: object = null;
+
+  loadingScreen: LoadingScreenData = {
+    mode: "determinate",
+    show: false,
+    text: "Loading",
+    current: 0,
+    total: 1
+  };
+
 
 
   set editorActiveTab(tab: EditorTab) {
@@ -182,18 +199,13 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.scene.add(this.pins);
 
     // Wait for item to load
-    let c = new Clock();
-    c.start();
     await this.loadItem();
-    console.log(c.getDelta());
 
     // Disable the loading overlay and turn off editor mode by default
-    this.showLoading = false;
     this.editorMode = false;
 
     // Start the render loop (outside angular)
     this.zone.runOutsideAngular(() => {
-      this.resize();
       this.render();
     });
 
@@ -207,6 +219,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   async loadItem(): Promise<void> {
 
     const resources = this.resources;
+
 
     // Setup camera
 
@@ -238,6 +251,14 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     if (this.item.pinLayers)
       for (let pinLayerDef of this.item.pinLayers)
         resourcePromises[pinLayerDef.geometry] = resources.loadPlyMesh(this.router.resolve(pinLayerDef.geometry, this.item));
+
+    // Setup loading screen
+    this.loadingScreen.mode = "determinate";
+    this.loadingScreen.text = "Loading assets";
+    this.loadingScreen.show = true;
+    this.loadingScreen.current = 0;
+    this.loadingScreen.total = Object.entries(resourcePromises).length;
+    Object.values(resourcePromises).forEach(p => p.then(() => this.loadingScreen.current++));
 
 
     // Load models
@@ -303,6 +324,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 
         // Force rendering to upload data to the GPU
+        
         {
           let tempScene = new Scene();
           tempScene.add(model);
@@ -311,6 +333,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
             this.renderer.render(tempScene, this.camera);
           }
         }
+        
 
         model.currentMaterial = modelDef.activeMaterial || 0;
 
@@ -415,6 +438,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 
     // Load other stuff
+
+    // Close loading screen
+    this.loadingScreen.show = false;
 
   }
 
@@ -594,6 +620,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     // This has to run outside angualar zone for performance
     NgZone.assertNotInAngularZone();
 
+    this.resize();
+
     let dt: number = this.clock.getDelta();
     let renderer = this.renderer;
     let w = this.width, h = this.height;
@@ -615,8 +643,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     let lookAt = new Vector3();
     let binFiles = new BinaryFiles();
 
-
-    this.showLoading = true;
+    this.loadingScreen.text = "Saving...";
+    this.loadingScreen.mode = "indeterminate";
+    this.loadingScreen.show = true;
 
     this.camera.getWorldDirection(lookAt);
     lookAt.add(this.camera.position);
@@ -649,7 +678,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         { responseType: "text" }).toPromise()
     }
 
-    this.showLoading = false;
+    this.loadingScreen.show = false;
 
     this.snackBar.open("Scene saved!");
 
