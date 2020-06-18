@@ -376,9 +376,13 @@
 
 </div>
 
-<div class="cn-overlay cn-three-viewer-loading" [appBgImage]="item.loadingBackgroundImage | cnUrl : item" *ngIf="loadingScreen.show">
-    <div class="cn-three-viewer-loading-progress">
-        <div class="cn-three-viewer-loading-text text-center mb-2">{{ loadingScreen.text }}</div>
+<div class="cn-overlay cn-three-viewer-loading" [appBgImage]="item.loadingBackgroundImage | cnUrl : item"
+    *ngIf="loadingScreen.show">
+    <div class="cn-three-viewer-loading-progress text-center">
+        <div class="cn-three-viewer-loading-text">{{ loadingScreen.text }} <span
+                *ngIf="loadingScreen.mode === 'determinate'">({{ loadingScreen.current }}/{{ loadingScreen.total }})</span>
+        </div>
+        <div class="my-2"></div>
         <mat-progress-bar [mode]="loadingScreen.mode" [value]="loadingScreen.current / loadingScreen.total * 100">
         </mat-progress-bar>
     </div>
