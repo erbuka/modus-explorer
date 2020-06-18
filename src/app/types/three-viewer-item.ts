@@ -87,6 +87,7 @@ export interface ThreeViewerItem extends ItemBase {
         zoomStep?: number,
         zoomDamping?: number
     },
+    loadingBackgroundImage?: string;
     models?: ThreeViewerItemModel[],
     lights?: ThreeViewerItemLight[],
     pinLayers?: ThreeViewerItemPinLayer[],

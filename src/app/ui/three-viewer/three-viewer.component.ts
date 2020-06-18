@@ -140,7 +140,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   private _disposed: boolean;
 
   constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
-    private router: LocationRouterService, private dialog: MatDialog) {
+    public router: LocationRouterService, private dialog: MatDialog) {
     this.allowEditorMode = !environment.production;
     this.editorActiveTab = "models";
     this._disposed = false;
@@ -161,7 +161,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.containterRef.nativeElement.appendChild(this.renderer.domElement);
 
     // Resource manager
-    this.resources = new ThreeViewerResources();
+    this.resources = new ThreeViewerResources(this.renderer);
 
     // Raycaster
     this.rayscaster = new Raycaster();
@@ -219,7 +219,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   async loadItem(): Promise<void> {
 
     const resources = this.resources;
-
 
     // Setup camera
 
@@ -321,19 +320,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
           material.description = materialDef.description;
           material.previewImage = materialDef.previewImage;
         }
-
-
-        // Force rendering to upload data to the GPU
-        
-        {
-          let tempScene = new Scene();
-          tempScene.add(model);
-          for (let i = 0; i < model.materials.length; i++) {
-            model.currentMaterial = i;
-            this.renderer.render(tempScene, this.camera);
-          }
-        }
-        
 
         model.currentMaterial = modelDef.activeMaterial || 0;
 

@@ -9,7 +9,7 @@ export class UrlPipe implements PipeTransform {
   constructor(private router: LocationRouterService) { }
 
   transform(value: any, ...args: any[]): any {
-    return this.router.resolve(value, args[0]);
+    return value ? this.router.resolve(value, args[0]) : null;
   }
 
 }

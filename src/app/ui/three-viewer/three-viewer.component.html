@@ -376,7 +376,7 @@
 
 </div>
 
-<div class="cn-overlay cn-three-viewer-loading" *ngIf="loadingScreen.show">
+<div class="cn-overlay cn-three-viewer-loading" [appBgImage]="item.loadingBackgroundImage | cnUrl : item" *ngIf="loadingScreen.show">
     <div class="cn-three-viewer-loading-progress">
         <div class="cn-three-viewer-loading-text text-center mb-2">{{ loadingScreen.text }}</div>
         <mat-progress-bar [mode]="loadingScreen.mode" [value]="loadingScreen.current / loadingScreen.total * 100">

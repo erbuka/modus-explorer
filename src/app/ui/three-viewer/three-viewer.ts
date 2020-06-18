@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneBufferGeometry, MeshBasicMaterial } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
@@ -78,7 +78,7 @@ interface OnRemove {
 
 
 
-export type ThreeViewerResource = Texture | BufferGeometry | MeshStandardMaterial | string;
+export type ThreeViewerResource = Texture | BufferGeometry | MeshStandardMaterial | WebGLRenderTarget | string;
 
 export class ThreeViewerResources {
 
@@ -88,11 +88,18 @@ export class ThreeViewerResources {
     private ddsLoader: DDSLoader;
     private textureLoader: TextureLoader;
     private plyLoader: PLYLoader;
+    private planeGeom: PlaneBufferGeometry;
+    private renderer: WebGLRenderer;
+    private renderTarget: WebGLRenderTarget;
 
-    constructor() {
+    constructor(renderer: WebGLRenderer) {
         this.ddsLoader = new DDSLoader();
         this.textureLoader = new TextureLoader();
         this.plyLoader = new PLYLoader();
+
+        this.planeGeom = this.track(new PlaneBufferGeometry());
+        this.renderer = renderer;
+        this.renderTarget = this.track(new WebGLRenderTarget(128, 128));
     }
 
     track<T extends ThreeViewerResource>(res: T): T {
@@ -107,6 +114,8 @@ export class ThreeViewerResources {
     dispose(): void {
         for (let res of this.resources) {
             if (res instanceof Texture) {
+                res.dispose();
+            } else if (res instanceof WebGLRenderTarget) {
                 res.dispose();
             } else if (res instanceof MeshStandardMaterial) {
                 res.dispose();
@@ -157,7 +166,41 @@ export class ThreeViewerResources {
             let p = new Promise<Texture>((resolve, reject) => {
                 loader.load(
                     url,
-                    (texture) => { texture.sourceFile = url; resolve(this.track(texture)); },
+                    (texture) => {
+
+                        /*
+                            Here we force the texture to be uploaded to the GPU by
+                            using it. It has to be done because ThreeJS will upload the 
+                            texture the first time it is used causing an annoying frame lag
+                        */
+
+                        let renderer = this.renderer
+                        let canvas = renderer.domElement;
+
+                        canvas.width = 128;
+                        canvas.height = 128;
+
+                        let scene = new Scene();
+                        let camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 1, 10);
+                        let mesh = new Mesh(this.planeGeom, new MeshBasicMaterial({ map: texture, color: "#ffffff" }));
+
+                        mesh.position.set(0, 0, -2);
+
+                        scene.add(mesh);
+
+                        renderer.setRenderTarget(this.renderTarget);
+                        renderer.setViewport(0, 0, canvas.width, canvas.height);
+                        renderer.setClearColor(0, 0);
+                        renderer.clear();
+                        renderer.render(scene, camera);
+                        renderer.setRenderTarget(null);
+
+                        texture.sourceFile = url;
+
+                        scene.dispose();
+
+                        resolve(this.track(texture));
+                    },
                     null,
                     (error) => reject(<ErrorEvent>{ description: error.message }));
             });

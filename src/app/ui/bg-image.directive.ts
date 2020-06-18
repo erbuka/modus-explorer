@@ -11,8 +11,14 @@ export class BgImageDirective implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['url']) {
-      let css = this.url.indexOf("blob") >= 0 ? this.url : `url('${this.url}`;
-      this.renderer.setStyle(this.element.nativeElement, "background-image",  `url('${this.url}`);
+
+      if(this.url) {
+        let css = this.url.indexOf("blob") >= 0 ? this.url : `url('${this.url}`;
+        this.renderer.setStyle(this.element.nativeElement, "background-image",  `url('${this.url}`);
+      } else {
+        this.renderer.setStyle(this.element.nativeElement, "background-image",  null);
+      }
+
     }
   }
 

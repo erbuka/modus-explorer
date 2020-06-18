@@ -4,6 +4,8 @@ $cn-three-viewer-visible-layers: 12;
 .cn-three-viewer-loading {
   z-index: 1;
 
+  @extend .cn-bg-cover;
+
   .cn-three-viewer-loading-progress {
     @extend .cn-absolute;
     @extend .cn-center;
