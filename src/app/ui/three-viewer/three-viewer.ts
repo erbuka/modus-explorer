@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneBufferGeometry, MeshBasicMaterial } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneBufferGeometry, MeshBasicMaterial, Int32BufferAttribute, BufferAttribute } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
@@ -240,6 +240,7 @@ export class ThreeViewerResources {
             let count = 0;
 
             loader.setUseOAsMesh(true);
+            loader.setUseIndices(true);
 
             loader.setCallbackOnAssetAvailable((asset) => {
 
@@ -254,6 +255,9 @@ export class ThreeViewerResources {
 
                     if (asset.buffers.uvs)
                         geometry.setAttribute("uv", new Float32BufferAttribute(asset.buffers.uvs, 2));
+
+                    if (asset.buffers.indices)
+                        geometry.setIndex(new BufferAttribute(asset.buffers.indices, 1));
 
                     let name = asset.params.meshName ? asset.params.meshName : `mesh${count++}`;
 

@@ -58,12 +58,29 @@
                 <button mat-icon-button (click)="tool='pan'" [class.cn-opacity-50]="tool !== 'pan'">
                     <mat-icon>pan_tool</mat-icon>
                 </button>
-                <button mat-button [matMenuTriggerFor]="unitsMenu" [class.cn-opacity-50]="tool !== 'measure'">
+
+                <button mat-icon-button (click)="tool='measure'" [class.cn-opacity-50]="tool !== 'measure'">
                     <mat-icon>square_foot</mat-icon>
+                </button>
+
+
+                <div class="border border-white rounded p-2" style="width: 8rem;"
+                    [matMenuTriggerFor]="unitsMenu" [class.cn-opacity-50]="tool !== 'measure'">
+                    <div class="float-right">
+                        <span>&#x25B4;</span>
+                    </div>
+                    <span *ngIf="measureUnit==='pixels'">Pixels</span>
+                    <span *ngIf="measureUnit==='inches'">Inches</span>
+                    <span *ngIf="measureUnit==='centimeters'">Centimeters</span>
+                </div>
+
+                <!--
+                <button mat-button [matMenuTriggerFor]="unitsMenu" [class.cn-opacity-50]="tool !== 'measure'">
                     <span *ngIf="measureUnit==='pixels'">Pixels</span>
                     <span *ngIf="measureUnit==='inches'">Inches</span>
                     <span *ngIf="measureUnit==='centimeters'">Centimeters</span>
                 </button>
+                -->
                 <div class="ml-auto"></div>
                 <span style="width: 2.5rem">
                     {{formattedZoom}}

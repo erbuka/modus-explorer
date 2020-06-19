@@ -12,6 +12,40 @@ import { Item } from 'src/app/types/item';
 import { SlideshowItem, SlideShowItemGroup } from 'src/app/types/slideshow-item';
 import { LocationRouterService } from 'src/app/location-router.service';
 
+type Styles = { [key: string]: string | number };
+
+const createSlideAnimation = function (normal: Styles, next: Styles, previous: Styles) {
+
+  const time = "0.25s";
+
+  return [
+    transition(':increment',
+      group([
+        query(":enter", [
+          style(next),
+          animate(time, style(normal))
+        ]),
+        query(":leave", [
+          animate(time, style(previous))
+        ], { optional: true }),
+      ])
+    ),
+    transition(':decrement',
+      group([
+        query(":enter", [
+          style(previous),
+          animate(time, style(normal))
+        ]),
+        query(":leave", [
+          animate(time, style(next))
+        ], { optional: true }),
+      ])
+    )
+  ]
+}
+
+
+
 
 
 @Component({
@@ -19,30 +53,12 @@ import { LocationRouterService } from 'src/app/location-router.service';
   templateUrl: './slideshow.component.html',
   styleUrls: ['./slideshow.component.scss'],
   animations: [
-    trigger('slideAnimation', [
-      transition(':increment',
-        group([
-          query(":enter", [
-            style({ transform: "translateX(100%)" }),
-            animate("0.25s", style({ transform: "translateX(0)" }))
-          ]),
-          query(":leave", [
-            animate("0.25s", style({ transform: "translateX(-100%)" }))
-          ], { optional: true }),
-        ])
-      ),
-      transition(':decrement',
-        group([
-          query(":enter", [
-            style({ transform: "translateX(-100%)" }),
-            animate("0.25s", style({ transform: "translateX(0)" }))
-          ]),
-          query(":leave", [
-            animate("0.25s", style({ transform: "translateX(100%)" }))
-          ], { optional: true }),
-        ])
-      )
-    ])
+    trigger('slideAnimation', createSlideAnimation({ transform: "translateX(0)" }, { transform: "translateX(100%)" }, { transform: "translateX(-100%)" })),
+    trigger('fadeAnimation', createSlideAnimation(
+      { opacity: 1, transform: "translateX(0)" },
+      { opacity: 0, transform: "translateX(30%)" },
+      { opacity: 0, transform: "translateX(-30%)" }
+    ))
   ]
 })
 export class SlideshowComponent implements OnInit {
@@ -82,7 +98,7 @@ export class SlideshowComponent implements OnInit {
     });
   }
 
-  get simpleMode():boolean {
+  get simpleMode(): boolean {
     return this.item.options.mode === "simple";
   }
 
@@ -110,7 +126,7 @@ export class SlideshowComponent implements OnInit {
     return this.item.slides.filter(s => s.group === groupName);
   }
 
-  getSlideGroup(s:number):SlideShowItemGroup {
+  getSlideGroup(s: number): SlideShowItemGroup {
     return this.item.groups.find(x => x.name === this.item.slides[s].group);
   }
 
