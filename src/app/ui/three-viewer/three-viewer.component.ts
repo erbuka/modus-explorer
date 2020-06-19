@@ -75,8 +75,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   selectedPinStyle: object = null;
 
   loadingScreen: LoadingScreenData = {
-    mode: "determinate",
-    show: false,
+    mode: "indeterminate",
+    show: true,
     text: "Loading",
     current: 0,
     total: 1
