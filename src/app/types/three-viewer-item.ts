@@ -78,6 +78,8 @@ export interface ThreeViewerItemPinLayer {
 
 // Base Item
 
+export type ThreeViewerItemCameraControls = "orbit" | "fly";
+
 export interface ThreeViewerItem extends ItemBase {
     type: "3d",
     camera: {
@@ -85,7 +87,8 @@ export interface ThreeViewerItem extends ItemBase {
         lookAt: ThreeViewerItemVector3,
         rotationSpeed?: number,
         zoomStep?: number,
-        zoomDamping?: number
+        zoomDamping?: number,
+        controls?: ThreeViewerItemCameraControls
     },
     loadingBackgroundImage?: string;
     models?: ThreeViewerItemModel[],

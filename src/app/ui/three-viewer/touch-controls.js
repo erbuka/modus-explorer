@@ -99,9 +99,9 @@ export class TouchControls {
          * @property {object} options
          */
         this.options = {
-            rotationSpeed: options.rotationSpeed || Math.PI,
-            zoomDamping: options.zoomDamping || Number.POSITIVE_INFINITY,
-            zoomStep: options.zoomStep || 1
+            rotationSpeed: options.rotationSpeed,
+            zoomDamping: options.zoomDamping,
+            zoomStep: options.zoomStep
         }
 
         /**
@@ -202,8 +202,12 @@ export class TouchControls {
 
                 let srcEvent = evt.srcEvent;
 
-                let dx = -srcEvent.movementX / (this.domElement.clientWidth * window.devicePixelRatio * 0.5) * this.options.rotationSpeed;
-                let dy = srcEvent.movementY / (this.domElement.clientHeight * window.devicePixelRatio * 0.5) * this.options.rotationSpeed;
+                //let dx = -srcEvent.movementX / (this.domElement.clientHeight * window.devicePixelRatio * 0.5) * this.options.rotationSpeed;
+                //let dy = srcEvent.movementY / (this.domElement.clientHeight * window.devicePixelRatio * 0.5) * this.options.rotationSpeed;
+
+                let dx = -srcEvent.movementX / this.domElement.clientHeight * this.options.rotationSpeed * 2.0 * Math.PI;
+                let dy = srcEvent.movementY / this.domElement.clientHeight * this.options.rotationSpeed * 2.0 * Math.PI;
+
 
                 this.raycaster.setFromCamera({
                     x: dx,

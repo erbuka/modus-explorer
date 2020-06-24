@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, ChangeDetectorRef, OnChanges, DoCheck } from '@angular/core';
-import { ThreeViewerItem, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
+import { ThreeViewerItem, ThreeViewerItemLightType, ThreeViewerItemCameraControls } from 'src/app/types/three-viewer-item';
 import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper, BufferGeometry, Texture } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService, FileChooserResult } from 'src/app/context.service';
@@ -57,8 +57,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   scene: Scene = null;
   renderer: WebGLRenderer = null;
 
-  touchControls: TouchControls = null;
-  orbitControls: OrbitControls = null;
+  controls: TouchControls | OrbitControls = null;
+  editorControls: OrbitControls = null;
   transformControls: TransformControls = null;
   gridHelper: GridHelper = null;
 
@@ -109,8 +109,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   set editorMode(value: boolean) {
     this._editorMode = value;
 
-    this.touchControls.enabled = !value;
-    this.orbitControls.enabled = value;
+    this.controls.enabled = !value;
+    this.editorControls.enabled = value;
     this.transformControls.enabled = value;
     this.gridHelper.visible = value;
     this.selectedObject = null;
@@ -178,18 +178,13 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     // Transform controls
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
-    this.transformControls.addEventListener('dragging-changed', (evt) => this.orbitControls.enabled = !evt.value);
+    this.transformControls.addEventListener('dragging-changed', (evt) => this.editorControls.enabled = !evt.value);
 
     // Orbit and touch controls
 
-    this.orbitControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
+    this.editorControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
 
-    this.touchControls = new TouchControls(this.camera, this.containterRef.nativeElement, {
-      rotationSpeed: this.item.camera.rotationSpeed,
-      zoomStep: this.item.camera.zoomStep,
-      zoomDamping: this.item.camera.zoomDamping
-    });
-    this.touchControls.enabled = false;
+
 
     // Add everything to the scene
     this.scene.add(this.transformControls);
@@ -221,9 +216,24 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     const resources = this.resources;
 
     // Setup camera
-
     this.camera.position.fromArray(this.item.camera.position);
     this.camera.lookAt(this.item.camera.lookAt[0], this.item.camera.lookAt[1], this.item.camera.lookAt[2]);
+
+    // Controls
+    const controlsType: ThreeViewerItemCameraControls = this.item.camera.controls || "fly";
+
+    if (controlsType === "fly") {
+      this.controls = new TouchControls(this.camera, this.containterRef.nativeElement, {
+        rotationSpeed: this.item.camera.rotationSpeed || 1.0,
+        zoomStep: this.item.camera.zoomStep || 1.0,
+        zoomDamping: this.item.camera.zoomDamping || Number.POSITIVE_INFINITY
+      });
+    } else { // orbit
+      this.controls = new OrbitControls(this.camera, this.containterRef.nativeElement);
+      this.controls.rotateSpeed = this.item.camera.rotationSpeed || 1.0;
+      this.controls.zoomSpeed = this.item.camera.zoomStep || 1.0;
+      this.controls.enablePan = false;
+    }
 
     // Parallel asset loading. Set up all the promises immediatley without waiting. Might speed up things.
     let resourcePromises: { [name: string]: Promise<ThreeViewerResource> } = {};
@@ -560,8 +570,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     };
 
-    if (this.touchControls)
-      this.touchControls.dispose();
+    if (this.controls)
+      this.controls.dispose();
 
     if (this.transformControls)
       this.transformControls.dispose();
