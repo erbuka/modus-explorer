@@ -75,7 +75,7 @@ export class SlideshowComponent extends State implements OnInit {
   }
 
   saveState(data: StateData): void {
-    console.log("SlideShowComponent.saveState()");
+    //console.log("SlideShowComponent.saveState()");
     this.state.saveState(data);
   }
 

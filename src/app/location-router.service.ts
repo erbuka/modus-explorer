@@ -7,7 +7,7 @@ import { StateData } from './classes/state';
 
 type QueryParams = { [key: string]: any };
 
-export type LocationRoute = {
+type LocationRoute = {
   url: string,
   path: string,
   queryString: string
@@ -69,8 +69,6 @@ export class LocationRouterService {
 
   update() {
     let newLoc = this.parseLocation(this.location.path());
-
-    console.log(newLoc);
 
     if (newLoc.url !== this.url.value)
       this.url.next(newLoc.url);
