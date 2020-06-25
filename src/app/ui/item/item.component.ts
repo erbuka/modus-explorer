@@ -15,7 +15,7 @@ export class ItemComponent extends State implements OnInit {
   constructor(@SkipSelf() private state: State) { super(); }
 
   saveState(data: StateData): void {
-    console.log("ItemComponent.saveState()");
+    //console.log("ItemComponent.saveState()");
     this.state.saveState(data);
   }
 

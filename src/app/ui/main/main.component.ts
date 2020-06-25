@@ -24,7 +24,7 @@ export class MainComponent extends State implements OnInit {
   }
 
   saveState(data: StateData): void {
-    console.log("MainComponent.saveState()");
+    //console.log("MainComponent.saveState()");
     this.router.saveState(data);
   }
 

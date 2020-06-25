@@ -39,7 +39,7 @@ export class LocationRouterService {
 
   saveState(data: StateData): void {
     this.location.replaceState(this.path.value, this.queryString.value, data);
-    console.log("LocationRouter.saveState()", this.location.getState());
+    //console.log("LocationRouter.saveState()", this.location.getState());
   }
 
   back(): void {

@@ -341,7 +341,7 @@ export class LeafletDeepZoomComponent implements OnInit {
       center: [center.lat, center.lng]
     };
 
-    console.log("DeepZoomComponent.saveState()");
+    //console.log("DeepZoomComponent.saveState()");
     this.state.saveState(state);
 
   }
