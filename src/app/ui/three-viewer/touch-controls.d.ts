@@ -7,10 +7,14 @@ export type TouchControlsOptions = {
     zoomStep: number;
 }
 
+
 export declare class TouchControls {
     camera: PerspectiveCamera;
     domElement: HTMLElement;
     enabled: boolean;
     constructor(camera: PerspectiveCamera, domElement: HTMLElement, options?: Partial<TouchControlsOptions>);
     dispose(): void;
+
+    addEventListener(evt: "change", handler: (target: TouchControls) => void);
+
 }

@@ -228,11 +228,17 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         zoomStep: this.item.camera.zoomStep || 1.0,
         zoomDamping: this.item.camera.zoomDamping || Number.POSITIVE_INFINITY
       });
+
+      this.controls.addEventListener("change", (evt) => console.log(evt));
+
     } else { // orbit
       this.controls = new OrbitControls(this.camera, this.containterRef.nativeElement);
       this.controls.rotateSpeed = this.item.camera.rotationSpeed || 1.0;
       this.controls.zoomSpeed = this.item.camera.zoomStep || 1.0;
       this.controls.enablePan = false;
+
+      this.controls.addEventListener("change", (evt) => console.log(evt));
+
     }
 
     // Parallel asset loading. Set up all the promises immediatley without waiting. Might speed up things.
@@ -654,7 +660,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         lookAt: [lookAt.x, lookAt.y, lookAt.z],
         rotationSpeed: this.item.camera.rotationSpeed,
         zoomStep: this.item.camera.zoomStep,
-        zoomDamping: this.item.camera.zoomDamping
+        zoomDamping: this.item.camera.zoomDamping,
+        controls: this.item.camera.controls
       },
       models: await Promise.all(this.models.children.map(model => model.serialize(binFiles))),
       lights: await Promise.all(this.lights.children.map(light => light.serialize(binFiles))),

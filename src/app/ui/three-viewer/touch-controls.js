@@ -19,6 +19,8 @@ const moveTowards = function (pos, target, maxSpeed) {
         let dir = target.clone().sub(pos).normalize();
         pos.add(dir.multiplyScalar(maxSpeed));
     }
+
+    return len;
 }
 
 
@@ -57,7 +59,35 @@ class EventHandlers {
 }
 
 
-export class TouchControls {
+class EventDispatcher {
+
+    constructor() {
+        this._handlers = [];
+    }
+
+    addEventListener(event, handler) {
+        this._handlers.push({
+            event: event,
+            handler: handler
+        });
+    }
+
+    dispatch(event, ...params) {
+        this._handlers
+            .filter(x => x.event === event)
+            .map(x => x.handler)
+            .forEach(h => h(...params));
+    }
+
+
+    dispose() {
+        this._handlers = [];
+    }
+
+}
+
+
+export class TouchControls extends EventDispatcher {
 
     /**
      * 
@@ -66,6 +96,8 @@ export class TouchControls {
      * @param {NgZone} zone
      */
     constructor(camera, domElement, options) {
+
+        super();
 
         if (!options)
             options = {}
@@ -170,7 +202,11 @@ export class TouchControls {
         if (this.enabled) {
             // Move the camera towards target location
             let fw = this.camera.getWorldDirection(this.forward);
-            moveTowards(this.camera.position, this.targetPosition, this.options.zoomDamping * dt);
+            let len = moveTowards(this.camera.position, this.targetPosition, this.options.zoomDamping * dt);
+
+            if (len > 0)
+                this.dispatch("change", this);
+
         }
 
     }
@@ -216,12 +252,13 @@ export class TouchControls {
 
                 this.camera.lookAt(this.camera.position.clone().add(this.raycaster.ray.direction));
 
+                this.dispatch("change", this);
+
             } else if (evt.type === "panup" || evt.type === "pandown") {
                 let delta = (evt.type === "panup" ? -1 : 1) * this.options.zoomStep;
                 let dir = new Vector3();
                 this.camera.getWorldDirection(dir);
                 this.targetPosition.copy(dir.multiplyScalar(delta).add(this.camera.position));
-                console.log(delta);
             }
         }
 
