@@ -1,27 +1,45 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, Inject, Query } from '@angular/core';
 import { Location, APP_BASE_HREF, DOCUMENT } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { Item } from './types/item';
 import { HttpClient } from '@angular/common/http';
+import { StateData } from './classes/state';
+
+type QueryParams = { [key: string]: any };
 
 export type LocationRoute = {
-  path: string;
-  params: { [key: string]: any };
+  url: string,
+  path: string,
+  queryString: string
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class LocationRouterService extends BehaviorSubject<LocationRoute> {
+export class LocationRouterService {
+
+  url: BehaviorSubject<string> = new BehaviorSubject(null);
+  path: BehaviorSubject<string> = new BehaviorSubject(null);
+  queryString: BehaviorSubject<string> = new BehaviorSubject(null);
+  queryParams: BehaviorSubject<QueryParams> = new BehaviorSubject(null);
 
   constructor(private location: Location, @Inject(APP_BASE_HREF) private baseHref: string, @Inject(DOCUMENT) private document: Document) {
-    super(null);
     this.location.onUrlChange((url, state) => this.update());
     this.update();
   }
 
   isRoot(): boolean {
-    return this.value.path === this.baseHref;
+    return this.path.value === this.baseHref;
+  }
+
+  getState(): StateData | null {
+    let state = this.location.getState();
+    return state || null;
+  }
+
+  saveState(data: StateData): void {
+    this.location.replaceState(this.path.value, this.queryString.value, data);
+    console.log("LocationRouter.saveState()", this.location.getState());
   }
 
   back(): void {
@@ -29,7 +47,7 @@ export class LocationRouterService extends BehaviorSubject<LocationRoute> {
   }
 
   navigate(uri: string, replace: boolean = false): void {
-    
+
     uri = this.normalize(uri);
 
     if (this.isExternal(uri)) {
@@ -50,7 +68,31 @@ export class LocationRouterService extends BehaviorSubject<LocationRoute> {
   }
 
   update() {
-    this.next(this.parseLocation(this.location.path()));
+    let newLoc = this.parseLocation(this.location.path());
+
+    console.log(newLoc);
+
+    if (newLoc.url !== this.url.value)
+      this.url.next(newLoc.url);
+
+    if (newLoc.path !== this.path.value)
+      this.path.next(newLoc.path);
+
+    if (newLoc.queryString !== this.queryString.value) {
+
+      let queryString = newLoc.queryString;
+      let params: QueryParams = {};
+
+      for (let p of queryString.split("&")) {
+        let [key, val] = p.split("=");
+        params[key] = val;
+      }
+
+      this.queryString.next(newLoc.queryString);
+      this.queryParams.next(params);
+
+    }
+
   }
 
   join(...pieces: string[]): string {
@@ -104,22 +146,14 @@ export class LocationRouterService extends BehaviorSubject<LocationRoute> {
 
   }
 
-  private parseLocation(uri: string): LocationRoute {
+  private parseLocation(url: string): LocationRoute {
 
-    let [path, queryString] = this.normalize(uri).split("?");
-
-    let params = {};
-
-    if (queryString) {
-      for (let p of queryString.split("&")) {
-        let [key, val] = p.split("=");
-        params[key] = val;
-      }
-    }
+    let [path, queryString] = this.normalize(url).split("?");
 
     let result = {
+      url: url,
       path: path,
-      params: params
+      queryString: queryString ? queryString : ""
     }
 
     return result;

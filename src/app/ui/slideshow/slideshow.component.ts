@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, forwardRef, SkipSelf } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import {
   trigger,
@@ -11,6 +11,7 @@ import {
 import { Item } from 'src/app/types/item';
 import { SlideshowItem, SlideShowItemGroup } from 'src/app/types/slideshow-item';
 import { LocationRouterService } from 'src/app/location-router.service';
+import { State, StateData } from 'src/app/classes/state';
 
 type Styles = { [key: string]: string | number };
 
@@ -52,6 +53,7 @@ const createSlideAnimation = function (normal: Styles, next: Styles, previous: S
   selector: 'app-slideshow',
   templateUrl: './slideshow.component.html',
   styleUrls: ['./slideshow.component.scss'],
+  providers: [{ provide: State, useExisting: forwardRef(() => SlideshowComponent) }],
   animations: [
     trigger('slideAnimation', createSlideAnimation({ transform: "translateX(0)" }, { transform: "translateX(100%)" }, { transform: "translateX(-100%)" })),
     trigger('fadeAnimation', createSlideAnimation(
@@ -61,25 +63,37 @@ const createSlideAnimation = function (normal: Styles, next: Styles, previous: S
     ))
   ]
 })
-export class SlideshowComponent implements OnInit {
+export class SlideshowComponent extends State implements OnInit {
 
   @Input() item: SlideshowItem = null;
 
   currentSlideIndex: number = null;
   slideItemsCache: Item[] = null;
 
-  constructor(private context: ContextService, private router: LocationRouterService) { }
+  constructor(private context: ContextService, private router: LocationRouterService, @SkipSelf() private state: State) {
+    super();
+  }
+
+  saveState(data: StateData): void {
+    console.log("SlideShowComponent.saveState()");
+    this.state.saveState(data);
+  }
+
+  getState():StateData {
+    return this.state.getState();
+  }
+
 
   ngOnInit() {
 
     this.slideItemsCache = new Array<Item>(this.item.slides.length);
     this.slideItemsCache.fill(null, 0, this.slideItemsCache.length);
 
-    this.router.subscribe(route => {
+    this.router.queryParams.subscribe(params => {
 
-      if (route.params["s"]) {
+      if (params["s"]) {
 
-        let slideIndex = parseInt(route.params["s"]);
+        let slideIndex = parseInt(params["s"]);
 
         if (slideIndex >= 0) {
 

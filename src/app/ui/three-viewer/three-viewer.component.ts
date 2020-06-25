@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, ChangeDetectorRef, OnChanges, DoCheck } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, ChangeDetectorRef, OnChanges, DoCheck, forwardRef, SkipSelf } from '@angular/core';
 import { ThreeViewerItem, ThreeViewerItemLightType, ThreeViewerItemCameraControls } from 'src/app/types/three-viewer-item';
 import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper, BufferGeometry, Texture } from 'three';
 import { environment } from 'src/environments/environment';
@@ -17,6 +17,7 @@ import { PinLayerEditorComponent, PinLayerEditorData } from './pin-layer-editor/
 
 import { moveItemInArray } from '@angular/cdk/drag-drop'
 import { LocationRouterService } from 'src/app/location-router.service';
+import { State, StateData } from 'src/app/classes/state';
 
 
 type EditorTab = "models" | "lights" | "pins";
@@ -33,7 +34,7 @@ type LoadingScreenData = {
 @Component({
   selector: 'app-three-viewer',
   templateUrl: './three-viewer.component.html',
-  styleUrls: ['./three-viewer.component.scss']
+  styleUrls: ['./three-viewer.component.scss'],
 })
 export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
@@ -140,7 +141,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   private _disposed: boolean;
 
   constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
-    public router: LocationRouterService, private dialog: MatDialog) {
+    public router: LocationRouterService, private dialog: MatDialog, private state: State) {
     this.allowEditorMode = !environment.production;
     this.editorActiveTab = "models";
     this._disposed = false;
@@ -196,6 +197,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     // Wait for item to load
     await this.loadItem();
 
+
+
     // Disable the loading overlay and turn off editor mode by default
     this.editorMode = false;
 
@@ -215,9 +218,20 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     const resources = this.resources;
 
+    // Load saved state
+    let state = this.state.getState();
+
+    let cameraPosition = this.item.camera.position;
+    let cameraLookAt = this.item.camera.lookAt;
+
+    if (state) {
+      cameraPosition = state.cameraPosition;
+      cameraLookAt = state.cameraLookAt;
+    }
+
     // Setup camera
-    this.camera.position.fromArray(this.item.camera.position);
-    this.camera.lookAt(this.item.camera.lookAt[0], this.item.camera.lookAt[1], this.item.camera.lookAt[2]);
+    this.camera.position.fromArray(cameraPosition);
+    this.camera.lookAt(cameraLookAt[0], cameraLookAt[1], cameraLookAt[2]);
 
     // Controls
     const controlsType: ThreeViewerItemCameraControls = this.item.camera.controls || "fly";
@@ -229,7 +243,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         zoomDamping: this.item.camera.zoomDamping || Number.POSITIVE_INFINITY
       });
 
-      this.controls.addEventListener("change", (evt) => console.log(evt));
+      this.controls.addEventListener("change", (evt) => this.saveState());
 
     } else { // orbit
       this.controls = new OrbitControls(this.camera, this.containterRef.nativeElement);
@@ -237,7 +251,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       this.controls.zoomSpeed = this.item.camera.zoomStep || 1.0;
       this.controls.enablePan = false;
 
-      this.controls.addEventListener("change", (evt) => console.log(evt));
+      this.controls.addEventListener("change", (evt) => this.saveState());
 
     }
 
@@ -443,6 +457,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     // Close loading screen
     this.loadingScreen.show = false;
+    
+    // Save the state again
+    this.saveState();
 
   }
 
@@ -816,6 +833,18 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   private updateCamera(dt: number): void {
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
+  }
+
+  private saveState(): void {
+    console.log("ThreeViewerComponent.saveState()");
+
+    let lookDir = this.camera.getWorldDirection(new Vector3());
+    let lookAt = new Vector3().copy(this.camera.position).add(lookDir);
+
+    this.state.saveState({
+      cameraPosition: this.camera.position.toArray(),
+      cameraLookAt: lookAt.toArray()
+    });
   }
 
 }

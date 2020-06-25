@@ -1,30 +1,44 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterContentInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterContentInit, forwardRef } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import { Item } from 'src/app/types/item';
 import { LocationRouterService } from 'src/app/location-router.service';
 import { ConfigLocale } from 'src/app/types/config';
+import { State, StateData } from 'src/app/classes/state';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
-  styleUrls: ['./main.component.scss']
+  styleUrls: ['./main.component.scss'],
+  providers: [{ provide: State, useExisting: forwardRef(() => MainComponent) }]
 })
-export class MainComponent implements OnInit {
+export class MainComponent extends State implements OnInit {
+ 
 
   @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
   locales: ConfigLocale[] = null;
   item: Item = null;
 
-  constructor(public context: ContextService, private router: LocationRouterService) { }
+  constructor(public context: ContextService, private router: LocationRouterService) { 
+    super();
+  }
+
+  saveState(data: StateData): void {
+    console.log("MainComponent.saveState()");
+    this.router.saveState(data);
+  }
+
+  getState():StateData {
+    return this.router.getState();
+  }
 
   ngOnInit(): void {
 
     this.locales = this.context.getLocales();
 
-    this.router.subscribe(v => {
+    this.router.path.subscribe(v => {
 
-      this.context.getItem(v.path, false).subscribe({
+      this.context.getItem(v, false).subscribe({
         next: item => {
           this.item = item;
           this.resetContentScrollTop();
@@ -49,8 +63,8 @@ export class MainComponent implements OnInit {
     this.router.navigate(this.router.resolve("..", this.item));
   }
 
-  resetContentScrollTop():void {
-    if(this.appContentElmt != null) {
+  resetContentScrollTop(): void {
+    if (this.appContentElmt != null) {
       this.appContentElmt.nativeElement.scrollTop = 0;
     }
   }

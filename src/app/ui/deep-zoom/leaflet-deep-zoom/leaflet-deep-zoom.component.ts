@@ -7,6 +7,7 @@ import { LeafletDeepImageLayer } from './leaflet-deep-image-layer';
 import { LeafletMeasureLayer } from './leaflet-measure-layer';
 import { NavigatorTrackBounds, NavigatorPanEvent } from '../navigator/navigator.component';
 import { LocationRouterService } from 'src/app/location-router.service';
+import { State } from 'src/app/classes/state';
 
 
 const MEASURE_LAYER_PANE = "dz-measure-pane";
@@ -35,7 +36,8 @@ export class LeafletDeepZoomComponent implements OnInit {
   _tool: DeepZoomTools = "pan";
   _measureUnit: DeepZoomMeasureUnit = "centimeters";
 
-  constructor(private context: ContextService, private router: LocationRouterService) { }
+  constructor(private context: ContextService, private router: LocationRouterService, private state: State) { }
+
 
 
   get viewportAspectRatio(): number {
@@ -152,11 +154,13 @@ export class LeafletDeepZoomComponent implements OnInit {
     // Setup map listeners 
     this.map.on("move", () => {
       this.updateNavigatorBounds();
+      this.saveState();
     });
 
     this.map.on("zoom", () => {
       this.updateNavigatorBounds();
       this.updateLayers();
+      this.saveState();
     });
 
     // Create the layers
@@ -171,11 +175,18 @@ export class LeafletDeepZoomComponent implements OnInit {
 
     this.map.setMinZoom(this.map.getBoundsZoom(bounds));
 
-    // Reset the camera
-    this.resetCamera();
 
     // Set tool 
     this.tool = this._tool;
+
+    let state = this.state.getState();
+
+    if (state) {
+      this.map.setView(state.center, state.zoom);
+    } else {
+      // Reset the camera
+      this.resetCamera();
+    }
 
   }
 
@@ -320,4 +331,18 @@ export class LeafletDeepZoomComponent implements OnInit {
 
   }
 
+
+  private saveState(): void {
+
+    let center = this.map.getBounds().getCenter();
+
+    let state = {
+      zoom: this.map.getZoom(),
+      center: [center.lat, center.lng]
+    };
+
+    console.log("DeepZoomComponent.saveState()");
+    this.state.saveState(state);
+
+  }
 }
