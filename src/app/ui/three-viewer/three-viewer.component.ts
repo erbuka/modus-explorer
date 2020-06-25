@@ -795,7 +795,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   @HostListener("keydown", ["$event"])
   onKeyDown(evt: KeyboardEvent) {
 
-    if (evt.code === "KeyQ") {
+    if (evt.code === "KeyQ" && !environment.production) {
       console.log(this.renderer.info);
     }
 
@@ -836,7 +836,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   private saveState(): void {
-    console.log("ThreeViewerComponent.saveState()");
+    //console.log("ThreeViewerComponent.saveState()");
 
     let lookDir = this.camera.getWorldDirection(new Vector3());
     let lookAt = new Vector3().copy(this.camera.position).add(lookDir);
