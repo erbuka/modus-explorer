@@ -66,6 +66,7 @@ export class BinaryFiles {
 
 interface EditorMode {
     setEditorMode(enabled: boolean);
+    setSelected(selected: boolean);
 }
 
 interface OnAdd {
@@ -384,6 +385,7 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 
 
     setEditorMode(enabled: boolean) { }
+    setSelected(selected: boolean) { }
 
     async serialize(binData: BinaryFiles): Promise<ThreeViewerItemPin> {
         let pos = this.position;
@@ -405,6 +407,8 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 }
 
 export class ThreeViewerCollider extends Mesh implements Serializable<ThreeViewerItemCollider>, EditorMode {
+
+    isThreeViewerCollider: boolean = true;
 
     title: LocalizedText = "";
     description: LocalizedText = "";
@@ -434,6 +438,8 @@ export class ThreeViewerCollider extends Mesh implements Serializable<ThreeViewe
         mat.visible = enabled;
         mat.needsUpdate = true;
     }
+    setSelected(selected: boolean) { }
+
 
 }
 
@@ -455,7 +461,6 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
     cameraHelper: CameraHelper;
 
     _shadowCameraSize: Vector3 = new Vector3();
-    _editorMode: boolean = false;
 
     set shadowMapWidth(v: number) {
         let n: number = typeof v === "string" ? parseFloat(v) || 0 : v;
@@ -511,16 +516,13 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
     }
 
     setEditorMode(enabled: boolean) {
-        this._editorMode = enabled;
-        this.updateEditorMode();
+        if (this.gizmo)
+            this.gizmo.visible = enabled;
     }
 
-    updateEditorMode(): void {
-        if (this.gizmo)
-            this.gizmo.visible = this._editorMode;
-
+    setSelected(selected: boolean) {
         if (this.cameraHelper)
-            this.cameraHelper.visible = this._editorMode;
+            this.cameraHelper.visible = selected;
     }
 
     updateMatrixWorld(force?: boolean): void {
@@ -535,10 +537,9 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
         }
     }
 
-    private async createGizmo(): Promise<void> {
+    private createGizmo() {
 
         let gizmo = new Sprite(new SpriteMaterial({
-            map: await this.resources.loadTexture("core-assets/three-viewer/light-gizmo.png"),
             color: 0xffffff,
             depthTest: false,
             depthWrite: false,
@@ -547,14 +548,19 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
 
         gizmo.scale.set(0.1, 0.1, 0.1);
         gizmo.renderOrder = 1;
+        gizmo.visible = false;
 
         this.add(gizmo);
 
         this.gizmo = gizmo;
+
+        this.resources.loadTexture("core-assets/three-viewer/light-gizmo.png").then((texture) => this.gizmo.material.map = texture);
+
     }
 
     private createCameraHelper(): void {
         this.cameraHelper = new CameraHelper(this.light.shadow.camera);
+        this.cameraHelper.visible = false;
     }
 
     private initialize(): void {
@@ -566,7 +572,7 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
                 this.light = new DirectionalLight();
                 this.light.shadow.mapSize.set(1024, 1024);
                 this.createCameraHelper();
-                this.createGizmo().then(() => this.updateEditorMode());
+                this.createGizmo();
                 break;
             default:
                 throw new Error(`Unknown light type: ${this.lightType}`);
@@ -672,6 +678,8 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
     }
 
     setEditorMode(enabled: boolean) { }
+    setSelected(selected: boolean) { }
+
 
     swapMaterials(previousIdx: number, currentIdx: number): void {
         let current = this._materials[this.currentMaterial];

@@ -131,8 +131,22 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   set selectedObject(obj: any) {
+
+    if (obj === this._selectedObject)
+      return;
+
+    if (this._selectedObject)
+      this._selectedObject.setSelected(false);
+
+
     this._selectedObject = obj;
-    obj ? this.transformControls.attach(obj) : this.transformControls.detach();
+    
+    if (obj) {
+      obj.setSelected(true);
+      this.transformControls.attach(obj);
+    } else {
+      this.transformControls.detach();
+    }
   }
 
   get selectedObject(): any {
