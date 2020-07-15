@@ -285,7 +285,6 @@ export class LeafletDeepZoomComponent implements OnInit {
 
       if (s.type === "polygon") {
         shape = L.polygon(s.points.map(p => this.pointToLatLng(p[0], p[1], 0)), { pane: pane });
-
       } else if (s.type === "circle") {
         shape = L.circle(this.pointToLatLng(s.center[0], s.center[1], 0), { radius: s.radius, pane: pane });
       }
@@ -341,7 +340,6 @@ export class LeafletDeepZoomComponent implements OnInit {
       center: [center.lat, center.lng]
     };
 
-    //console.log("DeepZoomComponent.saveState()");
     this.state.saveState(state);
 
   }

@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Raycaster, Vector3, Clock } from 'three';
+import { PerspectiveCamera, Raycaster, Vector3, Clock, Scene } from 'three';
 import * as hammer from "hammerjs";
 
 /**
@@ -20,7 +20,7 @@ const moveTowards = function (pos, target, maxSpeed) {
         pos.add(dir.multiplyScalar(maxSpeed));
     }
 
-    return len;
+    return Math.sqrt(Math.min(len, maxSpeed * maxSpeed));
 }
 
 
@@ -56,6 +56,44 @@ class EventHandlers {
             h.target.removeEventListener(h.evtName, h.handler);
         }
     }
+}
+
+export class TouchControlBounds {
+    constructor() {
+        this.objects = [];
+        this.raycaster = new Raycaster();
+        this.raycaster.far = 1;
+    }
+
+    set(...objs) {
+        this.objects = objs.slice();
+    }
+
+    clear() {
+        this.objects = [];
+    }
+
+    test(pos, dir, length) {
+
+        this.raycaster.set(pos, dir);
+        this.raycaster.far = length;
+
+        let intersections = this.raycaster.intersectObjects(this.objects, true);
+
+        if(intersections.length > 0) {
+            return new Vector3().copy(intersections[0].face.normal).multiplyScalar(0.01).add(intersections[0].point)
+        } else {
+            return null;
+        }
+
+    }
+
+    dispose() {
+        this.objects = null;
+        this.raycaster = null;
+    }
+
+
 }
 
 
@@ -168,6 +206,13 @@ export class TouchControls extends EventDispatcher {
          */
         this.eventHandlers = new EventHandlers();
 
+
+        /**
+         * @public
+         * @property {TouchControlBounds} bounds
+         */
+        this.bounds = new TouchControlBounds();
+
         /**
          * @private
          * @property {hammer.Hammer} hammer
@@ -202,10 +247,24 @@ export class TouchControls extends EventDispatcher {
         if (this.enabled) {
             // Move the camera towards target location
             let fw = this.camera.getWorldDirection(this.forward);
-            let len = moveTowards(this.camera.position, this.targetPosition, this.options.zoomDamping * dt);
+            let pos = this.camera.position.clone();
+            let len = moveTowards(pos, this.targetPosition, this.options.zoomDamping * dt);
+            let dir = pos.clone().sub(this.camera.position).normalize();
 
-            if (len > 0)
-                this.dispatch("change", this);
+
+            if (len > 0) {
+
+                let intersection = this.bounds.test(this.camera.position, dir, len);
+
+                if (intersection) {
+                    this.camera.position.copy(intersection);
+                    this.targetPosition.copy(this.camera.position);
+                } else {
+                    this.camera.position.copy(pos);
+                }
+
+            }
+
 
         }
 
@@ -271,6 +330,7 @@ export class TouchControls extends EventDispatcher {
         this.disposed = true;
         this.hammer.destroy();
         this.eventHandlers.dispose();
+        this.bounds.dispose();
     }
 
 }

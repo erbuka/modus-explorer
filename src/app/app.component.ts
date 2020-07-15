@@ -9,10 +9,18 @@ import { DOCUMENT } from '@angular/common';
 })
 export class AppComponent {
   constructor(public context: ContextService, @Inject(DOCUMENT) private document: Document) {
-    // Disable pinch zoom on touch windows touch screens
-    document.addEventListener("wheel", (evt: WheelEvent) => {
+    
+    // Disable CTRL+Wheel
+    this.document.addEventListener("wheel", (evt: WheelEvent) => {
       if (evt.ctrlKey)
         evt.preventDefault();
     }, { passive: false });
+
+    // Disable pinch zoom page
+    this.document.addEventListener("touchstart", (evt: TouchEvent) => {
+      if (evt.touches.length > 1)
+        evt.preventDefault();
+    }, { passive: false });
+
   }
 }

@@ -13,6 +13,12 @@ interface ThreeViewerItemObject {
     scale?: ThreeViewerItemVector3,
 }
 
+
+// Colliders
+export interface ThreeViewerItemCollider extends ThreeViewerItemObject {
+    geometry: string;
+}
+
 // Models
 
 export interface ThreeViewerItemModel extends ThreeViewerItemObject {
@@ -94,5 +100,6 @@ export interface ThreeViewerItem extends ItemBase {
     models?: ThreeViewerItemModel[],
     lights?: ThreeViewerItemLight[],
     pinLayers?: ThreeViewerItemPinLayer[],
-    pins?: ThreeViewerItemPin[]
+    pins?: ThreeViewerItemPin[],
+    colliders?:ThreeViewerItemCollider[]
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, ChangeDetectorRef, OnChanges, DoCheck, forwardRef, SkipSelf } from '@angular/core';
 import { ThreeViewerItem, ThreeViewerItemLightType, ThreeViewerItemCameraControls } from 'src/app/types/three-viewer-item';
-import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper, BufferGeometry, Texture } from 'three';
+import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper, BufferGeometry, Texture, BoxBufferGeometry } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService, FileChooserResult } from 'src/app/context.service';
 
@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, ThreeViewerLight, ThreeViewerPinLayer, ThreeViewerPin, ThreeViewerResources, ThreeViewerResource } from './three-viewer';
+import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, ThreeViewerLight, ThreeViewerPinLayer, ThreeViewerPin, ThreeViewerResources, ThreeViewerResource, ThreeViewerCollider } from './three-viewer';
 import { PinLayerEditorComponent, PinLayerEditorData } from './pin-layer-editor/pin-layer-editor.component';
 
 import { moveItemInArray } from '@angular/cdk/drag-drop'
@@ -20,7 +20,7 @@ import { LocationRouterService } from 'src/app/location-router.service';
 import { State, StateData } from 'src/app/classes/state';
 
 
-type EditorTab = "models" | "lights" | "pins";
+type EditorTab = "models" | "lights" | "pins" | "colliders";
 
 type LoadingScreenData = {
   mode: "determinate" | "indeterminate";
@@ -50,6 +50,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   lights: ThreeViewerGroup<ThreeViewerLight> = new ThreeViewerGroup();
   models: ThreeViewerGroup<ThreeViewerModel> = new ThreeViewerGroup();
   pins: ThreeViewerGroup<ThreeViewerPin> = new ThreeViewerGroup();
+  colliders: ThreeViewerGroup<ThreeViewerCollider> = new ThreeViewerGroup();
 
   pinLayers: ThreeViewerPinLayer[] = [];
 
@@ -97,6 +98,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       case "pins":
         this.activeEditorHierarchyGroup = this.pins;
         break;
+      case "colliders":
+        this.activeEditorHierarchyGroup = this.colliders;
+        break;
       default:
         throw new Error(`Unknown tab: ${tab}`);
     }
@@ -118,6 +122,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     this.models.children.forEach(m => m.setEditorMode(value));
     this.lights.children.forEach(l => l.setEditorMode(value));
+    this.colliders.children.forEach(c => c.setEditorMode(value));
 
   }
 
@@ -193,10 +198,10 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.scene.add(this.models);
     this.scene.add(this.lights);
     this.scene.add(this.pins);
+    this.scene.add(this.colliders);
 
     // Wait for item to load
     await this.loadItem();
-
 
 
     // Disable the loading overlay and turn off editor mode by default
@@ -280,6 +285,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     if (this.item.pinLayers)
       for (let pinLayerDef of this.item.pinLayers)
         resourcePromises[pinLayerDef.geometry] = resources.loadPlyMesh(this.router.resolve(pinLayerDef.geometry, this.item));
+
+
+    if (this.item.colliders)
+      for (let colliderDef of this.item.colliders)
+        resourcePromises[colliderDef.geometry] = resources.loadPlyMesh(this.router.resolve(colliderDef.geometry, this.item));
 
     // Setup loading screen
     this.loadingScreen.mode = "determinate";
@@ -424,6 +434,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       }
     }
 
+
     // Load pins
     if (this.item.pins) {
       for (let pinDef of this.item.pins) {
@@ -452,12 +463,46 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       }
     }
 
+    // Load colliders 
+
+    this.colliders.remove(...this.colliders.children);
+
+    if (this.item.colliders) {
+      for (let colliderDef of this.item.colliders) {
+        let collider = new ThreeViewerCollider(this.resources, (await resourcePromises[colliderDef.geometry]) as BufferGeometry);
+
+        let pos = colliderDef.position;
+        let rot = colliderDef.rotation;
+        let scl = colliderDef.scale;
+
+        collider.title = colliderDef.title;
+        colliderDef.description = colliderDef.description || "";
+
+        if (pos)
+          collider.position.fromArray(pos);
+
+        if (rot)
+          collider.rotation.fromArray(rot);
+
+        if (scl)
+          collider.scale.fromArray(scl);
+
+        this.colliders.add(collider);
+        this.onObjectAdded(collider);
+
+      }
+    }
+
+    // TEMP
+    if (this.controls instanceof TouchControls) {
+      this.controls.bounds.set(...this.colliders.children);
+    }
 
     // Load other stuff
 
     // Close loading screen
     this.loadingScreen.show = false;
-    
+
     // Save the state again
     this.saveState();
 
@@ -468,7 +513,23 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     model.previewImage = await this.resources.loadArrayBuffer(file.data as ArrayBuffer);
   }
 
-  async loadModelFromWaveFront() {
+  async addCollider() {
+
+    let fileChooserResult: FileChooserResult = await this.context.fileChooser({ type: "arraybuffer", accept: ".obj" });
+    let geometries = await this.resources.loadGeometryFromWavefront(fileChooserResult.data as ArrayBuffer);
+
+    for (let geom of geometries) {
+      let collider = new ThreeViewerCollider(this.resources, geom.geometry);
+      collider.title = geom.name;
+
+      this.colliders.add(collider);
+      this.onObjectAdded(collider);
+    }
+
+    this.updateCollisionBounds();
+  }
+
+  async addModel() {
 
     let fileChooserResult: FileChooserResult = await this.context.fileChooser({ type: "arraybuffer", accept: ".obj" });
     let geometries = await this.resources.loadGeometryFromWavefront(fileChooserResult.data as ArrayBuffer);
@@ -515,12 +576,19 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     if (obj.onAdd) {
       obj.onAdd(this.scene);
       obj.setEditorMode(this.editorMode);
+
+      if (obj instanceof ThreeViewerCollider)
+        this.updateCollisionBounds();
+
     }
   }
 
   onObjectRemoved(obj: ThreeViewerObject3D) {
     if (obj.onRemove)
       obj.onRemove(this.scene);
+
+    if (obj instanceof ThreeViewerCollider)
+      this.updateCollisionBounds();
 
     if (obj === this.selectedObject) {
       this.selectedObject = null;
@@ -683,7 +751,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       models: await Promise.all(this.models.children.map(model => model.serialize(binFiles))),
       lights: await Promise.all(this.lights.children.map(light => light.serialize(binFiles))),
       pinLayers: await Promise.all(this.pinLayers.map(pinLayer => pinLayer.serialize(binFiles))),
-      pins: await Promise.all(this.pins.children.map(pin => pin.serialize(binFiles)))
+      pins: await Promise.all(this.pins.children.map(pin => pin.serialize(binFiles))),
+      colliders: await Promise.all(this.colliders.children.map(collider => collider.serialize(binFiles)))
     };
 
     await this.httpClient.delete(this.router.resolve("./", this.item), { responseType: "text" }).toPromise();
@@ -845,6 +914,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       cameraPosition: this.camera.position.toArray(),
       cameraLookAt: lookAt.toArray()
     });
+  }
+
+  private updateCollisionBounds(): void {
+    if (this.controls instanceof TouchControls) {
+      this.controls.bounds.set(...this.colliders.children);
+    }
   }
 
 }

@@ -1,9 +1,9 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneBufferGeometry, MeshBasicMaterial, Int32BufferAttribute, BufferAttribute } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneBufferGeometry, MeshBasicMaterial, Int32BufferAttribute, BufferAttribute, MeshBasicMaterialParameters } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader';
-import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType, ThreeViewerItemPinLayer, ThreeViewerItemPin } from 'src/app/types/three-viewer-item';
+import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType, ThreeViewerItemPinLayer, ThreeViewerItemPin, ThreeViewerItemCollider } from 'src/app/types/three-viewer-item';
 import { LocalizedText } from 'src/app/types/item';
 import { ErrorEvent } from 'src/app/context.service';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -78,7 +78,7 @@ interface OnRemove {
 
 
 
-export type ThreeViewerResource = Texture | BufferGeometry | MeshStandardMaterial | WebGLRenderTarget | string;
+export type ThreeViewerResource = Texture | BufferGeometry | MeshStandardMaterial | MeshBasicMaterial | WebGLRenderTarget | string;
 
 export class ThreeViewerResources {
 
@@ -117,6 +117,9 @@ export class ThreeViewerResources {
                 res.dispose();
             } else if (res instanceof WebGLRenderTarget) {
                 res.dispose();
+            } else if (res instanceof MeshBasicMaterial) {
+                res.dispose();
+                res.map = null;
             } else if (res instanceof MeshStandardMaterial) {
                 res.dispose();
                 res.map = null;
@@ -133,6 +136,10 @@ export class ThreeViewerResources {
 
         this.mappedResources = new Map();
         this.resources = [];
+    }
+
+    createBasicMaterial(params?: MeshBasicMaterialParameters): MeshBasicMaterial {
+        return this.track(new MeshBasicMaterial(params));
     }
 
     createStandardMaterial(params?: MeshStandardMaterialParameters): MeshStandardMaterial {
@@ -174,11 +181,7 @@ export class ThreeViewerResources {
                             texture the first time it is used causing an annoying frame lag
                         */
 
-                        let renderer = this.renderer
-                        let canvas = renderer.domElement;
-
-                        canvas.width = 128;
-                        canvas.height = 128;
+                        let renderer = this.renderer;
 
                         let scene = new Scene();
                         let camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 1, 10);
@@ -189,7 +192,7 @@ export class ThreeViewerResources {
                         scene.add(mesh);
 
                         renderer.setRenderTarget(this.renderTarget);
-                        renderer.setViewport(0, 0, canvas.width, canvas.height);
+                        renderer.setViewport(0, 0, this.renderTarget.width, this.renderTarget.height);
                         renderer.setClearColor(0, 0);
                         renderer.clear();
                         renderer.render(scene, camera);
@@ -285,7 +288,7 @@ export class ThreeViewerResources {
 export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer> {
     title: LocalizedText = "";
     description: LocalizedText = "";
-    geometry: BufferGeometry = new BoxBufferGeometry(1, 1, 1);
+    geometry: BufferGeometry = null;
     visible: boolean = true;
 
     get color(): Color {
@@ -305,6 +308,7 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
 
     constructor(private resources: ThreeViewerResources) {
         this._material = resources.createStandardMaterial({ color: 0xffffff });
+        this.geometry = resources.track(new BoxBufferGeometry(1, 1, 1));
     }
 
     createPreviewPicture() {
@@ -400,6 +404,38 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 
 }
 
+export class ThreeViewerCollider extends Mesh implements Serializable<ThreeViewerItemCollider>, EditorMode {
+
+    title: LocalizedText = "";
+    description: LocalizedText = "";
+
+    constructor(private resources: ThreeViewerResources, geometry: BufferGeometry) {
+        super(geometry, resources.createBasicMaterial({ color: 0xff0000, transparent: true, wireframe: true, opacity: 0.5 }));
+    }
+
+    async serialize(binData: BinaryFiles): Promise<ThreeViewerItemCollider> {
+
+        let pos = this.position;
+        let rot = this.rotation;
+        let scl = this.scale;
+
+        return {
+            title: this.title,
+            description: this.description,
+            position: [pos.x, pos.y, pos.z],
+            rotation: [rot.x, rot.y, rot.z],
+            scale: [scl.x, scl.y, scl.z],
+            geometry: await binData.store(await exportPlyMesh(this), "ply")
+        };
+    }
+
+    setEditorMode(enabled: boolean) {
+        let mat = this.material as MeshBasicMaterial;
+        mat.visible = enabled;
+        mat.needsUpdate = true;
+    }
+
+}
 
 /**
  * Light
@@ -750,7 +786,7 @@ export namespace ThreeViewerModel {
 }
 
 
-export type ThreeViewerObject3D = (ThreeViewerModel | ThreeViewerLight | ThreeViewerPin) & EditorMode & Partial<OnAdd> & Partial<OnRemove>;
+export type ThreeViewerObject3D = (ThreeViewerModel | ThreeViewerLight | ThreeViewerPin | ThreeViewerCollider) & EditorMode & Partial<OnAdd> & Partial<OnRemove>;
 
 /**
  * A threejs group with typed children

@@ -3,7 +3,9 @@
 </mat-menu>
 
 <mat-menu #addMenu>
-    <button mat-menu-item (click)="loadModelFromWaveFront()">Model...</button>
+    <button mat-menu-item (click)="addModel()">Model...</button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="addCollider()">Collider</button>
     <mat-divider></mat-divider>
     <button mat-menu-item [disabled]="pinLayers.length === 0" [matMenuTriggerFor]="addPinMenu">Pin</button>
     <mat-divider></mat-divider>
@@ -344,6 +346,9 @@
                 <li class="cn-caption" (click)="editorActiveTab = 'pins'"
                     [class.cn-selected]="editorActiveTab === 'pins'">
                     Pins</li>
+                <li class="cn-caption" (click)="editorActiveTab = 'colliders'"
+                    [class.cn-selected]="editorActiveTab === 'colliders'">
+                    Colliders</li>
             </ul>
 
             <div class="cn-three-viewer-editor-item-list" style="height: 30rem;" cdkDropList
