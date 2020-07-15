@@ -1,10 +1,10 @@
 import { Component, OnInit, Inject, ViewChild, ElementRef, NgZone, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ThreeViewerPinLayer, ThreeViewerResources } from '../three-viewer';
-import { WebGLRenderer, Scene, Mesh, BoxBufferGeometry, PerspectiveCamera, MeshStandardMaterial, DirectionalLight } from 'three';
-import { ContextService } from 'src/app/context.service';
+import { WebGLRenderer, Scene, Mesh, BoxBufferGeometry, PerspectiveCamera, DirectionalLight } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { ContextService } from 'src/app/context.service';
 
 
 export type PinLayerEditorData = {
