@@ -189,6 +189,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     // Camera
     this.camera = new PerspectiveCamera();
     this.camera.matrixAutoUpdate = true;
+    window["camera"] = this.camera;
 
     // Scene
     this.scene = new Scene();
@@ -273,6 +274,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       this.controls.addEventListener("change", (evt) => this.saveState());
 
     }
+
+    // Start with the controls disabled so that the user can't move while loading
+    this.controls.enabled = false;
 
     // Parallel asset loading. Set up all the promises immediatley without waiting. Might speed up things.
     let resourcePromises: { [name: string]: Promise<ThreeViewerResource> } = {};
