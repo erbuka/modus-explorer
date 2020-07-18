@@ -1,5 +1,4 @@
 import { PerspectiveCamera, Object3D } from "three";
-import { NgZone } from "@angular/core";
 
 export type TouchControlsOptions = {
     rotationSpeed: number;
@@ -19,6 +18,7 @@ export declare class TouchControls {
     get bounds(): TouchControlBounds;
 
     constructor(camera: PerspectiveCamera, domElement: HTMLElement, options?: Partial<TouchControlsOptions>);
+    update():void;
     dispose(): void;
 
     addEventListener(evt: "change", handler: (target: TouchControls) => void);

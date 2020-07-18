@@ -470,7 +470,7 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
 
     set shadowMapHeight(v: number) {
         let n: number = typeof v === "string" ? parseFloat(v) || 0 : v;
-        this.light.shadow.mapSize.height = Math.max(n, 512); this.updateShadowMap();
+        this.light.shadow.mapSize.height = Math.max(n, 512);
         this.updateShadowMap();
     }
 

@@ -167,6 +167,11 @@ export class TouchControls extends EventDispatcher {
 
         /**
          * @property {object} options
+         * @property {number} options.rotationSpeed How fast can the camera rotate. Base value should be 1.0
+         * @property {number} options.zoomDamping How fast can the camera move each frame towards the target. A value of Infinity, means
+         * that the camera will always reach the target in 1 frame
+         * @property {number} options.zoomStep How far to move the camera target each time the mouse wheel is scrolls or the double touch pan is
+         * detected. A value of 1 means that the target is moved 1 unit away from the current camera position for each zoom event
          */
         this.options = {
             rotationSpeed: options.rotationSpeed,
@@ -245,10 +250,10 @@ export class TouchControls extends EventDispatcher {
         let dt = this.clock.getDelta();
 
         if (this.enabled) {
-            // Move the camera towards target location
-            let fw = this.camera.getWorldDirection(this.forward);
+            // Calculcate the new camera position based on the target, the elapsed time and the zoom damping.
             let pos = this.camera.position.clone();
             let len = moveTowards(pos, this.targetPosition, this.options.zoomDamping * dt);
+            
             let dir = pos.clone().sub(this.camera.position).normalize();
 
 
@@ -257,9 +262,13 @@ export class TouchControls extends EventDispatcher {
                 let intersection = this.bounds.test(this.camera.position, dir, len);
 
                 if (intersection) {
+                    // If there's an intersection with the boundary, we want to force the camera to stay
+                    // at the intersection point and not move further. 
+                    // This means we also have to reset the target to the current camera position
                     this.camera.position.copy(intersection);
-                    this.targetPosition.copy(this.camera.position);
+                    this.targetPosition.copy(intersection);
                 } else {
+                    // If there's no intersection with the boundary we move the camera to the new position
                     this.camera.position.copy(pos);
                 }
 
@@ -321,6 +330,14 @@ export class TouchControls extends EventDispatcher {
             }
         }
 
+    }
+
+    /**
+     * Updates the target positon with the current camera position
+     * @returns {void}
+     */
+    update() {
+        this.targetPosition.copy(this.camera.position);
     }
 
     /**

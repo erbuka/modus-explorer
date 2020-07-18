@@ -17,7 +17,7 @@ import { PinLayerEditorComponent, PinLayerEditorData } from './pin-layer-editor/
 
 import { moveItemInArray } from '@angular/cdk/drag-drop'
 import { LocationRouterService } from 'src/app/location-router.service';
-import { State, StateData } from 'src/app/classes/state';
+import { State } from 'src/app/classes/state';
 
 
 type EditorTab = "models" | "lights" | "pins" | "colliders";
@@ -123,6 +123,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.models.children.forEach(m => m.setEditorMode(value));
     this.lights.children.forEach(l => l.setEditorMode(value));
     this.colliders.children.forEach(c => c.setEditorMode(value));
+
+    this.controls.update();
+    this.editorControls.update();
 
   }
 
@@ -269,6 +272,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       this.controls = new OrbitControls(this.camera, this.containterRef.nativeElement);
       this.controls.rotateSpeed = this.item.camera.rotationSpeed || 1.0;
       this.controls.zoomSpeed = this.item.camera.zoomStep || 1.0;
+      this.controls.minDistance = this.item.camera.orbitMinDistance || 0;
+      this.controls.maxDistance = this.item.camera.orbitMaxDistance || Number.POSITIVE_INFINITY;
       this.controls.enablePan = false;
 
       this.controls.addEventListener("change", (evt) => this.saveState());
@@ -755,7 +760,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.camera.getWorldDirection(lookAt);
     lookAt.add(this.camera.position);
 
-
     let exportItem: ThreeViewerItem = {
       type: "3d",
       camera: {
@@ -764,7 +768,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         rotationSpeed: this.item.camera.rotationSpeed,
         zoomStep: this.item.camera.zoomStep,
         zoomDamping: this.item.camera.zoomDamping,
-        controls: this.item.camera.controls
+        controls: this.item.camera.controls,
+        orbitMinDistance: this.item.camera.orbitMinDistance,
+        orbitMaxDistance: this.item.camera.orbitMaxDistance
       },
       models: await Promise.all(this.models.children.map(model => model.serialize(binFiles))),
       lights: await Promise.all(this.lights.children.map(light => light.serialize(binFiles))),

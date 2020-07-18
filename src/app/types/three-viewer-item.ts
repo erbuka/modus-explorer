@@ -94,12 +94,14 @@ export interface ThreeViewerItem extends ItemBase {
         rotationSpeed?: number,
         zoomStep?: number,
         zoomDamping?: number,
-        controls?: ThreeViewerItemCameraControls
+        controls?: ThreeViewerItemCameraControls,
+        orbitMinDistance?: number,
+        orbitMaxDistance?: number,
     },
     loadingBackgroundImage?: string;
     models?: ThreeViewerItemModel[],
     lights?: ThreeViewerItemLight[],
     pinLayers?: ThreeViewerItemPinLayer[],
     pins?: ThreeViewerItemPin[],
-    colliders?:ThreeViewerItemCollider[]
+    colliders?: ThreeViewerItemCollider[]
 }
