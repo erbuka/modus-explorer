@@ -206,8 +206,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     // Orbit and touch controls
 
     this.editorControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
-
-
+    this.editorControls.enabled = false;
 
     // Add everything to the scene
     this.scene.add(this.transformControls);
@@ -220,13 +219,13 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     // Wait for item to load
     await this.loadItem();
 
-
-    // Disable the loading overlay and turn off editor mode by default
-
     // Start the render loop (outside angular)
+    // Turn off editor mode by default
+
+
     this.zone.runOutsideAngular(() => {
       this.render();
-      this.editorMode = false;
+      setTimeout(() => this.editorMode = false, 0);
     });
 
   }
@@ -710,7 +709,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
   }
 
-  render(){
+  render() {
 
     if (this._disposed) {
       this.dispose();
