@@ -143,7 +143,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 
     this._selectedObject = obj;
-    
+
     if (obj) {
       obj.setSelected(true);
       this.transformControls.attach(obj);
@@ -190,9 +190,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.rayscaster = new Raycaster();
 
     // Camera
-    this.camera = new PerspectiveCamera();
+    this.camera = new PerspectiveCamera(50, 1, 0.1, 2000.0);
     this.camera.matrixAutoUpdate = true;
-    window["camera"] = this.camera;
 
     // Scene
     this.scene = new Scene();
@@ -223,11 +222,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 
     // Disable the loading overlay and turn off editor mode by default
-    this.editorMode = false;
 
     // Start the render loop (outside angular)
     this.zone.runOutsideAngular(() => {
       this.render();
+      this.editorMode = false;
     });
 
   }
@@ -255,6 +254,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     // Setup camera
     this.camera.position.fromArray(cameraPosition);
     this.camera.lookAt(cameraLookAt[0], cameraLookAt[1], cameraLookAt[2]);
+
 
     // Controls
     const controlsType: ThreeViewerItemCameraControls = this.item.camera.controls || "fly";
@@ -516,13 +516,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       }
     }
 
-    // TEMP
-    if (this.controls instanceof TouchControls) {
-      this.controls.bounds.set(...this.colliders.children);
-    }
-
-    // Load other stuff
-
     // Close loading screen
     this.loadingScreen.show = false;
 
@@ -596,14 +589,14 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 
   onObjectAdded(obj: ThreeViewerObject3D) {
-    if (obj.onAdd) {
+    if (obj.onAdd)
       obj.onAdd(this.scene);
-      obj.setEditorMode(this.editorMode);
 
-      if (obj instanceof ThreeViewerCollider)
-        this.updateCollisionBounds();
+    obj.setEditorMode(this.editorMode);
 
-    }
+    if (obj instanceof ThreeViewerCollider)
+      this.updateCollisionBounds();
+
   }
 
   onObjectRemoved(obj: ThreeViewerObject3D) {
@@ -717,13 +710,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
   }
 
-  render() {
+  render(){
 
     if (this._disposed) {
       this.dispose();
       return;
     }
-
 
     requestAnimationFrame(this.render.bind(this));
 
@@ -746,6 +738,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     renderer.clear(true, true);
 
     renderer.render(this.scene, this.camera);
+
+
   }
 
   async export(): Promise<void> {
@@ -881,17 +875,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
   @HostListener("window:resize")
   resize() {
-    this.width = this.renderer.domElement.width = this.containterRef.nativeElement.clientWidth;
-    this.height = this.renderer.domElement.height = this.containterRef.nativeElement.clientHeight;
+    this.width = this.renderer.domElement.width = this.containterRef.nativeElement.clientWidth || window.innerWidth;
+    this.height = this.renderer.domElement.height = this.containterRef.nativeElement.clientHeight || window.innerHeight;
   }
 
   @HostListener("keydown", ["$event"])
   onKeyDown(evt: KeyboardEvent) {
-
-    if (evt.code === "KeyQ" && !environment.production) {
-      console.log(this.renderer.info);
-    }
-
     if (this.editorMode) {
       switch (evt.code) {
         case "KeyR": this.transformControls.mode = "rotate"; break;

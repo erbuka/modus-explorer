@@ -80,7 +80,7 @@ export class TouchControlBounds {
 
         let intersections = this.raycaster.intersectObjects(this.objects, true);
 
-        if(intersections.length > 0) {
+        if (intersections.length > 0) {
             return new Vector3().copy(intersections[0].face.normal).multiplyScalar(0.01).add(intersections[0].point)
         } else {
             return null;
@@ -153,7 +153,7 @@ export class TouchControls extends EventDispatcher {
         /**
          * @property {boolean} enabled
          */
-        this._enabled = true;
+        this._enabled = false;
         Object.defineProperty(this, "enabled", {
             set: function (value) {
                 if (value && !this._enabled)
@@ -253,8 +253,9 @@ export class TouchControls extends EventDispatcher {
             // Calculcate the new camera position based on the target, the elapsed time and the zoom damping.
             let pos = this.camera.position.clone();
             let len = moveTowards(pos, this.targetPosition, this.options.zoomDamping * dt);
-            
+
             let dir = pos.clone().sub(this.camera.position).normalize();
+
 
 
             if (len > 0) {
@@ -311,7 +312,6 @@ export class TouchControls extends EventDispatcher {
 
                 let dx = -srcEvent.movementX / this.domElement.clientHeight * this.options.rotationSpeed * 2.0 * Math.PI;
                 let dy = srcEvent.movementY / this.domElement.clientHeight * this.options.rotationSpeed * 2.0 * Math.PI;
-
 
                 this.raycaster.setFromCamera({
                     x: dx,
