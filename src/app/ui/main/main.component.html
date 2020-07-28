@@ -8,9 +8,9 @@
                 <ng-container *ngTemplateOutlet="context.getTemplate(context.config.headerTemplate)"></ng-container>
             </div>
             <div class="ml-auto"></div>
-            <div class="p-2 align-self-end" *ngIf="locales.length > 1">
+            <div class="p-2 align-self-end">
 
-                <ng-container *ngIf="locales">
+                <ng-container *ngIf="locales && locales.length > 1">
                     <mat-menu #localeMenu>
                         <button mat-menu-item class="text-right" *ngFor="let l of locales"
                             (click)="context.setCurrentLocale(l.id, true)">
