@@ -40,6 +40,7 @@ import { MaterialEditorComponent } from './ui/three-viewer/material-editor/mater
 import { PinLayerEditorComponent } from './ui/three-viewer/pin-layer-editor/pin-layer-editor.component';
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import { LinkDirective } from './link.directive';
+import { EmbedComponent } from './ui/slideshow/embed/embed.component';
 
 
 
@@ -64,7 +65,8 @@ import { LinkDirective } from './link.directive';
     EditableLocalizedTextComponent,
     MaterialEditorComponent,
     PinLayerEditorComponent,
-    LinkDirective
+    LinkDirective,
+    EmbedComponent,
   ],
   imports: [
     BrowserModule,

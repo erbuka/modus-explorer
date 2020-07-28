@@ -31,6 +31,7 @@ type LoadingScreenData = {
 }
 
 
+
 @Component({
   selector: 'app-three-viewer',
   templateUrl: './three-viewer.component.html',
@@ -124,9 +125,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.lights.children.forEach(l => l.setEditorMode(value));
     this.colliders.children.forEach(c => c.setEditorMode(value));
 
-    this.controls.update();
-    this.editorControls.update();
-
+    if (value) {
+      this.editorControls.update();
+    } else {
+      this.controls.update();
+    }
   }
 
   get editorMode(): boolean {
