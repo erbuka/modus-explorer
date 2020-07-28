@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneBufferGeometry, MeshBasicMaterial, Int32BufferAttribute, BufferAttribute, MeshBasicMaterialParameters } from 'three';
+import { ShaderMaterialParameters, BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneBufferGeometry, MeshBasicMaterial, Int32BufferAttribute, BufferAttribute, MeshBasicMaterialParameters, ShaderMaterial, Material } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
@@ -30,6 +30,56 @@ export const exportPlyMesh: (meshOrGeometry: Mesh | BufferGeometry) => Promise<A
         plyExporter.parse(tempMesh, (result: any) => resolve(result as ArrayBuffer), { binary: true });
     });
 };
+
+
+// Pin shader
+
+const PIN_MATERIAL_VS = `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+        vNormal = normalize(normalMatrix * normal);
+        vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+`;
+
+const PIN_MATERIAL_FS = `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    uniform vec3 color;
+
+    const vec3 ambient = vec3(0.2);
+
+    void main() {
+
+        gl_FragColor = vec4(max(0.0, dot(vNormal, normalize(-vPosition))) * color + ambient * color, 1.0);
+    }
+
+`;
+
+class PinMaterial extends ShaderMaterial {
+    constructor() {
+        super({
+            uniforms: { "color": { value: new Color(0xffffffff) } },
+            vertexShader: PIN_MATERIAL_VS,
+            fragmentShader: PIN_MATERIAL_FS
+        });
+    }
+
+
+    set color(color: Color) {
+        this.uniforms["color"].value = color;
+    }
+
+    get color(): Color {
+        return this.uniforms["color"].value;
+    }
+
+}
+
 
 
 
@@ -79,7 +129,7 @@ interface OnRemove {
 
 
 
-export type ThreeViewerResource = Texture | BufferGeometry | MeshStandardMaterial | MeshBasicMaterial | WebGLRenderTarget | string;
+export type ThreeViewerResource = Texture | BufferGeometry | Material | WebGLRenderTarget | string;
 
 export class ThreeViewerResources {
 
@@ -110,21 +160,14 @@ export class ThreeViewerResources {
     }
 
 
-
-
     dispose(): void {
         for (let res of this.resources) {
             if (res instanceof Texture) {
                 res.dispose();
             } else if (res instanceof WebGLRenderTarget) {
                 res.dispose();
-            } else if (res instanceof MeshBasicMaterial) {
+            } else if (res instanceof Material) {
                 res.dispose();
-                res.map = null;
-            } else if (res instanceof MeshStandardMaterial) {
-                res.dispose();
-                res.map = null;
-                res.normalMap = null;
             } else if (res instanceof BufferGeometry) {
                 res.dispose();
                 res.setIndex(null);
@@ -296,7 +339,7 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
         return this._material.color;
     }
 
-    get material(): MeshStandardMaterial {
+    get material(): PinMaterial {
         return this._material;
     }
 
@@ -304,11 +347,11 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
         return this._previewImage;
     }
 
-    private _material: MeshStandardMaterial = null;
+    private _material: PinMaterial = null;
     private _previewImage: HTMLImageElement = new Image();
 
     constructor(private resources: ThreeViewerResources) {
-        this._material = resources.createStandardMaterial({ color: 0xffffff });
+        this._material = resources.track(new PinMaterial());
         this.geometry = resources.track(new BoxBufferGeometry(1, 1, 1));
     }
 
@@ -326,10 +369,6 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
 
         let mesh = new Mesh(this.geometry, this._material);
         scene.add(mesh);
-
-        let light = new DirectionalLight(0xffffff);
-        light.position.copy(camera.position);
-        scene.add(light);
 
         renderer.setViewport(0, 0, canvas.width, canvas.height);
         renderer.setClearColor(0, 0);
@@ -368,7 +407,8 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 
     set layer(layer: ThreeViewerPinLayer) {
         this.geometry = layer.geometry;
-        (this.material as MeshStandardMaterial).color = layer.color;
+        this.material = layer.material;
+        //(this.material as PinMaterial).color = layer.color;
         this._layer = layer;
     }
 
@@ -379,9 +419,8 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
     private _layer: ThreeViewerPinLayer = null;
 
     constructor(resources: ThreeViewerResources, private _layers: ThreeViewerPinLayer[]) {
-        super(new BoxBufferGeometry(1, 1, 1), resources.createStandardMaterial({ color: 0xffffff }));
+        super(new BoxBufferGeometry(1, 1, 1), resources.track(new PinMaterial()));
     }
-
 
 
     setEditorMode(enabled: boolean) { }
