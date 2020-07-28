@@ -178,8 +178,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
   async ngOnInit() {
 
-    console.log("onInit");
-
     // Create renderer
     this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true, antialias: true });
 
