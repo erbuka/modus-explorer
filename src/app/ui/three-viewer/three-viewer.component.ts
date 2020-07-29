@@ -699,6 +699,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.scene.traverse(disposeObject3D);
 
     this.scene.dispose();
+    this.renderer.renderLists.dispose();
     this.renderer.dispose();
 
     this.models = null;
