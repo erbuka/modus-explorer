@@ -250,6 +250,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     // Grid helper
     this.gridHelper = new GridHelper(20, 20);
+    this.gridHelper.visible = false;
 
     // Scene
     this.scene = new Scene();
