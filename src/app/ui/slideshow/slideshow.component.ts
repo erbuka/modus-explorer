@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, forwardRef, SkipSelf } from '@angular/core';
+import { Component, OnInit, Input, forwardRef, SkipSelf, OnDestroy } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import {
   trigger,
@@ -12,6 +12,7 @@ import { Item } from 'src/app/types/item';
 import { SlideshowItem, SlideShowItemGroup } from 'src/app/types/slideshow-item';
 import { LocationRouterService } from 'src/app/location-router.service';
 import { State, StateData } from 'src/app/classes/state';
+import { Subscription } from 'rxjs';
 
 type Styles = { [key: string]: string | number };
 
@@ -60,12 +61,13 @@ const createSlideAnimation = function (normal: Styles, next: Styles, previous: S
     ))
   ]
 })
-export class SlideshowComponent extends State implements OnInit {
+export class SlideshowComponent extends State implements OnInit, OnDestroy {
 
   @Input() item: SlideshowItem = null;
 
   currentSlideIndex: number = null;
   slideItemsCache: Item[] = null;
+  subscription: Subscription = null;
 
   constructor(private context: ContextService, private router: LocationRouterService, @SkipSelf() private state: State) {
     super();
@@ -75,7 +77,7 @@ export class SlideshowComponent extends State implements OnInit {
     this.state.saveState(data);
   }
 
-  getState():StateData {
+  getState(): StateData {
     return this.state.getState();
   }
 
@@ -85,7 +87,9 @@ export class SlideshowComponent extends State implements OnInit {
     this.slideItemsCache = new Array<Item>(this.item.slides.length);
     this.slideItemsCache.fill(null, 0, this.slideItemsCache.length);
 
-    this.router.queryParams.subscribe(params => {
+    this.subscription = this.router.queryParams.subscribe(params => {
+
+      console.log("ciao");
 
       if (params["s"]) {
 
@@ -106,6 +110,12 @@ export class SlideshowComponent extends State implements OnInit {
         this.currentSlideIndex = this.simpleMode ? 0 : null;
       }
     });
+  }
+
+
+  ngOnDestroy() {
+    if (this.subscription)
+      this.subscription.unsubscribe();
   }
 
   get simpleMode(): boolean {

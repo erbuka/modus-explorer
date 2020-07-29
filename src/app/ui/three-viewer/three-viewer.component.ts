@@ -218,10 +218,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   ngDoCheck(): void {
-    if (this._loadedItem != this.item && this.item != null) {
+    if (this._loadedItem != this.item && this.item != null)
       this.loadItem();
-      this._loadedItem = this.item;
-    }
 
     this.updateSelectedPinStyle();
   }
@@ -240,6 +238,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     const resources = this.resources;
 
     this.unloadItem();
+    this._loadedItem = this.item;
 
     // Transform controls
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
@@ -653,7 +652,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
   }
 
-
   editMaterials(model: ThreeViewerModel): void {
     this.dialog.open(MaterialEditorComponent, {
       minWidth: "1024px",
@@ -666,9 +664,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         resources: this.resources
       }
     })
-  }
-
-  createScene(): void {
   }
 
   unloadItem(): void {
@@ -710,14 +705,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.scene.traverse(disposeObject3D);
     this.scene.dispose();
 
-    // The objects disposal should have been handled by the resource tracking system
-    // so no need to traverse the scene for them
     this.models.remove(...this.models.children);
     this.pins.remove(...this.pins.children);
     this.lights.remove(...this.lights.children);
     this.colliders.remove(...this.colliders.children);
     this.pinLayers = [];
-
 
     this.renderer.renderLists.dispose();
 
@@ -765,8 +757,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     renderer.clear(true, true);
 
     renderer.render(this.scene, this.camera);
-
-    console.log("ciao");
 
   }
 
