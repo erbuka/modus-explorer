@@ -1,9 +1,5 @@
-$cn-font-family: "Roboto", "Helvetica", sans-serif;
-$cn-font-size: 14px;
-
+// animate.css
 @import "~animate.css/animate.compat.css";
-@import "scss/cn-custom-palette";
-
 
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
@@ -15,6 +11,11 @@ $cn-font-size: 14px;
 
 // Be sure that you only ever include this mixin once!
 
+@import 'scss/cn-custom';
+
+$cn-font-family: "Roboto", "Helvetica", sans-serif !default;
+$cn-font-size: 14px !default;
+
 $cn-mat-config: mat-typography-config($cn-font-family);
 
 @include mat-core($cn-mat-config);
@@ -22,11 +23,11 @@ $cn-mat-config: mat-typography-config($cn-font-family);
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$cn-mat-primary: mat-palette($mat-indigo);
-$cn-mat-accent: mat-palette($mat-pink, A200, A100, A400);
+$cn-mat-primary: mat-palette($mat-indigo) !default;
+$cn-mat-accent: mat-palette($mat-pink, A200, A100, A400) !default;
 
 // The warn palette is optional (defaults to red).
-$cn-mat-warn: mat-palette($mat-red);
+$cn-mat-warn: mat-palette($mat-red) !default;
 
 // Create the theme object (a Sass map containing all of the palettes).
 $cn-mat-theme: mat-light-theme($cn-mat-primary, $cn-mat-accent, $cn-mat-warn);

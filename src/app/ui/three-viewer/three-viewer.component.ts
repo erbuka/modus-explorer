@@ -237,6 +237,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     const resources = this.resources;
 
+    // Lock router navigation
+    this.router.locked = true;
+
     this.unloadItem();
     this._loadedItem = this.item;
 
@@ -532,8 +535,15 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     // Run the animation loop
     this.zone.runOutsideAngular(() => {
+      
+      // Setup animation frame
       this._animFrameHandler = new AnimationFrameHandler(this.render.bind(this));
       this._animFrameHandler.start();
+
+      // Unlock router
+      this.router.locked = false;
+
+      // Switch editor mode off
       setTimeout(() => this.editorMode = false, 0);
     });
 

@@ -17,11 +17,11 @@ type LocationRoute = {
   providedIn: 'root'
 })
 export class LocationRouterService {
-
   url: BehaviorSubject<string> = new BehaviorSubject(null);
   path: BehaviorSubject<string> = new BehaviorSubject(null);
   queryString: BehaviorSubject<string> = new BehaviorSubject(null);
   queryParams: BehaviorSubject<QueryParams> = new BehaviorSubject(null);
+  locked: boolean = false;
 
   constructor(private location: Location, @Inject(APP_BASE_HREF) private baseHref: string, @Inject(DOCUMENT) private document: Document) {
     this.location.onUrlChange((url, state) => this.update());
@@ -43,10 +43,16 @@ export class LocationRouterService {
   }
 
   back(): void {
+    if(this.locked)
+      return;
+
     this.location.back();
   }
 
   navigate(uri: string, replace: boolean = false): void {
+
+    if(this.locked)
+      return;
 
     uri = this.normalize(uri);
 
