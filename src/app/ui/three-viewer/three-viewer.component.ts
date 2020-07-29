@@ -30,6 +30,37 @@ type LoadingScreenData = {
   total: number;
 }
 
+class AnimationFrameHandler {
+  private _function: () => void = null;
+  private _canceled: boolean = false;
+  private _started: boolean = false;
+  private _id: number = 0;
+  constructor(fn: () => void) {
+    this._function = fn;
+  }
+
+  start(): void {
+    if (!this._started) {
+      this._started = true;
+      this.loop();
+    }
+  }
+
+  cancel(): void {
+    if (this._started) {
+      this._canceled = true;
+      cancelAnimationFrame(this._id);
+    }
+  }
+
+  private loop(): void {
+    if (this._canceled)
+      return;
+    this._id = requestAnimationFrame(this.loop.bind(this));
+    this._function();
+  }
+
+}
 
 
 @Component({
@@ -120,7 +151,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.transformControls.enabled = value;
     this.gridHelper.visible = value;
     this.selectedObject = null;
-
+    this.selectedPin = null;
+    
     this.models.children.forEach(m => m.setEditorMode(value));
     this.lights.children.forEach(l => l.setEditorMode(value));
     this.colliders.children.forEach(c => c.setEditorMode(value));
@@ -162,29 +194,17 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   private _selectedObject: any = null;
   private _editorMode: boolean = false;
   private _editorActiveTab: EditorTab = "models";
-
-  private _disposed: boolean;
+  private _animFrameHandler: AnimationFrameHandler = null;
+  private _loadedItem: ThreeViewerItem = null;
 
   constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
     public router: LocationRouterService, private dialog: MatDialog, private state: State) {
     this.allowEditorMode = !environment.production;
-    this.editorActiveTab = "models";
-    this._disposed = false;
-  }
-
-  ngDoCheck(): void {
-    this.updateSelectedPinStyle();
-  }
-
-  async ngOnInit() {
 
     // Create renderer
     this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true, antialias: true });
-
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFShadowMap;
-
-    this.containterRef.nativeElement.appendChild(this.renderer.domElement);
 
     // Resource manager
     this.resources = new ThreeViewerResources(this.renderer);
@@ -195,21 +215,45 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     // Camera
     this.camera = new PerspectiveCamera(50, 1, 0.1, 2000.0);
     this.camera.matrixAutoUpdate = true;
+  }
 
-    // Scene
-    this.scene = new Scene();
+  ngDoCheck(): void {
+    if (this._loadedItem != this.item && this.item != null) {
+      this.loadItem();
+      this._loadedItem = this.item;
+    }
 
-    // Grid helper
-    this.gridHelper = new GridHelper(20, 20);
+    this.updateSelectedPinStyle();
+  }
+
+  async ngOnInit() {
+    this.containterRef.nativeElement.appendChild(this.renderer.domElement);
+  }
+
+
+  ngOnDestroy(): void {
+    this.dispose();
+  }
+
+  async loadItem(): Promise<void> {
+
+    const resources = this.resources;
+
+    this.unloadItem();
 
     // Transform controls
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
     this.transformControls.addEventListener('dragging-changed', (evt) => this.editorControls.enabled = !evt.value);
 
     // Orbit and touch controls
-
-    this.editorControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
+    this.editorControls = new OrbitControls(this.camera, this.renderer.domElement);
     this.editorControls.enabled = false;
+
+    // Grid helper
+    this.gridHelper = new GridHelper(20, 20);
+
+    // Scene
+    this.scene = new Scene();
 
     // Add everything to the scene
     this.scene.add(this.transformControls);
@@ -219,28 +263,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     this.scene.add(this.pins);
     this.scene.add(this.colliders);
 
-    // Wait for item to load
-    await this.loadItem();
-
-    // Start the render loop (outside angular)
-    // Turn off editor mode by default
-
-
-    this.zone.runOutsideAngular(() => {
-      this.render();
-      setTimeout(() => this.editorMode = false, 0);
-    });
-
-  }
-
-
-  ngOnDestroy(): void {
-    this._disposed = true;
-  }
-
-  async loadItem(): Promise<void> {
-
-    const resources = this.resources;
+    this.editorActiveTab = "models";
 
     // Load saved state
     let state = this.state.getState();
@@ -262,7 +285,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     const controlsType: ThreeViewerItemCameraControls = this.item.camera.controls || "fly";
 
     if (controlsType === "fly") {
-      this.controls = new TouchControls(this.camera, this.containterRef.nativeElement, {
+      this.controls = new TouchControls(this.camera, this.renderer.domElement, {
         rotationSpeed: this.item.camera.rotationSpeed || 1.0,
         zoomStep: this.item.camera.zoomStep || 1.0,
         zoomDamping: this.item.camera.zoomDamping || Number.POSITIVE_INFINITY
@@ -271,7 +294,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       this.controls.addEventListener("change", (evt) => this.saveState());
 
     } else { // orbit
-      this.controls = new OrbitControls(this.camera, this.containterRef.nativeElement);
+      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       this.controls.rotateSpeed = this.item.camera.rotationSpeed || 1.0;
       this.controls.zoomSpeed = this.item.camera.zoomStep || 1.0;
       this.controls.minDistance = this.item.camera.orbitMinDistance || 0;
@@ -326,13 +349,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 
     // Load models
-    this.models.remove(...this.models.children);
-
-
-    // I'm not using array functions here (map, forEach, ...) because
-    // this is an async function and it would make the code a bit harder
-    // to read
-
     if (this.item.models) {
       for (let modelDef of this.item.models) {
         let model = new ThreeViewerModel(this.resources);
@@ -396,9 +412,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     }
 
     // Load lights
-
-    this.lights.remove(...this.lights.children);
-
     if (this.item.lights) {
 
       for (let lightDef of this.item.lights) {
@@ -434,9 +447,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     }
 
     // Load pin layers
-    this.pinLayers = [];
-    this.pins.remove(...this.pins.children);
-
     if (this.item.pinLayers) {
       for (let pinLayerDef of this.item.pinLayers) {
         let layer = new ThreeViewerPinLayer(resources);
@@ -458,7 +468,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
       }
     }
-
 
     // Load pins
     if (this.item.pins) {
@@ -489,9 +498,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     }
 
     // Load colliders 
-
-    this.colliders.remove(...this.colliders.children);
-
     if (this.item.colliders) {
       for (let colliderDef of this.item.colliders) {
         let collider = new ThreeViewerCollider(this.resources, (await resourcePromises[colliderDef.geometry]) as BufferGeometry);
@@ -523,6 +529,13 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     // Save the state again
     this.saveState();
+
+    // Run the animation loop
+    this.zone.runOutsideAngular(() => {
+      this._animFrameHandler = new AnimationFrameHandler(this.render.bind(this));
+      this._animFrameHandler.start();
+      setTimeout(() => this.editorMode = false, 0);
+    });
 
   }
 
@@ -655,7 +668,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     })
   }
 
-  dispose(): void {
+  createScene(): void {
+  }
+
+  unloadItem(): void {
+    if (this._loadedItem == null)
+      return;
 
     const disposeObject3D = (obj: any) => {
 
@@ -679,31 +697,44 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     };
 
-    if (this.controls)
-      this.controls.dispose();
-
-    if (this.transformControls)
-      this.transformControls.dispose();
-
     this.resources.dispose();
+
+    this._animFrameHandler.cancel();
+
+    this.controls.dispose();
+    this.transformControls.dispose();
+
+
+    // Traverse the scene for all the remaining objects, moslty should be helper controls and
+    // dispose their meshes. Don't look for textures, there shouldn't be any
+    this.scene.traverse(disposeObject3D);
+    this.scene.dispose();
 
     // The objects disposal should have been handled by the resource tracking system
     // so no need to traverse the scene for them
     this.models.remove(...this.models.children);
     this.pins.remove(...this.pins.children);
     this.lights.remove(...this.lights.children);
-    this.scene.remove(...this.scene.children);
+    this.colliders.remove(...this.colliders.children);
+    this.pinLayers = [];
 
-    // Traverse the scene for all the remaining objects, moslty should be helper controls and
-    // dispose their meshes. Don't look for textures, there shouldn't be any
-    this.scene.traverse(disposeObject3D);
 
-    this.scene.dispose();
     this.renderer.renderLists.dispose();
+
+    this._loadedItem = null;
+  }
+
+  dispose(): void {
+    this.unloadItem();
+
+    this.renderer.domElement.remove();
     this.renderer.dispose();
+
+    this._animFrameHandler.cancel();
 
     this.models = null;
     this.lights = null;
+    this.colliders = null;
     this.pinLayers = null;
     this.pins = null;
 
@@ -714,13 +745,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   render() {
-
-    if (this._disposed) {
-      this.dispose();
-      return;
-    }
-
-    requestAnimationFrame(this.render.bind(this));
 
     // This has to run outside angualar zone for performance
     NgZone.assertNotInAngularZone();
@@ -742,6 +766,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     renderer.render(this.scene, this.camera);
 
+    console.log("ciao");
 
   }
 

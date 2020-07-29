@@ -12,7 +12,6 @@ import { Item } from 'src/app/types/item';
 import { SlideshowItem, SlideShowItemGroup } from 'src/app/types/slideshow-item';
 import { LocationRouterService } from 'src/app/location-router.service';
 import { State, StateData } from 'src/app/classes/state';
-import { ItemComponent } from '../item/item.component';
 
 type Styles = { [key: string]: string | number };
 
