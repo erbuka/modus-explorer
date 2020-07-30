@@ -89,8 +89,6 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
 
     this.subscription = this.router.queryParams.subscribe(params => {
 
-      console.log("ciao");
-
       if (params["s"]) {
 
         let slideIndex = parseInt(params["s"]);
