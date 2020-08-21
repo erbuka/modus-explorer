@@ -11,7 +11,7 @@
 
 // Be sure that you only ever include this mixin once!
 
-@import 'scss/cn-custom';
+@import 'scss/cn-custom-material';
 
 $cn-font-family: "Roboto", "Helvetica", sans-serif !default;
 $cn-font-size: 14px !default;
@@ -79,4 +79,7 @@ $theme-colors: (
 @import "scss/cn-leaflet";
 @import "scss/cn-slider";
 @import "scss/cn-cdk-drag-drop";
+
+@import 'scss/cn-custom';
+
 
