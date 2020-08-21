@@ -1,7 +1,7 @@
 <ng-container *ngIf="item">
     <div class="p-4" *ngIf="currentSlideIndex === null && !simpleMode">
         <div *ngFor="let grp of item.groups" class="mb-3">
-            <h3 class="mb-0"><strong>{{ grp.title | cnLocalizedText }}</strong></h3>
+            <h3 class="mb-0 cn-slideshow-group-title"><strong>{{ grp.title | cnLocalizedText }}</strong></h3>
             <div class="d-flex flex-wrap mx-n1 cn-block-list">
                 <div *ngFor="let slide of getSlidesForGroup(grp.name); index as i"
                     class="p-1 cn-block-list-item animated fadeInRight" [style.animation-delay]="0.1 * i + 's'"
