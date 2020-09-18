@@ -21,5 +21,8 @@ $cn-header-height: 8rem;
         overflow-y: auto;
         //margin-top: $cn-header-height;
         height: calc(100vh - #{$cn-header-height});
+        background-position: right 1rem bottom 1rem;
+        background-repeat: no-repeat;
+        background-size: auto 4rem;
     }
 }
