@@ -8,28 +8,32 @@
                 <ng-container *ngTemplateOutlet="context.getTemplate(context.config.headerTemplate)"></ng-container>
             </div>
             <div class="ml-auto"></div>
-            <div class="p-2 align-self-end">
+            <div class="align-self-end d-flex flex-column h-100 text-right">
 
-                <ng-container *ngIf="locales && locales.length > 1">
-                    <mat-menu #localeMenu>
-                        <button mat-menu-item class="text-right" *ngFor="let l of locales"
-                            (click)="context.setCurrentLocale(l.id, true)">
-                            {{l.description}}
-                            <img *ngIf="l.flagIcon" [src]="l.flagIcon" class="ml-1"
-                                style="vertical-align:middle; height: 24px;">
-                        </button>
-                    </mat-menu>
+                <img style="height: 4rem;" class="pr-2 pt-2 align-self-end" src="core-assets/images/logo-light.png">
 
-                    <div class="text-right mb-1">
-                        <button mat-button [matMenuTriggerFor]="localeMenu">
-                            <span>{{ context.getCurrentLocale().description }}</span>
-                            <img *ngIf="context.getCurrentLocale().flagIcon" class="ml-1"
-                                [src]="context.getCurrentLocale().flagIcon" style="height: 24px;">
-                        </button>
-                    </div>
-                </ng-container>
+                <div class="mt-auto"></div>
 
-                <div style="white-space: nowrap;">
+                <div class="d-flex align-items-center p-2">
+                    <ng-container *ngIf="locales && locales.length > 1">
+                        <mat-menu #localeMenu>
+                            <button mat-menu-item class="text-right" *ngFor="let l of locales"
+                                (click)="context.setCurrentLocale(l.id, true)">
+                                {{l.description}}
+                                <img *ngIf="l.flagIcon" [src]="l.flagIcon" class="ml-1"
+                                    style="vertical-align:middle; height: 24px;">
+                            </button>
+                        </mat-menu>
+                        <div class="text-right">
+                            <button mat-button [matMenuTriggerFor]="localeMenu">
+                                <span>{{ context.getCurrentLocale().description }}</span>
+                                <img *ngIf="context.getCurrentLocale().flagIcon" class="ml-1"
+                                    [src]="context.getCurrentLocale().flagIcon" style="height: 24px;">
+                            </button>
+                        </div>
+
+                    </ng-container>
+
                     <button class="mx-1" mat-mini-fab color="primary" (click)="goBack()">
                         <mat-icon>chevron_left</mat-icon>
                     </button>
@@ -42,7 +46,7 @@
                 </div>
             </div>
         </div>
-        <div class="cn-app-content" #appContent style="background-image: url(core-assets/images/logo-light.png)">
+        <div class="cn-app-content" #appContent>
             <app-item [item]="item"></app-item>
         </div>
     </div>
