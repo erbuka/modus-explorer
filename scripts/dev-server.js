@@ -9,7 +9,11 @@ const port = 8080;
 
 const common = require("./common");
 
-
+/** Create starter application if it doesn't exist */
+if(!fs.fstatSync("assets").isDirectory())
+{
+    
+}
 
 /** Development Server */
 {
