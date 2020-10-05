@@ -2,7 +2,7 @@
 
 # assets
 /assets
-/templates
+/templates/*.html
 
 # compiled output
 /build-dev
