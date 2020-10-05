@@ -1,0 +1,14 @@
+{
+    "type" : "block-list",
+    "options" : {
+        "itemWidth" : "20rem",
+        "itemAspectRatio" : 1
+    },
+    "links" : [
+        {
+            "href" : "./welcome",
+            "image" : "./welcome.jpg",
+            "title" : "Welcome"
+        }
+    ] 
+}

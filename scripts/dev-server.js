@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const rimraf = require("rimraf");
 const colors = require("colors");
+const ncp = require("ncp");
 
 const app = express();
 const port = 8080;
@@ -10,9 +11,8 @@ const port = 8080;
 const common = require("./common");
 
 /** Create starter application if it doesn't exist */
-if(!fs.fstatSync("assets").isDirectory())
-{
-    
+if(!fs.existsSync("./assets")) {
+    ncp("./starter-project", "./assets");
 }
 
 /** Development Server */
