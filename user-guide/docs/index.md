@@ -3,7 +3,7 @@
 - [Prerequisiti](#prerequisiti)
 - [Installazione](#installazione)
 - [Struttura del repository](#struttura-del-repository)
-- [Modalità sviluppo](#modalità-sviluppo)
+- [sviluppo](#sviluppo)
   - [Comandi di avvio](#comandi-di-avvio)
 - [Gestione contenuti](#gestione-contenuti)
   - [Overview](#overview)
@@ -13,8 +13,8 @@
   - [Deepzoom](#deepzoom)
   - [3D](#3d)
   - [Pagine](#pagine)
-- [Templates](#templates)
-- [Build di produzione e deployment](#build-di-produzione-e-deployment)
+- [Guida ai templates](#guida-ai-templates)
+- [Produzione](#produzione)
 
 ## Prerequisiti
 
@@ -31,13 +31,13 @@ Il codice sorgente dell'applicazione viene reperito tramite il client Git dal re
 
 Ogni volta che si vuole create un nuovo progetto Modus Explorer è necessario eseguire questa procedura. Ogni progetto contiene il codice sorgente e tutti i file utilizzati per la generazione dei contenuti. 
 
-Per create un nuovo progetto, aprire un prompt dei comandi e posizionarsi sulla cartella di lavoro desiderata (as esempio, "Documenti") e lanciare il seguente comando:
+Per create un nuovo progetto, aprire un prompt dei comandi e posizionarsi sulla cartella di lavoro desiderata (ad esempio, "Documenti") e lanciare il seguente comando:
 
 `git clone https://github.com/erbuka/modus-explorer <cartella di destinazione>`
 
 Si consiglia di usare il nome del progetto stesso per la cartella di destinazione. Se la cartella di destinazione non viene specificata, il sistema utilizza il nome stesso del repository "modus-explorer".
 
-Dopo che l'operazione di clonazione è completata, è necessario installare tutti i pacchetti necessari allo sviluppo dell'applicazione: posizionarsi con il prompt dei comandi nella cartella appena creata e lanciare il seguente comandi:
+Dopo che l'operazione di clonazione è completata, è necessario installare tutti i pacchetti necessari allo sviluppo dell'applicazione: posizionarsi con il prompt dei comandi nella cartella appena creata e lanciare il seguente comando:
 
 `npm i`
 
@@ -58,7 +58,7 @@ Di seguito si riporta l'organizzazione delle cartelle del progetto. Alcune carte
   - **scss/** - Fogli di stile
 - **templates/** - Template per schede/pagine
 
-## Modalità sviluppo
+## sviluppo
 
 La modalità sviluppo consente di eseguire l'applicazione in us server web locale e di lavorare sui contenuti in maniera interattiva. Questa modalità richiede l'utilizzo di 2 o più prompt dei comandi aperti contemporaneamente, e quindi si consiglia di utilizzare Visual Studio Code per il terminale/prompt integrato.
 
@@ -75,6 +75,8 @@ Per compilare il codice sorgente vero e proprio, aprire un altro prompt e lancia
 `npm start`
 
 In questo modo si avvia il processo di compilazione. Al primo avvio in assoluto, potrebbero volerci alcuni minuti dato che il sistema deve compilare tutte le dipendenze.
+
+**NB**: entrambe i comandi sono di tipo "watch", ossia dei processi attivi in attesa di modifiche ai file locali all'applicazione. Quando avviene una modifica, l'applicazione viene ricompilata. E' quindi necessario che i prompt dei comandi rimangano aperti durante la fase di sviluppo
 
 A questo punto è possibile navigare tramite browser all'indirizzo http://localhost:8080/ e se la procedura è stata eseguita correttamente si dovrebbe visualizzare la seguente schermata:
 
@@ -96,6 +98,6 @@ A questo punto è possibile navigare tramite browser all'indirizzo http://localh
 
 ### Pagine
 
-## Templates
+## Guida ai templates
 
-## Build di produzione e deployment
+## Produzione
