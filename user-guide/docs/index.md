@@ -3,7 +3,7 @@
 - [Prerequisiti](#prerequisiti)
 - [Installazione](#installazione)
 - [Struttura del repository](#struttura-del-repository)
-- [sviluppo](#sviluppo)
+- [Sviluppo](#sviluppo)
   - [Comandi di avvio](#comandi-di-avvio)
 - [Gestione contenuti](#gestione-contenuti)
   - [Overview](#overview)
@@ -58,7 +58,7 @@ Di seguito si riporta l'organizzazione delle cartelle del progetto. Alcune carte
   - **scss/** - Fogli di stile
 - **templates/** - Template per schede/pagine
 
-## sviluppo
+## Sviluppo
 
 La modalità sviluppo consente di eseguire l'applicazione in us server web locale e di lavorare sui contenuti in maniera interattiva. Questa modalità richiede l'utilizzo di 2 o più prompt dei comandi aperti contemporaneamente, e quindi si consiglia di utilizzare Visual Studio Code per il terminale/prompt integrato.
 
