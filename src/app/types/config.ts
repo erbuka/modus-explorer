@@ -1,18 +1,18 @@
 import { LocalizedText } from './item';
 
 export interface ConfigLocale {
-    id: string;
-    flagIcon?: string;
-    description: string;
+    id: string;                     // "it", "en", ...
+    flagIcon?: string;              // Link per icona bandiera 
+    description: string;            // "Italiano", "English", ...
 }
 
 export interface Config {
-    title: LocalizedText;
-    backgroundImage: string;
-    entry: string;
-    headerTemplate?: string;
-    internationalization?: {
-        defaultLocale: string,
-        locales: ConfigLocale[]
+    title: LocalizedText;           // Titolo applicazione
+    backgroundImage: string;        // Immagine di sfondo
+    entry: string;                  // Link alla homepage
+    headerTemplate?: string;        // Template grafico per testata
+    internationalization?: {        // Parametri internazionalizzazione
+        defaultLocale: string,      // Lingua di default, es "it"
+        locales: ConfigLocale[]     // Lingue disponibili
     }
 }
