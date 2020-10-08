@@ -17,7 +17,6 @@
   - [Deepzoom](#deepzoom)
   - [3D](#3d)
   - [Pagine](#pagine)
-- [Guida ai templates](#guida-ai-templates)
 - [Produzione](#produzione)
 
 ## Prerequisiti
@@ -64,7 +63,7 @@ Di seguito si riporta l'organizzazione delle cartelle del progetto. Alcune carte
 
 ## Sviluppo
 
-La modalità sviluppo consente di eseguire l'applicazione in us server web locale e di lavorare sui contenuti in maniera interattiva. Questa modalità richiede l'utilizzo di 2 o più prompt dei comandi aperti contemporaneamente, e quindi si consiglia di utilizzare Visual Studio Code per il terminale/prompt integrato.
+La modalità sviluppo consente di eseguire l'applicazione in un server web locale e di lavorare sui contenuti in maniera interattiva. Questa modalità richiede l'utilizzo di 2 o più prompt dei comandi aperti contemporaneamente, e quindi si consiglia di utilizzare Visual Studio Code per il terminale/prompt integrato.
 
 ### Comandi di avvio
 
@@ -138,7 +137,7 @@ Da notare:
 -  I valori sono a loro volta degli elementi JSON. Nel caso specifico sono sempre stringhe, ma come sarà più chiaro negli schemi seguenti, possono essere a loro volta degli oggetti composti o array
 
 #### Esempio: Lingua
-Il seguente schema viene utilizzato per configurare una lingua in Modus Expolorer:
+Il seguente schema viene utilizzato per configurare una lingua in Modus Explorer:
 ```typescript
 export interface ConfigLocale {
     id: string;                     // "it", "en", ...
@@ -146,7 +145,7 @@ export interface ConfigLocale {
     description: string;            // "Italiano", "English", ...
 }
 ```
-Lo scopo di questo esempio è mostrare che ci sono dei campi che sono opzionali. In questo caso il campo "flagIcon?" è opzionale perchè postfisso con punto interrogativo. 
+Lo scopo di questo esempio è mostrare che ci sono dei campi che sono opzionali. In questo caso il campo "flagIcon?" è opzionale perché postfisso con punto interrogativo. 
 
 Alcuni esempi corretti:
 ```json
@@ -518,6 +517,7 @@ export interface ThreeViewerItem extends ItemBase {
 }
 ```
 ### Pagine
+
 ```typescript
 export interface PageItem extends ItemBase {
     type: "page";
@@ -525,7 +525,55 @@ export interface PageItem extends ItemBase {
     data?: any;             // Dati da passare al template
 }
 ```
+Le pagine sono dei contenti completamente dinamici. Il campo "template" indica il nome del template da utilizzare per il layout, mentre il campo "data" contiene tutti i dati da utilizzare per generare il contenuto ed è utilizzato dal template stesso.
 
-## Guida ai templates
+I template sono implementati dall'utente, risiedono nella cartella "templates" e devono avere estensione ".html". Il nome del template da specificare nella configurazione non è altro che il nome del relativo file privo di estensione. Ad esempio, se il nome del file è "templates/home.html", la configurazione della pagina sarà la seguente:
+
+```json
+{
+    "type": "page",
+    "template": "home"
+}
+```
+
+Il file corrispondente "templates/home.html":
+
+```html
+<h1>Titolo</h1>
+<h2>Sotto titolo</h2>
+<p>Dolor sint cupidatat cillum sunt aute nulla proident occaecat aliqua. Aute ex sint do ut irure occaecat magna magna laborum est aliqua. Consequat excepteur sint cillum aliquip dolor exercitation reprehenderit. Est et ea aute enim ullamco cupidatat proident.</p>
+```
+
+Non è necessario includere un documento HTML intero (quindi niente tag "html", "head" o "body"), ma soltanto uno snippet che poi verrà inserito dall'applicazione quando la corrispondente pagina viene caricata.
+
+In questo caso la pagina è completamente statica. La vera potenza dei template sta nel fatto di poter utilizzare, oltre all'HTML standard, quasi tutti i costrutti Angular per la generazione di contenuti.
+
+Se si desidera passare dei dati al template, come ad esempio testi, indirizzi di immagini, etc., è possibile utilizzare il campo opzionale "data". Lo schema specifica questo campo di tipo "any", il che significa che è l'utente a strutturare i dati come meglio crede:
+```json
+{
+    "type": "page",
+    "template": "home",
+    "data" : {
+        "firstName": "Andrea",
+        "lastName": "Bucaletti",
+        "address" : {
+            "street" : "Via Garibaldi, 8",
+            "city" : "Roma"
+        },
+        "luckyNumbers": [3, 14, 15, 92]
+    }
+}
+```
+Il corrispondente template può accedere ai dati e generare contenuti basati su questi:
+```html
+<div>
+    <div>Nome: {{data.firstName}}</div>
+    <div>Cognome: {{data.lastName}}</div>
+    <div>Indirizzo: {{data.address.street}}, {{data.address.city}}</div>
+    <div>Numeri fortunati: <span *ngFor="let n of data.luckyNumbers">{{n}},</span></div>
+</div>
+```
+
+Nel progetto di default generato dal sistema è presente una pagina con vari casi di utilizzo interessanti e una guida per esempi sia alle direttive Angular che a quelle specifiche per Modus Explorer, il che già consente di creare pagine molto complesse. In ogni caso, per sfruttare completamente le funzionalità dei template, si alla documentazione di [Angular](https://angular.io/).
 
 ## Produzione 

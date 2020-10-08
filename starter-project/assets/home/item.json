@@ -7,8 +7,13 @@
     "links" : [
         {
             "href" : "./welcome",
-            "image" : "./welcome.jpg",
+            "image" : "assets/images/welcome.jpg",
             "title" : "Welcome"
+        },
+        {
+            "href" : "./templates-samples",
+            "image" : "assets/images/tmpl.jpg",
+            "title" : "Templates Samples"
         }
     ] 
 }
