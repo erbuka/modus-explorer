@@ -10,7 +10,11 @@
                         [style.padding-bottom]="(1 / item.options.itemAspectRatio) * 100 + '%'"
                         (click)="gotoSlide(slide)">
                         <div class="cn-overlay cn-bg-cover" [appBgImage]="slide.previewImage | cnUrl : item"></div>
+                        <div *ngIf="slide.video" class="cn-overlay d-flex align-items-center justify-content-center text-primary-lighter">
+                            <mat-icon class="d-block" style="font-size: 2rem; width: auto; height: auto;">play_circle_outline</mat-icon>
+                        </div>
                         <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
+
                     </div>
                 </div>
             </div>

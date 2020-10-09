@@ -1,0 +1,77 @@
+{
+    "type": "slideshow",
+    "options": {
+        "itemWidth": "10rem",
+        "itemAspectRatio": 2
+    },
+    "groups": [
+        {
+            "name": "nature",
+            "title": "Natura"
+        },
+        {
+            "name": "sport",
+            "title": "Sport"
+        },
+        {
+            "name": "other",
+            "title": "Altro"
+        }
+    ],
+    "slides": [
+        {
+            "group": "nature",
+            "previewImage": "./nature/1.jpg",
+            "image": "./nature/1.jpg",
+            "title": "Natura 1"
+        },
+        {
+            "group": "nature",
+            "previewImage": "./nature/2.jpg",
+            "image": "./nature/2.jpg",
+            "title": "Natura 2"
+        },
+        {
+            "group": "nature",
+            "previewImage": "./nature/3.jpg",
+            "image": "./nature/3.jpg",
+            "title": "Natura 3"
+        },
+        {
+            "group": "nature",
+            "previewImage": "./nature/4.jpg",
+            "image": "./nature/4.jpg",
+            "title": "Natura 4"
+        },
+        {
+            "group": "sport",
+            "previewImage": "./sport/1.jpg",
+            "image": "./sport/1.jpg",
+            "title": "Sport 1"
+        },
+        {
+            "group": "sport",
+            "previewImage": "./sport/2.jpg",
+            "image": "./sport/2.jpg",
+            "title": "Sport 2"
+        },
+        {
+            "group": "sport",
+            "previewImage": "./sport/3.jpg",
+            "image": "./sport/3.jpg",
+            "title": "Sport 3"
+        },
+        {
+            "group": "other",
+            "previewImage": "./other/got.jpg",
+            "video": "./other/got.mp4",
+            "title": "Game of Thrones intro"
+        },
+        {
+            "group": "other",
+            "previewImage": "assets/images/tmpl.jpg",
+            "href": "../templates-samples/simple-page",
+            "title": "Simple page"
+        }
+    ]
+}

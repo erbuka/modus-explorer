@@ -12,11 +12,12 @@
     - [Esempio: Lingua](#esempio-lingua)
     - [Esempio: Array](#esempio-array)
   - [Configurazione globale](#configurazione-globale)
-  - [Liste a blocchi](#liste-a-blocchi)
-  - [Slideshow](#slideshow)
-  - [Deepzoom](#deepzoom)
-  - [3D](#3d)
-  - [Pagine](#pagine)
+  - [Componenti](#componenti)
+    - [Liste a blocchi](#liste-a-blocchi)
+    - [Slideshow](#slideshow)
+    - [Deepzoom](#deepzoom)
+    - [3D](#3d)
+    - [Pagine](#pagine)
 - [Produzione](#produzione)
 
 ## Prerequisiti
@@ -71,7 +72,10 @@ Per avviare il server locale, aprire un prompt dei comandi nella cartella del pr
 
 `npm run start:dev-server`
 
-Il comando apre un server web locale in ascolto sulla porta 8080 e avvia una serie di comandi secondari che ricompilano alcune parti dell'applicazione (ad esempio, i templates) se queste vengono modificate dall'utente.
+Questo svolge le seguenti operazioni:
+- Se si tratta della prima esecuzione, genera un progetto con dei contenuti di esempio.
+- apre un server web locale in ascolto sulla porta 8080
+- avvia una serie di comandi secondari che ricompilano alcune parti dell'applicazione (ad esempio, i templates) se queste vengono modificate dall'utente.
 
 Per compilare il codice sorgente vero e proprio, aprire un altro prompt e lanciare il comando:
 
@@ -91,26 +95,24 @@ A questo punto è possibile navigare tramite browser all'indirizzo http://localh
 
 Il sistema di gestione dei contenuti Modus Explorer è basato su file e cartelle. Tutti i file relativi ai contenuti si trovano sotto la cartella "assets", dove l'utente crea e organizza una gerarchia di cartelle che rappresentano le pagine e sezioni dell'applicazione.
 
-Il percorso di ogni cartella definisce anche l'URI della pagina ad esso associata. Ad esempio, se si crea un elemento Slideshow in "assets/slideshow", questo percorso rappresenta anche l'indirizzo relativo della pagina nel browser (ad esempio, nel server web locale, "http://localhost:8080/assets/slideshow").
+Il percorso di ogni cartella definisce anche l'URI della pagina ad esso associata. Ad esempio, se si crea un componente Slideshow in "assets/slideshow", questo percorso rappresenta anche l'indirizzo relativo della pagina nel browser (ad esempio, nel server web locale, "http://localhost:8080/assets/slideshow").
 
-Per ogni cartella può quindi essere definito un elemento tramite un file di configurazione di nome "item.json". Al momento, i tipi di elementi supportati in Modus Explorer sono i seguenti:
+Per ogni cartella può quindi essere definito un componente tramite un file di configurazione di nome "item.json". Al momento, i tipi di componente supportati in Modus Explorer sono i seguenti:
 - Lista a blocchi - una lista di link ad altre pagine organizzata in blocchi con immagine e titolo
 - Slideshow - Insieme di slide (immagini, video, 3D, deepzoom, etc.)
 - Deepzoom - Visualizzazione multi-layer di immagini ad alta risoluzione
 - 3D - Visualizzatore scene 3D
 - Pagine - Pagina dinamica con contenuti arbitrari definita tramite templates
 
-A parte il 3D per il quale è incluso un editor, i file "item.json" relativi agli altri elementi devono essere scritti a mano e devono seguire un determinato schema a seconda dell'elemento. Per la sintassi di base del formato JSON, si rimanda al [sito ufficiale](https://www.json.org/json-en.html).
-
-Nelle sezioni seguenti verranno descritti tutti gli elementi ed i loro relativi schemi.
+A parte il 3D per il quale è incluso un editor, i file "item.json" relativi agli altri componenti devono essere scritti a mano e devono seguire un determinato schema a seconda del componente. Per la sintassi di base del formato JSON, si rimanda al [sito ufficiale](https://www.json.org/json-en.html).
 
 ### Schemi
 
-Lo scheme definisce la struttura di un determinato file JSON, i campi che può o non può contenere, e il tipo di ogni campo. In questa sezione si riportano alcuni schemi JSON ricorrenti nelle sezioni successive.
+Lo schema definisce la struttura di un determinato file JSON, i campi che può o non può contenere, e il tipo di ogni campo. In questa sezione si riportano alcuni schemi JSON ricorrenti nelle sezioni successive.
 
 #### Esempio: Testo localizzato
 
-Essendo Modus Explorer un'applicazione multi-lingua è necessario avere un modo di specificare i contenuti testuali in più lingue. Quindi negli schemi dei vari elementi i testi devono seguire lo schema "LocalizedText". 
+Essendo Modus Explorer un'applicazione multi-lingua è necessario avere un modo di specificare i contenuti testuali in più lingue. Quindi negli schemi dei vari componenti i testi devono seguire lo schema "LocalizedText". 
 
 Schema:
 ```typescript
@@ -263,12 +265,15 @@ Esempio:
 }
 ```
 
-### Liste a blocchi
+### Componenti
+Nelle seguenti sezioni vengono riportati gli schemi relativi ai componente attualmente supportati in Modus Explorer. Per esempi pratici si veda l'applicazione di base.
+
+#### Liste a blocchi
 ```typescript
 export interface BlockListItem extends ItemBase {
-    type: "block-list";             // Tipo dell'elemento, sempre "block-list"
+    type: "block-list";             
     options: {                      // Opzioni
-        itemWidth: string,          // Lunghezza CSS dell'elemento (pixel, em, ...)
+        itemWidth: string,          // Lunghezza CSS del singolo elemento (pixel, em, ...)
         itemAspectRatio: number     // Aspect ratio
     },
     links: {                        // Lista dei link
@@ -279,7 +284,7 @@ export interface BlockListItem extends ItemBase {
 }
 ```
 
-### Slideshow
+#### Slideshow
 ```typescript
 export type SlideShowItemMode = "normal" | "simple";  // Modalità normale/semplice
 
@@ -304,13 +309,13 @@ export interface SlideshowItem extends ItemBase {
     previewImage: string,       // Miniatura
     image?: string,             // Immagine
     title?: LocalizedText,      // Titolo
-    href?: string,              // Link ad un altro elemento
+    href?: string,              // Link ad un altro componente
     video?: string,             // Link a video
   }[]
 }
 ```
 
-### Deepzoom
+#### Deepzoom
 ```typescript
 
 // Definizione di una figura geometrica generica
@@ -370,7 +375,7 @@ export interface DeepZoomItemVectorLayer extends DeepZoomItemLayer {
     shapes: (DeepZoomItemPolygon | DeepZoomItemCircle)[]; // Lista delle figure geometriche
 }
 
-// Elemento deepzoom
+// Componente deepzoom
 export interface DeepZoomItem extends ItemBase {
     type: "deep-zoom";
     options: {                      // Opzioni
@@ -391,9 +396,9 @@ export interface DeepZoomItem extends ItemBase {
 }
 ```
 
-### 3D
+#### 3D
 
-Lo schema del visualizzatore 3D è estremamente complesso e non è pensato per la modifica manuale, in quanto il file "item.json" viene aggiornato automaticamente dall'editor 3D. E' necessario tuttavia definirlo al momento della creazione dell'elemento con una configurazione minimale:
+Lo schema del visualizzatore 3D è estremamente complesso e non è pensato per la modifica manuale, in quanto il file "item.json" viene aggiornato automaticamente dall'editor 3D. E' necessario tuttavia definirlo al momento della creazione del componente con una configurazione minimale:
 ```json
 {
     "type": "3d",
@@ -516,7 +521,8 @@ export interface ThreeViewerItem extends ItemBase {
     colliders?: ThreeViewerItemCollider[]
 }
 ```
-### Pagine
+
+#### Pagine
 
 ```typescript
 export interface PageItem extends ItemBase {
@@ -574,6 +580,6 @@ Il corrispondente template può accedere ai dati e generare contenuti basati su 
 </div>
 ```
 
-Nel progetto di default generato dal sistema è presente una pagina con vari casi di utilizzo interessanti e una guida per esempi sia alle direttive Angular che a quelle specifiche per Modus Explorer, il che già consente di creare pagine molto complesse. In ogni caso, per sfruttare completamente le funzionalità dei template, si alla documentazione di [Angular](https://angular.io/).
+Nel progetto di esempio generato dal sistema è presente una pagina con vari casi di utilizzo interessanti e una guida per esempi sia alle direttive Angular che a quelle specifiche per Modus Explorer, il che già consente di creare pagine molto complesse. In ogni caso, per sfruttare completamente le funzionalità dei template, si alla documentazione di [Angular](https://angular.io/).
 
 ## Produzione 
