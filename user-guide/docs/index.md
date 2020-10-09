@@ -580,6 +580,6 @@ Il corrispondente template può accedere ai dati e generare contenuti basati su 
 </div>
 ```
 
-Nel progetto di esempio generato dal sistema è presente una pagina con vari casi di utilizzo interessanti e una guida per esempi sia alle direttive Angular che a quelle specifiche per Modus Explorer, il che già consente di creare pagine molto complesse. In ogni caso, per sfruttare completamente le funzionalità dei template, si alla documentazione di [Angular](https://angular.io/).
+Nel progetto di esempio generato dal sistema è presente una pagina con vari casi di utilizzo interessanti e una guida per esempi sia alle direttive Angular che a quelle specifiche per Modus Explorer, il che già consente di creare pagine molto complesse. In ogni caso, per sfruttare completamente le funzionalità dei template, si rimanda alla documentazione di [Angular](https://angular.io/).
 
 ## Produzione 
