@@ -1,24 +1,29 @@
 {
-    "type" : "block-list",
-    "options" : {
-        "itemWidth" : "20rem",
-        "itemAspectRatio" : 1
+    "type": "block-list",
+    "options": {
+        "itemWidth": "20rem",
+        "itemAspectRatio": 1
     },
-    "links" : [
+    "links": [
         {
-            "href" : "./welcome",
-            "image" : "assets/images/welcome.jpg",
-            "title" : "Welcome"
+            "href": "./welcome",
+            "image": "assets/images/welcome.jpg",
+            "title": "Welcome"
         },
         {
-            "href" : "./templates-samples",
-            "image" : "assets/images/tmpl.jpg",
-            "title" : "Templates Samples"
+            "href": "./templates-samples",
+            "image": "assets/images/tmpl.jpg",
+            "title": "Templates Samples"
         },
         {
-            "href" : "./slideshow-sample",
-            "image" : "assets/images/slideshow.png",
-            "title" : "Slideshow Sample"
+            "href": "./slideshow-sample",
+            "image": "assets/images/slideshow.png",
+            "title": "Slideshow Sample"
+        },
+        {
+            "href": "./3d-sample",
+            "image": "assets/images/3d.jpg",
+            "title": "3D Sample"
         }
-    ] 
+    ]
 }

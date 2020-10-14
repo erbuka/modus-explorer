@@ -1,0 +1,217 @@
+{
+    "type": "3d",
+    "camera": {
+        "position": [
+            0.6461123946426424,
+            16.892718635474452,
+            15.261435593730807
+        ],
+        "lookAt": [
+            0.6177428115261162,
+            16.15099105159449,
+            14.591334587862745
+        ],
+        "controls": "orbit"
+    },
+    "models": [
+        {
+            "title": "Floor",
+            "description": "",
+            "position": [
+                0,
+                0,
+                0
+            ],
+            "rotation": [
+                0,
+                0,
+                0
+            ],
+            "scale": [
+                10,
+                1,
+                10
+            ],
+            "activeMaterial": 0,
+            "meshes": [
+                {
+                    "name": "Cube",
+                    "file": "./2a26eded6462076fb2cfac00951c2f509fadc2d6b84ed3e7051675ac7e555720.ply"
+                }
+            ],
+            "materials": [
+                {
+                    "title": "Default",
+                    "meshMaterials": [
+                        {
+                            "color": 16777215
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Cube 0",
+            "description": "",
+            "position": [
+                -5.034232314967477,
+                1.8928793531309172,
+                2.1926420010249243
+            ],
+            "rotation": [
+                0,
+                0,
+                0
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "activeMaterial": 0,
+            "meshes": [
+                {
+                    "name": "Cube",
+                    "file": "./2a26eded6462076fb2cfac00951c2f509fadc2d6b84ed3e7051675ac7e555720.ply"
+                }
+            ],
+            "materials": [
+                {
+                    "title": "Default",
+                    "meshMaterials": [
+                        {
+                            "color": 16747146
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Cube 1",
+            "description": "",
+            "position": [
+                0,
+                2.014402178367499,
+                -4.603907469705238
+            ],
+            "rotation": [
+                0,
+                0,
+                0
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "activeMaterial": 0,
+            "meshes": [
+                {
+                    "name": "Cube",
+                    "file": "./2a26eded6462076fb2cfac00951c2f509fadc2d6b84ed3e7051675ac7e555720.ply"
+                }
+            ],
+            "materials": [
+                {
+                    "title": "Default",
+                    "meshMaterials": [
+                        {
+                            "color": 9753087
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Cube 2",
+            "description": "",
+            "position": [
+                3.089287215732525,
+                2.8425363020590533,
+                2.530861578245693
+            ],
+            "rotation": [
+                0,
+                0,
+                0
+            ],
+            "scale": [
+                2,
+                2,
+                2
+            ],
+            "activeMaterial": 0,
+            "meshes": [
+                {
+                    "name": "Cube",
+                    "file": "./2a26eded6462076fb2cfac00951c2f509fadc2d6b84ed3e7051675ac7e555720.ply"
+                }
+            ],
+            "materials": [
+                {
+                    "title": "Default",
+                    "meshMaterials": [
+                        {
+                            "color": 8454064
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "lights": [
+        {
+            "title": "Sun",
+            "description": "",
+            "position": [
+                12.308480346064659,
+                12.982831060459226,
+                8.803802889123574
+            ],
+            "rotation": [
+                0,
+                0,
+                0
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "type": "directional",
+            "color": 16777215,
+            "castShadow": true,
+            "shadowMapWidth": 1024,
+            "shadowMapHeight": 1024,
+            "shadowCameraSize": [
+                20,
+                20,
+                499.5
+            ]
+        },
+        {
+            "title": "Ambient",
+            "description": "",
+            "position": [
+                0,
+                0,
+                0
+            ],
+            "rotation": [
+                0,
+                0,
+                0
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "type": "ambient",
+            "color": 7039851
+        }
+    ],
+    "pinLayers": [],
+    "pins": [],
+    "colliders": []
+}

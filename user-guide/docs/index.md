@@ -18,7 +18,10 @@
     - [Deepzoom](#deepzoom)
     - [3D](#3d)
     - [Pagine](#pagine)
+  - [Fogli di stile](#fogli-di-stile)
 - [Produzione](#produzione)
+  - [Cartella radice](#cartella-radice)
+  - [Deployment](#deployment)
 
 ## Prerequisiti
 
@@ -36,15 +39,16 @@ Il codice sorgente dell'applicazione viene reperito tramite il client Git dal re
 Ogni volta che si vuole create un nuovo progetto Modus Explorer è necessario eseguire questa procedura. Ogni progetto contiene il codice sorgente e tutti i file utilizzati per la generazione dei contenuti. 
 
 Per create un nuovo progetto, aprire un prompt dei comandi e posizionarsi sulla cartella di lavoro desiderata (ad esempio, "Documenti") e lanciare il seguente comando:
-
-`git clone https://github.com/erbuka/modus-explorer <cartella di destinazione>`
+```
+git clone https://github.com/erbuka/modus-explorer <cartella di destinazione>
+```
 
 Si consiglia di usare il nome del progetto stesso per la cartella di destinazione. Se la cartella di destinazione non viene specificata, il sistema utilizza il nome stesso del repository "modus-explorer".
 
 Dopo che l'operazione di clonazione è completata, è necessario installare tutti i pacchetti necessari allo sviluppo dell'applicazione: posizionarsi con il prompt dei comandi nella cartella appena creata e lanciare il seguente comando:
-
-`npm i`
-
+```
+npm i
+```
 A questo punto NodeJS installerà tutti i pacchetti necessari allo sviluppo dentro la cartella "node_modules".
 
 **Attenzione:** Se per qualsiasi motivo si volesse fare una copia manuale del progetto in un'altra cartella, escludere la cartella "node_modules" dalla copia, in quanto contiene centinaia di migliaia di file e **il tempo di copia sarebbe biblico**. E' molto più conveniente invece copiare tutto tranne "node_modules", ed eseguire nuovamente il comando "npm i" nella cartella di destinazione.
@@ -70,17 +74,19 @@ La modalità sviluppo consente di eseguire l'applicazione in un server web local
 
 Per avviare il server locale, aprire un prompt dei comandi nella cartella del progetto e lanciare il comando:
 
-`npm run start:dev-server`
-
+```
+npm run start:dev-server
+```
 Questo svolge le seguenti operazioni:
-- Se si tratta della prima esecuzione, genera un progetto con dei contenuti di esempio.
+- se si tratta della prima esecuzione, genera un progetto con dei contenuti di esempio.
 - apre un server web locale in ascolto sulla porta 8080
 - avvia una serie di comandi secondari che ricompilano alcune parti dell'applicazione (ad esempio, i templates) se queste vengono modificate dall'utente.
 
 Per compilare il codice sorgente vero e proprio, aprire un altro prompt e lanciare il comando:
 
-`npm start`
-
+```
+npm start
+```
 In questo modo si avvia il processo di compilazione. Al primo avvio in assoluto, potrebbero volerci alcuni minuti dato che il sistema deve compilare tutte le dipendenze.
 
 **NB**: entrambe i comandi sono di tipo "watch", ossia dei processi attivi in attesa di modifiche ai file locali all'applicazione. Quando avviene una modifica, l'applicazione viene ricompilata. E' quindi necessario che i prompt dei comandi rimangano aperti durante la fase di sviluppo
@@ -531,7 +537,7 @@ export interface PageItem extends ItemBase {
     data?: any;             // Dati da passare al template
 }
 ```
-Le pagine sono dei contenti completamente dinamici. Il campo "template" indica il nome del template da utilizzare per il layout, mentre il campo "data" contiene tutti i dati da utilizzare per generare il contenuto ed è utilizzato dal template stesso.
+Le pagine sono dei contenuti completamente dinamici. Il campo "template" indica il nome del template da utilizzare per il layout, mentre il campo "data" contiene tutti i dati da utilizzare per generare il contenuto ed è utilizzato dal template stesso.
 
 I template sono implementati dall'utente, risiedono nella cartella "templates" e devono avere estensione ".html". Il nome del template da specificare nella configurazione non è altro che il nome del relativo file privo di estensione. Ad esempio, se il nome del file è "templates/home.html", la configurazione della pagina sarà la seguente:
 
@@ -582,4 +588,56 @@ Il corrispondente template può accedere ai dati e generare contenuti basati su 
 
 Nel progetto di esempio generato dal sistema è presente una pagina con vari casi di utilizzo interessanti e una guida per esempi sia alle direttive Angular che a quelle specifiche per Modus Explorer, il che già consente di creare pagine molto complesse. In ogni caso, per sfruttare completamente le funzionalità dei template, si rimanda alla documentazione di [Angular](https://angular.io/).
 
+### Fogli di stile
+
+E' possibile modificare il tema generale dell'applicazione e l'aspetto dei singoli componenti tramite i fogli di stile ineriti nella cartella "src/scss". I file hanno dei nomi intuitivi che identificano a quali componenti dell'applicazione si riferiscono.
+Fanno comunque parte del codice sorgente dell'applicazione, quindi per rendere effettive le modifiche è necessario ricompilare il codice.
+
+Il progetto include due file attualmente vuoti che l'utente può modificare per personalizzare l'applicazione:
+- **cn-custom-material.scss** - Il file include alcune variabili con valori di default che controllano lo stile globale dell'applicazione.
+- **cn-custom.scss** - Il file viene incluso alla fine e consente di sovraiscrivere tutti gli stili dell'applicazione.
+  
+Gli altri file non dovrebbero essere modificati in quanto fanno parte del progetto originale, e in caso di modifiche da parte degli utenti queste comporterebbero dei conflitti da risolvere manualmente nella fase di aggiornamento.
+
 ## Produzione 
+
+Il comando per la build di produzione è il seguente:
+```
+npm run build
+```
+I file vengono creati nella cartella "build-prod", e il progetto è pronto per essere inserito nella cartella radice del server web di produzione.
+
+### Cartella radice
+
+Di default, la build di produzione assume che l'applicazione venga installata nella cartella radice del server web di produzione. In particolare, questa impostazione è codificata nel tag `base` della pagina "index.html":
+
+```html
+<base href="/">
+```
+Se si desidera effettuare il deployment dell'applicazione in una cartella diversa, è necessario modificare questo parametro inserendo il nome della sottocartella di destinazione (NB. **trailing slash sono necessarie**), ad esempio
+```html
+<base href="/cartella1/cartella2/">
+```
+E' possibile effettuare questa operazione manualmente dopo aver eseguito il comando di build.
+
+In alternativa, è possibile eseguire eseguire direttamente il seguente comando e imposta direttamente il tag:
+```
+ng build --prod --baseHref=/cartella1/cartella2/
+```
+
+### Deployment
+
+Dopo aver eseguito il processo di build, copiare il contenuto della cartella "build-prod", e la cartella "assets" nella cartella radice del server web di destinazione. Per far si che il routing interno all'applicazione funzioni è necessario configurare il sistema di rewrite degli URL.
+
+Se si utilizza il server web [Apache](https://www.apache.org/) è necessario inserire le seguenti istruzioni nel file ".htaccess" nella cartella radice dell'applicazione:
+
+```
+RewriteEngine On
+# If an existing asset or directory is requested go to it as it is
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f
+RewriteRule ^ - [L]
+
+# If the requested resource doesn't exist, use index.html
+RewriteRule ^ /index.html
+```
+Per altri server è necessario impostare delle regole equivalenti. Per maggiori informazioni sul perché questa regola è necessaria, consultare la sezione [Deployment](https://angular.io/guide/deployment) della guida di Angular.
