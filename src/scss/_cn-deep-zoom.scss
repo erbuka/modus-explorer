@@ -5,6 +5,7 @@ $cn-dz-layer-count: 12;
 .cn-deep-zoom-container {
   @extend .cn-relative;
   user-select: none;
+  background-color: transparent;
 }
 
 .cn-dz-show-layers {
