@@ -4,6 +4,7 @@ const fs = require("fs");
 const rimraf = require("rimraf");
 const colors = require("colors");
 const ncp = require("ncp");
+const { argv } = require("yargs");
 
 const app = express();
 const port = 8080;
@@ -76,7 +77,7 @@ const common = require("./common");
 
 
     /** Item Type Schema Generator */
-    {
+    if (argv.types) {
 
         console.log(`${colors.green("[Dev-Server]")} - Starting type schema generator`);
 
@@ -111,7 +112,7 @@ const common = require("./common");
     }
 
     /** Template Generator */
-    {
+    if (argv.templates) {
         const dest = "./src/app/templates/templates.component.html";
 
         console.log(`${colors.green("[Dev-Server]")} - Starting template generator`);

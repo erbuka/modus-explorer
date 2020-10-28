@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng build --watch --base-href=/ --output-path build-dev",
-    "start:dev-server": "node ./scripts/dev-server.js",
+    "start:server": "node ./scripts/dev-server.js",
+    "start:dev-server": "node ./scripts/dev-server.js --templates --types",
     "build": "ng build --prod --base-href=/ --output-path build-prod",
     "build:ghpages": "ng build --prod --output-path docs --base-href /cultura-nuova/ && ncp ./assets ./docs/assets",
     "test": "ng test",
@@ -59,6 +60,7 @@
     "ts-node": "~7.0.0",
     "tslint": "~6.1.0",
     "typescript": "~3.9.6",
-    "typescript-json-schema": "^0.42.0"
+    "typescript-json-schema": "^0.42.0",
+    "yargs": "^16.1.0"
   }
 }
