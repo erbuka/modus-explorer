@@ -5,6 +5,7 @@
 - [Struttura del repository](#struttura-del-repository)
 - [Sviluppo](#sviluppo)
   - [Comandi di avvio](#comandi-di-avvio)
+  - [Sviluppo senza sorgenti](#sviluppo-senza-sorgenti)
 - [Gestione contenuti](#gestione-contenuti)
   - [Overview](#overview)
   - [Schemi](#schemi)
@@ -94,6 +95,22 @@ In questo modo si avvia il processo di compilazione. Al primo avvio in assoluto,
 A questo punto è possibile navigare tramite browser all'indirizzo http://localhost:8080/ e se la procedura è stata eseguita correttamente si dovrebbe visualizzare la seguente schermata:
 
 ![Starter Project](images/starter-project.jpg)
+
+### Sviluppo senza sorgenti
+
+E' possibile distribuire l'applicazione in modalità sviluppo ma senza il codice sorgente. In questo caso l'utente potrà liberamente modificare i contenuti (cartella "assets"), ma non avrà accesso alle seguenti funzionalità:
+- Modifica degli stili
+- Modifica/creazione dei template
+
+Per distribuire l'applicazione in questa modalità è sufficiente fornire un archivio contenente il progetto, **includendo la cartella "build-dev"** e senza le seguenti cartelle:
+- src (File sorgente)
+- node_modules (Dipendenze)
+- templates
+  
+L'utente finale, una volta ricevuto il pacchetto, dovrà eseguire comunque eseguire le seguenti operazioni:
+- Installazione di NodeJS
+- Installazione delle dipendenze tramite il comando `npm i`
+- Avvio del server locale in modalità light (ossia senza templates), tramite il comando `npm run start:server`
 
 ## Gestione contenuti
 
