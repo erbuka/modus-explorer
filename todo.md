@@ -1,0 +1,10 @@
+- Studio API
+  - Scrittura
+  - Lettura a quali informazione
+  - Creazione automatica di DeepZoom Link
+- Image Tool
+  - Funzionare in locale
+  - Interfaccia per caricamento deep-zoom
+  - Verifica best practice (?)
+- Modus Explorer
+  - Interfacce di editing per slideshow e deepzoom
