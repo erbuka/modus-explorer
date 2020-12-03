@@ -714,7 +714,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
     // Traverse the scene for all the remaining objects, moslty should be helper controls and
     // dispose their meshes. Don't look for textures, there shouldn't be any
     this.scene.traverse(disposeObject3D);
-    this.scene.dispose();
+    //this.scene.dispose();
 
     this.models.remove(...this.models.children);
     this.pins.remove(...this.pins.children);

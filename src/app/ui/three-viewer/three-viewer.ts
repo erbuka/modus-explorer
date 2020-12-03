@@ -244,7 +244,7 @@ export class ThreeViewerResources {
 
                         texture.sourceFile = url;
 
-                        scene.dispose();
+                        //scene.dispose();
 
                         resolve(this.track(texture));
                     },
