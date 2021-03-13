@@ -812,6 +812,8 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
             title: this.title,
             description: this.description,
             previewImage: previewImage,
+            visible: this.visible,
+            opacity: this._opacity,
             position: [pos.x, pos.y, pos.z],
             rotation: [rot.x, rot.y, rot.z],
             scale: [scl.x, scl.y, scl.z],

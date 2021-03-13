@@ -360,6 +360,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         let scl = modelDef.scale;
 
         model.title = modelDef.title;
+        model.visible = typeof modelDef.visible === "boolean" ? modelDef.visible : true;
         model.description = modelDef.description || "";
         model.previewImage = modelDef.previewImage ? this.router.resolve(modelDef.previewImage, this.item) : null;
 
@@ -406,7 +407,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
         }
 
         model.currentMaterial = modelDef.activeMaterial || 0;
-
+        model.opacity = typeof modelDef.opacity === "number" ? modelDef.opacity : 1.0;
 
         this.models.add(model);
         this.onObjectAdded(model);
