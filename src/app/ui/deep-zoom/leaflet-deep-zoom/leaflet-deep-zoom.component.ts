@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import * as L from 'leaflet';
 import { DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
@@ -23,7 +23,7 @@ interface LeafletLayerControls extends DeepZoomLayerControls {
   templateUrl: './leaflet-deep-zoom.component.html',
   styleUrls: ['./leaflet-deep-zoom.component.scss']
 })
-export class LeafletDeepZoomComponent implements OnInit {
+export class LeafletDeepZoomComponent implements OnInit, OnChanges {
 
   @ViewChild("mapContainer", { static: true }) mapContainer: ElementRef;
   @Input() item: DeepZoomItem = null;
@@ -79,7 +79,16 @@ export class LeafletDeepZoomComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.createMap();
+    //this.createMap();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes["item"]) {
+      const c = changes["item"];
+      if (c.previousValue !== c.currentValue && c.currentValue) {
+        this.createMap();
+      }
+    }
   }
 
   updateNavigatorBounds(): void {
@@ -137,6 +146,9 @@ export class LeafletDeepZoomComponent implements OnInit {
   }
 
   private createMap(): void {
+
+    if (this.map)
+      this.map.remove();
 
 
     this.map = L.map(this.mapContainer.nativeElement, {
