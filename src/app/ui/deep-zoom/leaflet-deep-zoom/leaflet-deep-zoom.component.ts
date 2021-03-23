@@ -301,6 +301,7 @@ export class LeafletDeepZoomComponent implements OnInit, OnChanges {
         shape = L.circle(this.pointToLatLng(s.center[0], s.center[1], 0), { radius: s.radius, pane: pane });
       }
 
+      shape.options.fillOpacity = 1;
 
       if (shape) {
 
