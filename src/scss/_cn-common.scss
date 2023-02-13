@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 *,
 *::before,
 *::after {
@@ -60,7 +62,7 @@ body {
 
 @for $i from 0 through 20 {
   .cn-opacity-#{$i*5} {
-    opacity: #{$i * 5/100};
+    opacity: #{$i *  0.05};
   }
 }
 
