@@ -57,6 +57,10 @@ $cn-dz-layer-count: 12;
   top: 16px;
   right: 16px;
 
+	@include media-breakpoint-down(md) {
+		display: none;
+	}
+
   .cn-dz-minimap-image {
     overflow: hidden;
     position: relative;
