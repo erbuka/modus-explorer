@@ -58,7 +58,7 @@
 
 (window as any).__Zone_disable_requestAnimationFrame = true; // disable patch requestAnimationFrame
 
-import 'zone.js/dist/zone';  // Included with Angular CLI.
+import 'zone.js';  // Included with Angular CLI.
 
 
 /***************************************************************************************************
