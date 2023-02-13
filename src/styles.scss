@@ -1,4 +1,5 @@
 // animate.css
+@use '~@angular/material' as mat;
 @import "~animate.css/animate.compat.css";
 
 // Custom Theming for Angular Material
@@ -16,26 +17,26 @@
 $cn-font-family: "Roboto", "Helvetica", sans-serif !default;
 $cn-font-size: 14px !default;
 
-$cn-mat-config: mat-typography-config($cn-font-family);
+$cn-mat-config: mat.define-typography-config($cn-font-family);
 
-@include mat-core($cn-mat-config);
+@include mat.core($cn-mat-config);
 
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$cn-mat-primary: mat-palette($mat-indigo) !default;
-$cn-mat-accent: mat-palette($mat-pink, A200, A100, A400) !default;
+$cn-mat-primary: mat.define-palette(mat.$indigo-palette) !default;
+$cn-mat-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400) !default;
 
 // The warn palette is optional (defaults to red).
-$cn-mat-warn: mat-palette($mat-red) !default;
+$cn-mat-warn: mat.define-palette(mat.$red-palette) !default;
 
 // Create the theme object (a Sass map containing all of the palettes).
-$cn-mat-theme: mat-light-theme($cn-mat-primary, $cn-mat-accent, $cn-mat-warn);
+$cn-mat-theme: mat.define-light-theme($cn-mat-primary, $cn-mat-accent, $cn-mat-warn);
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
-@include angular-material-theme($cn-mat-theme);
+@include mat.all-component-themes($cn-mat-theme);
 
 // Customize bootstrap
 
@@ -50,8 +51,8 @@ $theme-colors: (
   "primary-darker-contrast": map-get($cn-mat-primary, "darker-contrast"),
   "accent": map-get($cn-mat-accent, "default"),
   "danger": map-get($cn-mat-warn, "default"),
-  "background" : mat-color(map-get($cn-mat-theme, "background"), "background"),
-  "foreground" : mat-color(map-get($cn-mat-theme, "foreground"), "base"),
+  "background" : mat.get-color-from-palette(map-get($cn-mat-theme, "background"), "background"),
+  "foreground" : mat.get-color-from-palette(map-get($cn-mat-theme, "foreground"), "base"),
 );
 
 // Leaflet

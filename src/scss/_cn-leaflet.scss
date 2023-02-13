@@ -1,4 +1,5 @@
 // Override global font
+@use '~@angular/material' as mat;
 .leaflet-container {
   font: inherit !important;
 }
@@ -20,7 +21,7 @@
 }
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  color: mat-color($cn-mat-primary, default-contrast);
+  color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
   @extend .bg-primary;
   @extend .mat-elevation-z1;
 }
@@ -28,7 +29,7 @@
 // Tooltip
 
 .leaflet-tooltip {
-  color: mat-color($cn-mat-primary, default-contrast);
+  color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
   @extend .bg-primary;
   @extend .mat-elevation-z1;
 }
