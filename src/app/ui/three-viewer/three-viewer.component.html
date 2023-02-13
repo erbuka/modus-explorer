@@ -40,10 +40,10 @@
         <h3>{{ selectedPin.title | cnLocalizedText }}</h3>
         <div>{{ selectedPin.description | cnLocalizedText }}</div>
         <div *ngIf="selectedPin.href" class="text-right mt-2">
-            <button mat-button color="primary" [cnLink]="selectedPin.href | cnUrl : item">
+            <a mat-button color="primary" [cnLink]="selectedPin.href | cnUrl : item">
                 <span>{{ selectedPin.hrefText | cnLocalizedText }}</span>
                 <mat-icon>arrow_forward</mat-icon>
-            </button>
+						</a>
         </div>
     </div>
 

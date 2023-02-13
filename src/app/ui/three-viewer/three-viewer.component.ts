@@ -302,7 +302,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
       this.controls.zoomSpeed = this.item.camera.zoomStep || 1.0;
       this.controls.minDistance = this.item.camera.orbitMinDistance || 0;
       this.controls.maxDistance = this.item.camera.orbitMaxDistance || Number.POSITIVE_INFINITY;
-      this.controls.enablePan = false;
+      this.controls.enablePan = true;
 
       this.controls.addEventListener("change", (evt) => this.saveState());
 
