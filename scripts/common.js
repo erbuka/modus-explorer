@@ -14,7 +14,7 @@ const generateJsonSchema = function (files, type, watchCallback) {
 
     const getSchema = function () {
         const program = tjs.getProgramFromFiles(files);
-        const generator = tjs.buildGenerator(program, settings);
+				const generator = tjs.buildGenerator(program, settings);
         return generator.getSchemaForSymbol(type);
     }
 

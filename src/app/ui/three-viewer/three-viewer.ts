@@ -1,7 +1,7 @@
-import { ShaderMaterialParameters, BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneBufferGeometry, MeshBasicMaterial, Int32BufferAttribute, BufferAttribute, MeshBasicMaterialParameters, ShaderMaterial, Material } from 'three';
+import { ShaderMaterialParameters, BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxGeometry, WebGLRenderer, PerspectiveCamera, MeshStandardMaterialParameters, CompressedTexture, CompressedTextureLoader, PlaneGeometry, MeshBasicMaterial, Int32BufferAttribute, BufferAttribute, MeshBasicMaterialParameters, ShaderMaterial, Material } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
-import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader';
 import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType, ThreeViewerItemPinLayer, ThreeViewerItemPin, ThreeViewerItemCollider } from 'src/app/types/three-viewer-item';
 import { LocalizedText } from 'src/app/types/item';
@@ -11,24 +11,23 @@ import { moveItemInArray } from '@angular/cdk/drag-drop';
 // Utility functions
 
 const computeHash: (data: ArrayBuffer) => Promise<string> = async (data) => {
-    return Array.prototype.map.call(
-        new Uint8Array(await crypto.subtle.digest("SHA-256", data)),
-        (x: number) => x.toString(16).padStart(2, "0")
-    ).reduce((prev, curr) => prev + curr, "");
+	return Array.prototype.map.call(
+		new Uint8Array(await crypto.subtle.digest("SHA-256", data)),
+		(x: number) => x.toString(16).padStart(2, "0")
+	).reduce((prev, curr) => prev + curr, "");
 }
 
-
 export const exportPlyMesh: (meshOrGeometry: Mesh | BufferGeometry) => Promise<ArrayBuffer> = (meshOrGeometry) => {
-    let plyExporter = new PLYExporter();
+	let plyExporter = new PLYExporter();
 
-    // This is done because PLYExporter applies the world matrix
-    // to the mesh before exporing it, and we don't need that since
-    // we store position, rotation and scale in the parent group
-    let tempMesh = meshOrGeometry instanceof Mesh ? new Mesh(meshOrGeometry.geometry) : new Mesh(meshOrGeometry);
+	// This is done because PLYExporter applies the world matrix
+	// to the mesh before exporing it, and we don't need that since
+	// we store position, rotation and scale in the parent group
+	let tempMesh = meshOrGeometry instanceof Mesh ? new Mesh(meshOrGeometry.geometry) : new Mesh(meshOrGeometry);
 
-    return new Promise((resolve, reject) => {
-        plyExporter.parse(tempMesh, (result: any) => resolve(result as ArrayBuffer), { binary: true });
-    });
+	return new Promise((resolve, reject) => {
+		plyExporter.parse(tempMesh, (result: any) => resolve(result as ArrayBuffer), { binary: true });
+	});
 };
 
 
@@ -61,22 +60,22 @@ const PIN_MATERIAL_FS = `
 `;
 
 class PinMaterial extends ShaderMaterial {
-    constructor() {
-        super({
-            uniforms: { "color": { value: new Color(0xffffffff) } },
-            vertexShader: PIN_MATERIAL_VS,
-            fragmentShader: PIN_MATERIAL_FS
-        });
-    }
+	constructor() {
+		super({
+			uniforms: { "color": { value: new Color(0xffffffff) } },
+			vertexShader: PIN_MATERIAL_VS,
+			fragmentShader: PIN_MATERIAL_FS
+		});
+	}
 
 
-    set color(color: Color) {
-        this.uniforms["color"].value = color;
-    }
+	set color(color: Color) {
+		this.uniforms["color"].value = color;
+	}
 
-    get color(): Color {
-        return this.uniforms["color"].value;
-    }
+	get color(): Color {
+		return this.uniforms["color"].value;
+	}
 
 }
 
@@ -86,45 +85,45 @@ class PinMaterial extends ShaderMaterial {
 // Serialization
 
 interface Serializable<T> {
-    serialize(binData: BinaryFiles): Promise<T>;
+	serialize(binData: BinaryFiles): Promise<T>;
 }
 
 export class BinaryFiles {
 
-    files: Map<string, ArrayBuffer> = new Map();
+	files: Map<string, ArrayBuffer> = new Map();
 
-    async storeTexture(tex: Texture | CompressedTexture): Promise<string> {
-        if (tex && tex.sourceFile) {
-            let ext = tex instanceof CompressedTexture ? "dds" : "bin";
-            return this.store(await (await fetch(tex.sourceFile)).arrayBuffer(), ext);
-        }
-        return Promise.reject(<ErrorEvent>{ description: "Invalid texture or sourceFile property is not set" });
-    }
+	async storeTexture(tex: Texture | CompressedTexture): Promise<string> {
+		if (tex && tex.sourceFile) {
+			let ext = tex instanceof CompressedTexture ? "dds" : "bin";
+			return this.store(await (await fetch(tex.sourceFile)).arrayBuffer(), ext);
+		}
+		return Promise.reject(<ErrorEvent>{ description: "Invalid texture or sourceFile property is not set" });
+	}
 
-    async store(data: ArrayBuffer, ext: string = "bin"): Promise<string> {
+	async store(data: ArrayBuffer, ext: string = "bin"): Promise<string> {
 
-        let name = `./${await computeHash(data)}.${ext}`;
+		let name = `./${await computeHash(data)}.${ext}`;
 
-        if (!this.files.has(name)) {
-            this.files.set(name, data);
-        }
+		if (!this.files.has(name)) {
+			this.files.set(name, data);
+		}
 
-        return name;
-    }
+		return name;
+	}
 
 }
 
 interface EditorMode {
-    setEditorMode(enabled: boolean);
-    setSelected(selected: boolean);
+	setEditorMode(enabled: boolean);
+	setSelected(selected: boolean);
 }
 
 interface OnAdd {
-    onAdd(scene: Scene): void;
+	onAdd(scene: Scene): void;
 }
 
 interface OnRemove {
-    onRemove(scene: Scene): void;
+	onRemove(scene: Scene): void;
 }
 
 
@@ -133,195 +132,225 @@ export type ThreeViewerResource = Texture | BufferGeometry | Material | WebGLRen
 
 export class ThreeViewerResources {
 
-    private mappedResources: Map<string, Promise<ThreeViewerResource>> = new Map();
-    private resources: ThreeViewerResource[] = [];
+	private mappedResources: Map<string, Promise<ThreeViewerResource>> = new Map();
+	private resources: ThreeViewerResource[] = [];
 
-    private ddsLoader: DDSLoader;
-    private textureLoader: TextureLoader;
-    private plyLoader: PLYLoader;
-    private planeGeom: PlaneBufferGeometry;
-    private renderer: WebGLRenderer;
-    private renderTarget: WebGLRenderTarget;
+	private ddsLoader: DDSLoader;
+	private textureLoader: TextureLoader;
+	private plyLoader: PLYLoader;
+	private planeGeom: PlaneGeometry;
+	private renderer: WebGLRenderer;
+	private renderTarget: WebGLRenderTarget;
 
-    constructor(renderer: WebGLRenderer) {
-        this.ddsLoader = new DDSLoader();
-        this.textureLoader = new TextureLoader();
-        this.plyLoader = new PLYLoader();
+	constructor(renderer: WebGLRenderer) {
+		this.ddsLoader = new DDSLoader();
+		this.textureLoader = new TextureLoader();
+		this.plyLoader = new PLYLoader();
 
-        this.planeGeom = this.track(new PlaneBufferGeometry());
-        this.renderer = renderer;
-        this.renderTarget = this.track(new WebGLRenderTarget(128, 128));
-    }
+		this.planeGeom = this.track(new PlaneGeometry());
+		this.renderer = renderer;
+		this.renderTarget = this.track(new WebGLRenderTarget(128, 128));
+	}
 
-    track<T extends ThreeViewerResource>(res: T): T {
-        if (!this.resources.includes(res))
-            this.resources.push(res);
-        return res;
-    }
+	track<T extends ThreeViewerResource>(res: T): T {
+		if (!this.resources.includes(res))
+			this.resources.push(res);
+		return res;
+	}
 
 
-    dispose(): void {
-        for (let res of this.resources) {
-            if (res instanceof Texture) {
-                res.dispose();
-            } else if (res instanceof WebGLRenderTarget) {
-                res.dispose();
-            } else if (res instanceof Material) {
-                res.dispose();
-            } else if (res instanceof BufferGeometry) {
-                res.dispose();
-                res.setIndex(null);
-                for (let attr in res.attributes)
-                    res.deleteAttribute(attr);
-            } else if (typeof res === "string") {
-                URL.revokeObjectURL(res);
-            }
-        }
+	dispose(): void {
+		for (let res of this.resources) {
+			if (res instanceof Texture) {
+				res.dispose();
+			} else if (res instanceof WebGLRenderTarget) {
+				res.dispose();
+			} else if (res instanceof Material) {
+				res.dispose();
+			} else if (res instanceof BufferGeometry) {
+				res.dispose();
+				res.setIndex(null);
+				for (let attr in res.attributes)
+					res.deleteAttribute(attr);
+			} else if (typeof res === "string") {
+				URL.revokeObjectURL(res);
+			}
+		}
 
-        this.mappedResources = new Map();
-        this.resources = [];
-    }
+		this.mappedResources = new Map();
+		this.resources = [];
+	}
 
-    createBasicMaterial(params?: MeshBasicMaterialParameters): MeshBasicMaterial {
-        return this.track(new MeshBasicMaterial(params));
-    }
+	createBasicMaterial(params?: MeshBasicMaterialParameters): MeshBasicMaterial {
+		return this.track(new MeshBasicMaterial(params));
+	}
 
-    createStandardMaterial(params?: MeshStandardMaterialParameters): MeshStandardMaterial {
-        return this.track(new MeshStandardMaterial(params));
-    }
+	createStandardMaterial(params?: MeshStandardMaterialParameters): MeshStandardMaterial {
+		return this.track(new MeshStandardMaterial(params));
+	}
 
-    async loadArrayBuffer(a: ArrayBuffer): Promise<string> {
-        let hash = await computeHash(a);
-        if (this.mappedResources.has(hash)) {
-            return this.mappedResources.get(hash) as Promise<string>;
-        } else {
-            let p = Promise.resolve(URL.createObjectURL(new Blob([a])));
-            this.mappedResources.set(hash, p);
-            return p;
-        }
-    }
+	async loadArrayBuffer(a: ArrayBuffer): Promise<string> {
+		let hash = await computeHash(a);
+		if (this.mappedResources.has(hash)) {
+			return this.mappedResources.get(hash) as Promise<string>;
+		} else {
+			let p = Promise.resolve(URL.createObjectURL(new Blob([a])));
+			this.mappedResources.set(hash, p);
+			return p;
+		}
+	}
 
-    async loadTexture(url: string, compressed?: boolean): Promise<Texture> {
+	async loadTexture(url: string, compressed?: boolean): Promise<Texture> {
 
-        if (this.mappedResources.has(url) && this.mappedResources.get(url)) {
-            return this.mappedResources.get(url) as Promise<Texture>;
-        } else {
+		if (this.mappedResources.has(url) && this.mappedResources.get(url)) {
+			return this.mappedResources.get(url) as Promise<Texture>;
+		} else {
 
-            let loader: TextureLoader | CompressedTextureLoader = null;
+			let loader: TextureLoader | CompressedTextureLoader = null;
 
-            if (compressed === undefined)
-                compressed = url.endsWith(".dds");
+			if (compressed === undefined)
+				compressed = url.endsWith(".dds");
 
-            loader = compressed ? this.ddsLoader : this.textureLoader;
+			loader = compressed ? this.ddsLoader : this.textureLoader;
 
-            let p = new Promise<Texture>((resolve, reject) => {
-                loader.load(
-                    url,
-                    (texture) => {
+			let p = new Promise<Texture>((resolve, reject) => {
+				loader.load(
+					url,
+					(texture) => {
 
-                        /*
-                            Here we force the texture to be uploaded to the GPU by
-                            using it. It has to be done because ThreeJS will upload the 
-                            texture the first time it is used causing an annoying frame lag
-                        */
+						/*
+								Here we force the texture to be uploaded to the GPU by
+								using it. It has to be done because ThreeJS will upload the 
+								texture the first time it is used causing an annoying frame lag
+						*/
 
-                        let renderer = this.renderer;
+						let renderer = this.renderer;
 
-                        let scene = new Scene();
-                        let camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 1, 10);
-                        let mesh = new Mesh(this.planeGeom, new MeshBasicMaterial({ map: texture, color: "#ffffff" }));
+						let scene = new Scene();
+						let camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 1, 10);
+						let mesh = new Mesh(this.planeGeom, new MeshBasicMaterial({ map: texture, color: "#ffffff" }));
 
-                        mesh.position.set(0, 0, -2);
+						mesh.position.set(0, 0, -2);
 
-                        scene.add(mesh);
+						scene.add(mesh);
 
-                        renderer.setRenderTarget(this.renderTarget);
-                        renderer.setViewport(0, 0, this.renderTarget.width, this.renderTarget.height);
-                        renderer.setClearColor(0, 0);
-                        renderer.clear();
-                        renderer.render(scene, camera);
-                        renderer.setRenderTarget(null);
+						renderer.setRenderTarget(this.renderTarget);
+						renderer.setViewport(0, 0, this.renderTarget.width, this.renderTarget.height);
+						renderer.setClearColor(0, 0);
+						renderer.clear();
+						renderer.render(scene, camera);
+						renderer.setRenderTarget(null);
 
-                        texture.sourceFile = url;
+						texture.sourceFile = url;
 
-                        //scene.dispose();
+						//scene.dispose();
 
-                        resolve(this.track(texture));
-                    },
-                    null,
-                    (error) => reject(<ErrorEvent>{ description: error.message }));
-            });
+						resolve(this.track(texture));
+					},
+					null,
+					(error) => reject(<ErrorEvent>{ description: error.message }));
+			});
 
-            this.mappedResources.set(url, p);
+			this.mappedResources.set(url, p);
 
-            return p;
-        }
-    }
+			return p;
+		}
+	}
 
-    async loadPlyMesh(url: string): Promise<BufferGeometry> {
+	async loadPlyMesh(url: string): Promise<BufferGeometry> {
 
-        if (this.mappedResources.has(url)) {
-            return this.mappedResources.get(url) as Promise<BufferGeometry>;
-        } else {
-            let p = new Promise<BufferGeometry>((resolve, reject) => {
-                this.plyLoader.load(
-                    url,
-                    (geom) => resolve(this.track(geom)),
-                    null,
-                    (err) => reject(<ErrorEvent>{ description: JSON.stringify(err) })
-                );
-            });
+		if (this.mappedResources.has(url)) {
+			return this.mappedResources.get(url) as Promise<BufferGeometry>;
+		} else {
+			let p = new Promise<BufferGeometry>((resolve, reject) => {
+				this.plyLoader.load(
+					url,
+					(geom) => resolve(this.track(geom)),
+					null,
+					(err) => reject(<ErrorEvent>{ description: JSON.stringify(err) })
+				);
+			});
 
-            this.mappedResources.set(url, p);
+			this.mappedResources.set(url, p);
 
-            return p;
-        }
+			return p;
+		}
 
-    }
+	}
 
-    async loadGeometryFromWavefront(wfData: ArrayBuffer): Promise<{ name: string, geometry: BufferGeometry }[]> {
-        return new Promise((resolve, reject) => {
+	async loadGeometryFromWavefront(wfData: ArrayBuffer): Promise<{ name: string, geometry: BufferGeometry }[]> {
+		return new Promise((resolve, reject) => {
 
-            let result: { name: string, geometry: BufferGeometry }[] = [];
-            let loader = new OBJLoader2();
-            let count = 0;
+			let result: { name: string, geometry: BufferGeometry }[] = [];
 
-            loader.setUseOAsMesh(true);
-            loader.setUseIndices(true);
+			let loader = new OBJLoader();
+			let count = 0;
+			const group = loader.parse(new TextDecoder("utf-8").decode(wfData));
 
-            loader.setCallbackOnAssetAvailable((asset) => {
+			for (let obj of group.children) {
+				if (obj instanceof Mesh) {
+					let geometry = new BufferGeometry();
 
-                if (asset.type === "mesh") {
-                    let geometry = new BufferGeometry();
+					if (obj.geometry.hasAttribute("position"))
+						geometry.setAttribute("position", obj.geometry.getAttribute("position"))
 
-                    if (asset.buffers.vertices)
-                        geometry.setAttribute("position", new Float32BufferAttribute(asset.buffers.vertices, 3));
+					if (obj.geometry.hasAttribute("normal"))
+						geometry.setAttribute("normal", obj.geometry.getAttribute("normal"));
 
-                    if (asset.buffers.normals)
-                        geometry.setAttribute("normal", new Float32BufferAttribute(asset.buffers.normals, 3));
+					if (obj.geometry.hasAttribute("uv"))
+						geometry.setAttribute("uv", obj.geometry.getAttribute("uv"));
 
-                    if (asset.buffers.uvs)
-                        geometry.setAttribute("uv", new Float32BufferAttribute(asset.buffers.uvs, 2));
+					let name = obj.name ? obj.name : `mesh${count++}`;
 
-                    if (asset.buffers.indices)
-                        geometry.setIndex(new BufferAttribute(asset.buffers.indices, 1));
 
-                    let name = asset.params.meshName ? asset.params.meshName : `mesh${count++}`;
+					result.push({ name: name, geometry: this.track(geometry) });
 
-                    result.push({ name: name, geometry: this.track(geometry) });
+				}
+			}
 
-                }
+			resolve(result);
 
-            });
+			/*
+						let loader = new OBJLoader2();
+						let count = 0;
+			
+						loader.setUseOAsMesh(true);
+						loader.setUseIndices(true);
+			
+						loader.setCallbackOnMeshAlter((asset: Mesh) => {
+			
+			
+							if (asset.type === "mesh") {
+								let geometry = new BufferGeometry();
+			
+								if (asset.geometry.hasAttribute("position"))
+									geometry.setAttribute("position", asset.geometry.getAttribute("position"))
+			
+								if (asset.geometry.hasAttribute("normal"))
+									geometry.setAttribute("normal", asset.geometry.getAttribute("normal"));
+			
+								if (asset.geometry.hasAttribute("uv"))
+									geometry.setAttribute("uv", asset.geometry.getAttribute("uv"));
+			
+								let name = asset.name ? asset.name : `mesh${count++}`;
+			
+			
+								result.push({ name: name, geometry: this.track(geometry) });
+			
+							}
+			
+						});
+			
+						loader.setCallbackOnError((err) => reject(<ErrorEvent>{ description: JSON.stringify(err) }));
+			
+						loader.parse(wfData);
+			
+						resolve(result);
+			
+						*/
 
-            loader.setCallbackOnError((err) => reject(<ErrorEvent>{ description: JSON.stringify(err) }));
-
-            loader.parse(wfData);
-
-            resolve(result);
-
-        });
-    }
+		});
+	}
 
 }
 
@@ -330,66 +359,66 @@ export class ThreeViewerResources {
  * Pin Layer
  */
 export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer> {
-    title: LocalizedText = "";
-    description: LocalizedText = "";
-    geometry: BufferGeometry = null;
-    visible: boolean = true;
+	title: LocalizedText = "";
+	description: LocalizedText = "";
+	geometry: BufferGeometry = null;
+	visible: boolean = true;
 
-    get color(): Color {
-        return this._material.color;
-    }
+	get color(): Color {
+		return this._material.color;
+	}
 
-    get material(): PinMaterial {
-        return this._material;
-    }
+	get material(): PinMaterial {
+		return this._material;
+	}
 
-    get previewImage(): HTMLImageElement {
-        return this._previewImage;
-    }
+	get previewImage(): HTMLImageElement {
+		return this._previewImage;
+	}
 
-    private _material: PinMaterial = null;
-    private _previewImage: HTMLImageElement = new Image();
+	private _material: PinMaterial = null;
+	private _previewImage: HTMLImageElement = new Image();
 
-    constructor(private resources: ThreeViewerResources) {
-        this._material = resources.track(new PinMaterial());
-        this.geometry = resources.track(new BoxBufferGeometry(1, 1, 1));
-    }
+	constructor(private resources: ThreeViewerResources) {
+		this._material = resources.track(new PinMaterial());
+		this.geometry = resources.track(new BoxGeometry(1, 1, 1));
+	}
 
-    createPreviewPicture() {
-        let renderer = new WebGLRenderer({ alpha: true, antialias: true });
-        let scene = new Scene();
+	createPreviewPicture() {
+		let renderer = new WebGLRenderer({ alpha: true, antialias: true });
+		let scene = new Scene();
 
-        let camera = new PerspectiveCamera(45, 1, 0.1, 10);
-        camera.position.set(0, 1.5, -2);
-        camera.lookAt(0, 0, 0);
+		let camera = new PerspectiveCamera(45, 1, 0.1, 10);
+		camera.position.set(0, 1.5, -2);
+		camera.lookAt(0, 0, 0);
 
-        let canvas = renderer.domElement;
-        canvas.width = 128;
-        canvas.height = 128;
+		let canvas = renderer.domElement;
+		canvas.width = 128;
+		canvas.height = 128;
 
-        let mesh = new Mesh(this.geometry, this._material);
-        scene.add(mesh);
+		let mesh = new Mesh(this.geometry, this._material);
+		scene.add(mesh);
 
-        renderer.setViewport(0, 0, canvas.width, canvas.height);
-        renderer.setClearColor(0, 0);
-        renderer.clear();
-        renderer.render(scene, camera);
+		renderer.setViewport(0, 0, canvas.width, canvas.height);
+		renderer.setClearColor(0, 0);
+		renderer.clear();
+		renderer.render(scene, camera);
 
-        this._previewImage.src = canvas.toDataURL();
+		this._previewImage.src = canvas.toDataURL();
 
-        renderer.dispose();
+		renderer.dispose();
 
 
-    }
+	}
 
-    async serialize(binData: BinaryFiles): Promise<ThreeViewerItemPinLayer> {
-        return {
-            title: this.title,
-            description: this.description,
-            color: this.color.getHex(),
-            geometry: await binData.store(await exportPlyMesh(this.geometry), "ply")
-        }
-    }
+	async serialize(binData: BinaryFiles): Promise<ThreeViewerItemPinLayer> {
+		return {
+			title: this.title,
+			description: this.description,
+			color: this.color.getHex(),
+			geometry: await binData.store(await exportPlyMesh(this.geometry), "ply")
+		}
+	}
 
 }
 
@@ -399,85 +428,85 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
 
 export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItemPin>, EditorMode {
 
-    isThreeViewerPin: boolean = true;
-    title: LocalizedText = "";
-    description: LocalizedText = "";
-    href: string = "";
-    hrefText: LocalizedText = "";
+	isThreeViewerPin: boolean = true;
+	title: LocalizedText = "";
+	description: LocalizedText = "";
+	href: string = "";
+	hrefText: LocalizedText = "";
 
-    set layer(layer: ThreeViewerPinLayer) {
-        this.geometry = layer.geometry;
-        this.material = layer.material;
-        //(this.material as PinMaterial).color = layer.color;
-        this._layer = layer;
-    }
+	set layer(layer: ThreeViewerPinLayer) {
+		this.geometry = layer.geometry;
+		this.material = layer.material;
+		//(this.material as PinMaterial).color = layer.color;
+		this._layer = layer;
+	}
 
-    get layer(): ThreeViewerPinLayer {
-        return this._layer;
-    }
+	get layer(): ThreeViewerPinLayer {
+		return this._layer;
+	}
 
-    private _layer: ThreeViewerPinLayer = null;
+	private _layer: ThreeViewerPinLayer = null;
 
-    constructor(resources: ThreeViewerResources, private _layers: ThreeViewerPinLayer[]) {
-        super(new BoxBufferGeometry(1, 1, 1), resources.track(new PinMaterial()));
-    }
+	constructor(resources: ThreeViewerResources, private _layers: ThreeViewerPinLayer[]) {
+		super(new BoxGeometry(1, 1, 1), resources.track(new PinMaterial()));
+	}
 
 
-    setEditorMode(enabled: boolean) { }
-    setSelected(selected: boolean) { }
+	setEditorMode(enabled: boolean) { }
+	setSelected(selected: boolean) { }
 
-    async serialize(binData: BinaryFiles): Promise<ThreeViewerItemPin> {
-        let pos = this.position;
-        let scl = this.scale;
-        let rot = this.rotation;
+	async serialize(binData: BinaryFiles): Promise<ThreeViewerItemPin> {
+		let pos = this.position;
+		let scl = this.scale;
+		let rot = this.rotation;
 
-        return {
-            title: this.title,
-            description: this.description,
-            href: this.href,
-            hrefText: this.hrefText,
-            position: [pos.x, pos.y, pos.z],
-            rotation: [rot.x, rot.y, rot.z],
-            scale: [scl.x, scl.y, scl.z],
-            layerIndex: this._layers.findIndex(x => x === this._layer)
-        }
-    }
+		return {
+			title: this.title,
+			description: this.description,
+			href: this.href,
+			hrefText: this.hrefText,
+			position: [pos.x, pos.y, pos.z],
+			rotation: [rot.x, rot.y, rot.z],
+			scale: [scl.x, scl.y, scl.z],
+			layerIndex: this._layers.findIndex(x => x === this._layer)
+		}
+	}
 
 }
 
 export class ThreeViewerCollider extends Mesh implements Serializable<ThreeViewerItemCollider>, EditorMode {
 
-    isThreeViewerCollider: boolean = true;
+	isThreeViewerCollider: boolean = true;
 
-    title: LocalizedText = "";
-    description: LocalizedText = "";
+	title: LocalizedText = "";
+	description: LocalizedText = "";
 
-    constructor(private resources: ThreeViewerResources, geometry: BufferGeometry) {
-        super(geometry, resources.createBasicMaterial({ color: 0xff0000, transparent: true, wireframe: true, opacity: 0.5 }));
-    }
+	constructor(private resources: ThreeViewerResources, geometry: BufferGeometry) {
+		super(geometry, resources.createBasicMaterial({ color: 0xff0000, transparent: true, wireframe: true, opacity: 0.5 }));
+	}
 
-    async serialize(binData: BinaryFiles): Promise<ThreeViewerItemCollider> {
+	async serialize(binData: BinaryFiles): Promise<ThreeViewerItemCollider> {
 
-        let pos = this.position;
-        let rot = this.rotation;
-        let scl = this.scale;
+		let pos = this.position;
+		let rot = this.rotation;
+		let scl = this.scale;
 
-        return {
-            title: this.title,
-            description: this.description,
-            position: [pos.x, pos.y, pos.z],
-            rotation: [rot.x, rot.y, rot.z],
-            scale: [scl.x, scl.y, scl.z],
-            geometry: await binData.store(await exportPlyMesh(this), "ply")
-        };
-    }
+		return {
+			title: this.title,
+			description: this.description,
+			position: [pos.x, pos.y, pos.z],
+			rotation: [rot.x, rot.y, rot.z],
+			scale: [scl.x, scl.y, scl.z],
+			geometry: await binData.store(await exportPlyMesh(this), "ply")
+		};
+	}
 
-    setEditorMode(enabled: boolean) {
-        let mat = this.material as MeshBasicMaterial;
-        mat.visible = enabled;
-        mat.needsUpdate = true;
-    }
-    setSelected(selected: boolean) { }
+	setEditorMode(enabled: boolean) {
+		let mat = this.material as MeshBasicMaterial;
+		mat.visible = enabled;
+		mat.needsUpdate = true;
+	}
+	setSelected(selected: boolean) { }
 
 
 }
@@ -487,175 +516,175 @@ export class ThreeViewerCollider extends Mesh implements Serializable<ThreeViewe
  */
 export class ThreeViewerLight extends Group implements Serializable<ThreeViewerItemLight>, EditorMode, OnAdd, OnRemove {
 
-    isThreeViewerLight: boolean = true;
+	isThreeViewerLight: boolean = true;
 
-    title: LocalizedText = "";
-    description: LocalizedText = "";
+	title: LocalizedText = "";
+	description: LocalizedText = "";
 
-    lightType: ThreeViewerItemLightType;
+	lightType: ThreeViewerItemLightType;
 
-    light: DirectionalLight | AmbientLight;
+	light: DirectionalLight | AmbientLight;
 
-    gizmo: Sprite;
-    cameraHelper: CameraHelper;
+	gizmo: Sprite;
+	cameraHelper: CameraHelper;
 
-    _shadowCameraSize: Vector3 = new Vector3();
+	_shadowCameraSize: Vector3 = new Vector3();
 
-    set shadowMapWidth(v: number) {
-        let n: number = typeof v === "string" ? parseFloat(v) || 0 : v;
-        this.light.shadow.mapSize.width = Math.max(n, 512);
-        this.updateShadowMap();
-    }
+	set shadowMapWidth(v: number) {
+		let n: number = typeof v === "string" ? parseFloat(v) || 0 : v;
+		this.light.shadow.mapSize.width = Math.max(n, 512);
+		this.updateShadowMap();
+	}
 
-    set shadowMapHeight(v: number) {
-        let n: number = typeof v === "string" ? parseFloat(v) || 0 : v;
-        this.light.shadow.mapSize.height = Math.max(n, 512);
-        this.updateShadowMap();
-    }
+	set shadowMapHeight(v: number) {
+		let n: number = typeof v === "string" ? parseFloat(v) || 0 : v;
+		this.light.shadow.mapSize.height = Math.max(n, 512);
+		this.updateShadowMap();
+	}
 
-    get shadowMapWidth(): number { return this.light.shadow.mapSize.width; }
-    get shadowMapHeight(): number { return this.light.shadow.mapSize.height; }
+	get shadowMapWidth(): number { return this.light.shadow.mapSize.width; }
+	get shadowMapHeight(): number { return this.light.shadow.mapSize.height; }
 
-    get shadowCameraSize(): Vector3 {
-        let camera = this.light.shadow.camera as OrthographicCamera;
-        return this._shadowCameraSize.set(camera.right - camera.left, camera.top - camera.bottom, camera.far - camera.near);
-    }
+	get shadowCameraSize(): Vector3 {
+		let camera = this.light.shadow.camera as OrthographicCamera;
+		return this._shadowCameraSize.set(camera.right - camera.left, camera.top - camera.bottom, camera.far - camera.near);
+	}
 
-    set shadowCameraSize(v: Vector3) {
-        let camera = this.light.shadow.camera as OrthographicCamera;
+	set shadowCameraSize(v: Vector3) {
+		let camera = this.light.shadow.camera as OrthographicCamera;
 
-        camera.left = -v.x / 2.0; camera.right = v.x / 2.0;
-        camera.bottom = -v.y / 2.0; camera.top = v.y / 2.0;
-        camera.near = -v.z / 2.0; camera.far = v.z / 2.0;
+		camera.left = -v.x / 2.0; camera.right = v.x / 2.0;
+		camera.bottom = -v.y / 2.0; camera.top = v.y / 2.0;
+		camera.near = -v.z / 2.0; camera.far = v.z / 2.0;
 
-        this._shadowCameraSize.set(camera.right - camera.left, camera.top - camera.bottom, camera.far - camera.near);
+		this._shadowCameraSize.set(camera.right - camera.left, camera.top - camera.bottom, camera.far - camera.near);
 
-        camera.updateProjectionMatrix();
-        this.cameraHelper.update();
-    }
+		camera.updateProjectionMatrix();
+		this.cameraHelper.update();
+	}
 
-    constructor(private resources: ThreeViewerResources, lightType: ThreeViewerItemLightType) {
-        super();
-        this.lightType = lightType;
-        this.initialize();
-    }
-
-
-    onAdd(scene: Scene): void {
-        if (this.cameraHelper)
-            scene.add(this.cameraHelper);
-    }
-    onRemove(scene: Scene): void {
-        if (this.cameraHelper)
-            scene.remove(this.cameraHelper);
-    }
-
-    get color(): Color {
-        return this.light.color;
-    }
-
-    setEditorMode(enabled: boolean) {
-        if (this.gizmo)
-            this.gizmo.visible = enabled;
-    }
-
-    setSelected(selected: boolean) {
-        if (this.cameraHelper)
-            this.cameraHelper.visible = selected;
-    }
-
-    updateMatrixWorld(force?: boolean): void {
-        super.updateMatrixWorld(force);
-    }
+	constructor(private resources: ThreeViewerResources, lightType: ThreeViewerItemLightType) {
+		super();
+		this.lightType = lightType;
+		this.initialize();
+	}
 
 
-    private updateShadowMap(): void {
-        const shadow = this.light.shadow;
-        if (shadow.map) {
-            (shadow.map as WebGLRenderTarget).setSize(shadow.mapSize.width, shadow.mapSize.height);
-        }
-    }
+	onAdd(scene: Scene): void {
+		if (this.cameraHelper)
+			scene.add(this.cameraHelper);
+	}
+	onRemove(scene: Scene): void {
+		if (this.cameraHelper)
+			scene.remove(this.cameraHelper);
+	}
 
-    private createGizmo() {
+	get color(): Color {
+		return this.light.color;
+	}
 
-        let gizmo = new Sprite(new SpriteMaterial({
-            color: 0xffffff,
-            depthTest: false,
-            depthWrite: false,
-            sizeAttenuation: false
-        }));
+	setEditorMode(enabled: boolean) {
+		if (this.gizmo)
+			this.gizmo.visible = enabled;
+	}
 
-        gizmo.scale.set(0.1, 0.1, 0.1);
-        gizmo.renderOrder = 1;
-        gizmo.visible = false;
+	setSelected(selected: boolean) {
+		if (this.cameraHelper)
+			this.cameraHelper.visible = selected;
+	}
 
-        this.add(gizmo);
-
-        this.gizmo = gizmo;
-
-        this.resources.loadTexture("core-assets/three-viewer/light-gizmo.png").then((texture) => this.gizmo.material.map = texture);
-
-    }
-
-    private createCameraHelper(): void {
-        this.cameraHelper = new CameraHelper(this.light.shadow.camera);
-        this.cameraHelper.visible = false;
-    }
-
-    private initialize(): void {
-        switch (this.lightType) {
-            case "ambient":
-                this.light = new AmbientLight();
-                break;
-            case "directional":
-                this.light = new DirectionalLight();
-                this.light.shadow.mapSize.set(1024, 1024);
-                this.createCameraHelper();
-                this.createGizmo();
-                break;
-            default:
-                throw new Error(`Unknown light type: ${this.lightType}`);
-        }
+	updateMatrixWorld(force?: boolean): void {
+		super.updateMatrixWorld(force);
+	}
 
 
-        this.add(this.light);
-    }
+	private updateShadowMap(): void {
+		const shadow = this.light.shadow;
+		if (shadow.map) {
+			(shadow.map as WebGLRenderTarget).setSize(shadow.mapSize.width, shadow.mapSize.height);
+		}
+	}
 
-    async serialize(binData: BinaryFiles): Promise<ThreeViewerItemLight> {
-        let pos = this.position;
-        let rot = this.rotation;
-        let scl = this.scale;
+	private createGizmo() {
+
+		let gizmo = new Sprite(new SpriteMaterial({
+			color: 0xffffff,
+			depthTest: false,
+			depthWrite: false,
+			sizeAttenuation: false
+		}));
+
+		gizmo.scale.set(0.1, 0.1, 0.1);
+		gizmo.renderOrder = 1;
+		gizmo.visible = false;
+
+		this.add(gizmo);
+
+		this.gizmo = gizmo;
+
+		this.resources.loadTexture("core-assets/three-viewer/light-gizmo.png").then((texture) => this.gizmo.material.map = texture);
+
+	}
+
+	private createCameraHelper(): void {
+		this.cameraHelper = new CameraHelper(this.light.shadow.camera);
+		this.cameraHelper.visible = false;
+	}
+
+	private initialize(): void {
+		switch (this.lightType) {
+			case "ambient":
+				this.light = new AmbientLight();
+				break;
+			case "directional":
+				this.light = new DirectionalLight();
+				this.light.shadow.mapSize.set(1024, 1024);
+				this.createCameraHelper();
+				this.createGizmo();
+				break;
+			default:
+				throw new Error(`Unknown light type: ${this.lightType}`);
+		}
 
 
-        switch (this.lightType) {
-            case "ambient":
-                return {
-                    title: this.title,
-                    description: this.description,
-                    position: [pos.x, pos.y, pos.z],
-                    rotation: [rot.x, rot.y, rot.z],
-                    scale: [scl.x, scl.y, scl.z],
-                    type: "ambient",
-                    color: this.color.getHex(),
-                };
-            case "directional":
-                return {
-                    title: this.title,
-                    description: this.description,
-                    position: [pos.x, pos.y, pos.z],
-                    rotation: [rot.x, rot.y, rot.z],
-                    scale: [scl.x, scl.y, scl.z],
-                    type: "directional",
-                    color: this.color.getHex(),
-                    castShadow: this.light.castShadow,
-                    shadowMapWidth: this.light.shadow.mapSize.width,
-                    shadowMapHeight: this.light.shadow.mapSize.height,
-                    shadowCameraSize: [this.shadowCameraSize.x, this.shadowCameraSize.y, this.shadowCameraSize.z]
-                };
-            default:
-                throw new Error(`Unknwon light type: ${this.lightType}`);
-        }
-    }
+		this.add(this.light);
+	}
+
+	async serialize(binData: BinaryFiles): Promise<ThreeViewerItemLight> {
+		let pos = this.position;
+		let rot = this.rotation;
+		let scl = this.scale;
+
+
+		switch (this.lightType) {
+			case "ambient":
+				return {
+					title: this.title,
+					description: this.description,
+					position: [pos.x, pos.y, pos.z],
+					rotation: [rot.x, rot.y, rot.z],
+					scale: [scl.x, scl.y, scl.z],
+					type: "ambient",
+					color: this.color.getHex(),
+				};
+			case "directional":
+				return {
+					title: this.title,
+					description: this.description,
+					position: [pos.x, pos.y, pos.z],
+					rotation: [rot.x, rot.y, rot.z],
+					scale: [scl.x, scl.y, scl.z],
+					type: "directional",
+					color: this.color.getHex(),
+					castShadow: this.light.castShadow,
+					shadowMapWidth: this.light.shadow.mapSize.width,
+					shadowMapHeight: this.light.shadow.mapSize.height,
+					shadowCameraSize: [this.shadowCameraSize.x, this.shadowCameraSize.y, this.shadowCameraSize.z]
+				};
+			default:
+				throw new Error(`Unknwon light type: ${this.lightType}`);
+		}
+	}
 
 }
 
@@ -665,173 +694,173 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
  */
 export class ThreeViewerModel extends Group implements Serializable<ThreeViewerItemModel>, EditorMode {
 
-    isThreeViewerModel: boolean = true;
+	isThreeViewerModel: boolean = true;
 
-    title: LocalizedText = "";
-    description: LocalizedText = "";
-    previewImage: string = null;
+	title: LocalizedText = "";
+	description: LocalizedText = "";
+	previewImage: string = null;
 
-    private _opacity: number = 1;
-    private _currentMaterialIndex: number = null;
+	private _opacity: number = 1;
+	private _currentMaterialIndex: number = null;
 
-    private _materials: ThreeViewerModel.Material[] = [];
+	private _materials: ThreeViewerModel.Material[] = [];
 
-    set currentMaterial(index: number) {
+	set currentMaterial(index: number) {
 
-        index = parseInt(<any>index);
+		index = parseInt(<any>index);
 
-        let mat = this._materials[index];
+		let mat = this._materials[index];
 
-        if (mat) {
-            this._currentMaterialIndex = index;
-            this.meshes.forEach((mesh, index) => mesh.material = mat.meshMaterials[index]);
-        }
-    }
+		if (mat) {
+			this._currentMaterialIndex = index;
+			this.meshes.forEach((mesh, index) => mesh.material = mat.meshMaterials[index]);
+		}
+	}
 
-    get currentMaterial(): number {
-        return this._currentMaterialIndex;
-    }
-
-
-    set opacity(value: number) {
-        this._opacity = value;
-        this._materials
-            .reduce((prev, curr) => [...prev, ...curr.meshMaterials], <MeshStandardMaterial[]>[])
-            .forEach(mat => mat.opacity = value);
-    }
-
-    get opacity(): number {
-        return this._opacity;
-    }
-
-    get meshes(): Mesh[] {
-        return <Mesh[]>this.children.filter(x => x instanceof Mesh);
-    }
-
-    get materials(): ThreeViewerModel.Material[] {
-        return this._materials.map(x => x);
-    }
-
-    constructor(private resources: ThreeViewerResources) {
-        super();
-    }
-
-    setEditorMode(enabled: boolean) { }
-    setSelected(selected: boolean) { }
+	get currentMaterial(): number {
+		return this._currentMaterialIndex;
+	}
 
 
-    swapMaterials(previousIdx: number, currentIdx: number): void {
-        let current = this._materials[this.currentMaterial];
-        moveItemInArray(this._materials, previousIdx, currentIdx);
-        this.currentMaterial = this._materials.findIndex(x => x === current);
-    }
+	set opacity(value: number) {
+		this._opacity = value;
+		this._materials
+			.reduce((prev, curr) => [...prev, ...curr.meshMaterials], <MeshStandardMaterial[]>[])
+			.forEach(mat => mat.opacity = value);
+	}
 
-    removeMaterial(idx: number) {
-        if (this._materials.length <= 1)
-            return;
+	get opacity(): number {
+		return this._opacity;
+	}
 
-        let current = this._materials[this.currentMaterial];
+	get meshes(): Mesh[] {
+		return <Mesh[]>this.children.filter(x => x instanceof Mesh);
+	}
 
-        this._materials.splice(idx, 1);
+	get materials(): ThreeViewerModel.Material[] {
+		return this._materials.map(x => x);
+	}
 
-        if (this.currentMaterial === idx) {
-            this.currentMaterial = 0;
-        } else {
-            this.currentMaterial = this._materials.findIndex(x => x === current);
-        }
+	constructor(private resources: ThreeViewerResources) {
+		super();
+	}
 
-    }
+	setEditorMode(enabled: boolean) { }
+	setSelected(selected: boolean) { }
 
-    addMaterial(meshMaterials?: MeshStandardMaterial[]): ThreeViewerModel.Material {
 
-        if (this.meshes.length === 0) {
-            throw new Error("There are no meshes");
-        }
+	swapMaterials(previousIdx: number, currentIdx: number): void {
+		let current = this._materials[this.currentMaterial];
+		moveItemInArray(this._materials, previousIdx, currentIdx);
+		this.currentMaterial = this._materials.findIndex(x => x === current);
+	}
 
-        if (!meshMaterials) {
-            meshMaterials = this.meshes.map(x => this.resources.createStandardMaterial({
-                premultipliedAlpha: false,
-                transparent: true,
-                color: 0xffffff
-            }));
-        }
+	removeMaterial(idx: number) {
+		if (this._materials.length <= 1)
+			return;
 
-        if (meshMaterials.length !== this.meshes.length) {
-            throw new Error(`Incorrect material count. Expected ${this.meshes.length}, got ${meshMaterials.length}`)
-        }
+		let current = this._materials[this.currentMaterial];
 
-        let newMaterial: ThreeViewerModel.Material = { title: "Material", meshMaterials: meshMaterials }
-        this._materials.push(newMaterial);
+		this._materials.splice(idx, 1);
 
-        if (this._currentMaterialIndex === null)
-            this.currentMaterial = 0;
+		if (this.currentMaterial === idx) {
+			this.currentMaterial = 0;
+		} else {
+			this.currentMaterial = this._materials.findIndex(x => x === current);
+		}
 
-        return newMaterial;
+	}
 
-    }
+	addMaterial(meshMaterials?: MeshStandardMaterial[]): ThreeViewerModel.Material {
 
-    async serialize(binFiles: BinaryFiles): Promise<ThreeViewerItemModel> {
-        let pos = this.position;
-        let scl = this.scale;
-        let rot = this.rotation;
+		if (this.meshes.length === 0) {
+			throw new Error("There are no meshes");
+		}
 
-        let meshes = this.meshes.map(async mesh => {
-            let data = await exportPlyMesh(mesh);
-            let fileName = await binFiles.store(data, "ply");
-            return {
-                name: mesh.name,
-                file: fileName
-            }
-        });
+		if (!meshMaterials) {
+			meshMaterials = this.meshes.map(x => this.resources.createStandardMaterial({
+				premultipliedAlpha: false,
+				transparent: true,
+				color: 0xffffff
+			}));
+		}
 
-        let materials = this._materials.map(async m => {
+		if (meshMaterials.length !== this.meshes.length) {
+			throw new Error(`Incorrect material count. Expected ${this.meshes.length}, got ${meshMaterials.length}`)
+		}
 
-            let meshMaterials = m.meshMaterials.map(async x => {
-                let map = x.map && x.map.sourceFile ? await binFiles.storeTexture(x.map) : undefined;
-                let normalMap = x.normalMap && x.normalMap.sourceFile ? await binFiles.storeTexture(x.normalMap) : undefined;
-                return {
-                    color: x.color.getHex(),
-                    map: map,
-                    normalMap: normalMap
-                }
-            });
+		let newMaterial: ThreeViewerModel.Material = { title: "Material", meshMaterials: meshMaterials }
+		this._materials.push(newMaterial);
 
-            let previewImage: string = m.previewImage ? await binFiles.store(await (await fetch(m.previewImage)).arrayBuffer()) : undefined;
+		if (this._currentMaterialIndex === null)
+			this.currentMaterial = 0;
 
-            return {
-                title: m.title,
-                description: m.description,
-                previewImage: previewImage,
-                meshMaterials: await Promise.all(meshMaterials)
-            }
-        });
+		return newMaterial;
 
-        let previewImage: string = this.previewImage ? await binFiles.store(await (await fetch(this.previewImage)).arrayBuffer()) : undefined;
+	}
 
-        return {
-            title: this.title,
-            description: this.description,
-            previewImage: previewImage,
-            visible: this.visible,
-            opacity: this._opacity,
-            position: [pos.x, pos.y, pos.z],
-            rotation: [rot.x, rot.y, rot.z],
-            scale: [scl.x, scl.y, scl.z],
-            activeMaterial: this.currentMaterial,
-            meshes: await Promise.all(meshes),
-            materials: await Promise.all(materials)
-        }
-    }
+	async serialize(binFiles: BinaryFiles): Promise<ThreeViewerItemModel> {
+		let pos = this.position;
+		let scl = this.scale;
+		let rot = this.rotation;
+
+		let meshes = this.meshes.map(async mesh => {
+			let data = await exportPlyMesh(mesh);
+			let fileName = await binFiles.store(data, "ply");
+			return {
+				name: mesh.name,
+				file: fileName
+			}
+		});
+
+		let materials = this._materials.map(async m => {
+
+			let meshMaterials = m.meshMaterials.map(async x => {
+				let map = x.map && x.map.sourceFile ? await binFiles.storeTexture(x.map) : undefined;
+				let normalMap = x.normalMap && x.normalMap.sourceFile ? await binFiles.storeTexture(x.normalMap) : undefined;
+				return {
+					color: x.color.getHex(),
+					map: map,
+					normalMap: normalMap
+				}
+			});
+
+			let previewImage: string = m.previewImage ? await binFiles.store(await (await fetch(m.previewImage)).arrayBuffer()) : undefined;
+
+			return {
+				title: m.title,
+				description: m.description,
+				previewImage: previewImage,
+				meshMaterials: await Promise.all(meshMaterials)
+			}
+		});
+
+		let previewImage: string = this.previewImage ? await binFiles.store(await (await fetch(this.previewImage)).arrayBuffer()) : undefined;
+
+		return {
+			title: this.title,
+			description: this.description,
+			previewImage: previewImage,
+			visible: this.visible,
+			opacity: this._opacity,
+			position: [pos.x, pos.y, pos.z],
+			rotation: [rot.x, rot.y, rot.z],
+			scale: [scl.x, scl.y, scl.z],
+			activeMaterial: this.currentMaterial,
+			meshes: await Promise.all(meshes),
+			materials: await Promise.all(materials)
+		}
+	}
 
 }
 
 export namespace ThreeViewerModel {
-    export type Material = {
-        title: LocalizedText;
-        description?: LocalizedText;
-        previewImage?: string;
-        meshMaterials: MeshStandardMaterial[]
-    };
+	export type Material = {
+		title: LocalizedText;
+		description?: LocalizedText;
+		previewImage?: string;
+		meshMaterials: MeshStandardMaterial[]
+	};
 }
 
 
@@ -841,14 +870,14 @@ export type ThreeViewerObject3D = (ThreeViewerModel | ThreeViewerLight | ThreeVi
  * A threejs group with typed children
  */
 export class ThreeViewerGroup<T extends ThreeViewerObject3D> extends Group {
-    constructor() { super(); }
-    children: T[];
-    add(...o: T[]): this {
-        super.add(...o);
-        return this;
-    }
-    remove(...o: T[]): this {
-        super.remove(...o);
-        return this;
-    }
+	constructor() { super(); }
+	children: T[];
+	add(...o: T[]): this {
+		super.add(...o);
+		return this;
+	}
+	remove(...o: T[]): this {
+		super.remove(...o);
+		return this;
+	}
 }
