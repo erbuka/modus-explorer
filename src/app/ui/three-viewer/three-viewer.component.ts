@@ -103,6 +103,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
   width: number = 0;
   height: number = 0;
 
+  layerControls: boolean = true;
   allowEditorMode: boolean = false;
   showLayers: boolean = true;
   selectedPin: ThreeViewerPin = null;
@@ -242,6 +243,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
     this.unloadItem();
     this._loadedItem = this.item;
+
+    // Layer controls
+    this.layerControls = this.item.layerControls !== undefined ? this.item.layerControls : true;
 
     // Transform controls
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
