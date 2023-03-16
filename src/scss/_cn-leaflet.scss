@@ -1,35 +1,48 @@
 // Override global font
 @use '@angular/material' as mat;
+
 .leaflet-container {
-  font: inherit !important;
+	font: inherit !important;
 }
 
 .leaflet-map-pane svg {
-  z-index: unset;
+	z-index: unset;
 }
+
 .leaflet-map-pane canvas {
-  z-index: unset;
+	z-index: unset;
 }
 
 // Popups
 .leaflet-popup-content-wrapper {
-  @extend .rounded;
+	@extend .rounded;
 }
+
 .leaflet-popup-content {
-  @extend .m-0;
-  @extend .p-2;
+	@extend .m-0;
+	@extend .p-4;
 }
+
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
-  @extend .bg-primary;
-  @extend .mat-elevation-z1;
+	color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
+	@extend .bg-primary;
+	@extend .mat-elevation-z1;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+	color: map-get($cn-mat-primary, default-contrast);
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: map-get($cn-mat-primary, default-contrast);
 }
 
 // Tooltip
 
 .leaflet-tooltip {
-  color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
-  @extend .bg-primary;
-  @extend .mat-elevation-z1;
+	color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
+	@extend .bg-primary;
+	@extend .mat-elevation-z1;
 }
