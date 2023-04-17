@@ -59,7 +59,7 @@
     <div cdkDrag class="cn-three-viewer-layers" [class.cn-hidden]="!showLayers">
 
         <mat-toolbar color="primary" cdkDragHandle style="cursor: move">
-            <span>Layers</span>
+            <span class="text-capitalize">{{ "layers" | cnLocalizedText }}</span>
             <button class="ml-auto" mat-icon-button (click)="showLayers=false">
                 <mat-icon>close</mat-icon>
             </button>

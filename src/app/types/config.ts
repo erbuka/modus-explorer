@@ -4,6 +4,8 @@ export interface ConfigLocale {
     id: string;                     // "it", "en", ...
     flagIcon?: string;              // Link per icona bandiera 
     description: string;            // "Italiano", "English", ...
+		translations?: { [key: string]: string } // Traduzioni
+
 }
 
 export interface Config {
@@ -13,6 +15,6 @@ export interface Config {
     headerTemplate?: string;        // Template grafico per testata
     internationalization?: {        // Parametri internazionalizzazione
         defaultLocale: string,      // Lingua di default, es "it"
-        locales: ConfigLocale[]     // Lingue disponibili
+        locales: ConfigLocale[],     // Lingue disponibili
     }
 }

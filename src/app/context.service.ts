@@ -73,7 +73,9 @@ export class ContextService {
       let translation = text[locale.id];
       return translation ? translation : `Translation not found for locale "${locale.id}"`;
     } else if (typeof text === "string") {
-      return text;
+			if(locale?.translations?.[text])
+				return locale.translations[text];
+			return text;
     } else {
       return `Invalid text type: ${typeof text}`;
     }

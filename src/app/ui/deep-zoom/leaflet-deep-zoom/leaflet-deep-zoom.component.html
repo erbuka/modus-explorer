@@ -15,7 +15,7 @@
 		<div class="cn-dz-layer-controls" [class.cn-show]="showLayers">
 
 			<mat-toolbar color="primary">
-				<span>Layers</span>
+				<span class="text-capitalize">{{ "layers" | cnLocalizedText }}</span>
 				<button class="ml-auto" mat-icon-button (click)="showLayers=false">
 					<mat-icon>close</mat-icon>
 				</button>
@@ -43,13 +43,13 @@
 
 			<mat-menu #unitsMenu>
 				<button mat-menu-item (click)="measureUnit='pixels'">
-					<span>Pixels</span>
+					<span class="text-capitalize">{{ "pixels" | cnLocalizedText }}</span>
 				</button>
 				<button mat-menu-item (click)="measureUnit='inches'">
-					<span>Inches</span>
+					<span class="text-capitalize">{{ "inches" | cnLocalizedText }}</span>
 				</button>
 				<button mat-menu-item (click)="measureUnit='centimeters'">
-					<span>Centimeters</span>
+					<span class="text-capitalize">{{ "centimeters" | cnLocalizedText }}</span>
 				</button>
 			</mat-menu>
 
@@ -68,9 +68,9 @@
 					<div class="float-right">
 						<span>&#x25B4;</span>
 					</div>
-					<span *ngIf="measureUnit==='pixels'">Pixels</span>
-					<span *ngIf="measureUnit==='inches'">Inches</span>
-					<span *ngIf="measureUnit==='centimeters'">Centimeters</span>
+					<span class="text-capitalize" *ngIf="measureUnit==='pixels'">{{ "pixels" | cnLocalizedText }}</span>
+					<span class="text-capitalize" *ngIf="measureUnit==='inches'">{{ "inches" | cnLocalizedText }}</span>
+					<span class="text-capitalize" *ngIf="measureUnit==='centimeters'">{{ "centimeters" | cnLocalizedText }}</span>
 				</div>
 
 				<!--
