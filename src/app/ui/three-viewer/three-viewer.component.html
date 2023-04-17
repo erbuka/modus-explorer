@@ -48,7 +48,7 @@
     </div>
 
     <div class="cn-three-viewer-controls">
-        <button mat-mini-fab color="primary" (click)="showLayers=!showLayers">
+        <button mat-mini-fab color="primary" (click)="showLayers=!showLayers" *ngIf="layerControls">
             <mat-icon>layers</mat-icon>
         </button>
         <button *ngIf="allowEditorMode" color="primary" class="ml-2" mat-mini-fab (click)="editorMode=true">
@@ -56,7 +56,7 @@
         </button>
     </div>
 
-    <div cdkDrag class="cn-three-viewer-layers" [class.cn-hidden]="!showLayers">
+    <div cdkDrag class="cn-three-viewer-layers" [class.cn-hidden]="!layerControls || !showLayers">
 
         <mat-toolbar color="primary" cdkDragHandle style="cursor: move">
             <span class="text-capitalize">{{ "layers" | cnLocalizedText }}</span>
