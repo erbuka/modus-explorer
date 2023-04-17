@@ -25,8 +25,8 @@
 
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-	color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
-	@extend .bg-primary;
+	//color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
+	@extend .bg-white;
 	@extend .mat-elevation-z1;
 }
 

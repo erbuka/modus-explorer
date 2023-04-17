@@ -8,6 +8,7 @@ import { LeafletMeasureLayer } from './leaflet-measure-layer';
 import { NavigatorTrackBounds, NavigatorPanEvent } from '../navigator/navigator.component';
 import { LocationRouterService } from 'src/app/location-router.service';
 import { State } from 'src/app/classes/state';
+import { LocalizedText } from 'src/app/types/item';
 
 
 const MEASURE_LAYER_PANE = "dz-measure-pane";
@@ -93,6 +94,10 @@ export class LeafletDeepZoomComponent implements OnInit, OnChanges {
 				this.createMap();
 			}
 		}
+	}
+
+	getDescriptionAsArray(description: LocalizedText | LocalizedText[]): LocalizedText[] {
+		return description instanceof Array ? description : [description];
 	}
 
 	updateNavigatorBounds(): void {

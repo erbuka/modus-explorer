@@ -4,7 +4,7 @@ import { ItemBase, LocalizedText } from './item';
 export interface DeepZoomItemShape {
 	type: string;               // Tipo, per adesso solo "circle" o "polygon"
 	title?: LocalizedText;      // Titolo
-	description?: LocalizedText;
+	description?: LocalizedText; // Descrizione
 	href?: string;              // Link al click
 	drawAttributes: {           // Parametri per il rendering            
 		stroke: boolean;        // Disegnare il bordo?

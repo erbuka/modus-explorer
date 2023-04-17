@@ -104,9 +104,10 @@
 <div #popupElement>
 	<ng-container *ngIf="activeShape">
 		<h2 *ngIf="activeShape.title">{{ activeShape.title }}</h2>
-		<p *ngIf="activeShape.description">{{ activeShape.description }}</p>
+		<ng-container *ngIf="activeShape.description"></ng-container>
+		<p *ngIf="activeShape.description" [innerHtml]="activeShape.description | cnLocalizedText"></p>
 		<p *ngIf="activeShape.href" class="text-right mb-0">
-			<a mat-mini-fab [cnLink]="activeShape.href | cnUrl : item">
+			<a mat-mini-fab color="primary" [cnLink]="activeShape.href | cnUrl : item">
 				<mat-icon>open_in_new</mat-icon>
 			</a>
 		</p>
