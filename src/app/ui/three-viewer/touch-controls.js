@@ -340,9 +340,6 @@ export class TouchControls extends EventDispatcher {
 
 			}
 			else if (evt.type === "panup" || evt.type === "pandown") {
-
-				console.log("ciao");
-
 				let delta = (evt.type === "panup" ? -1 : 1) * this.options.zoomStep;
 				let dir = new Vector3();
 				this.camera.getWorldDirection(dir);
