@@ -153,7 +153,7 @@ export class TouchControls extends EventDispatcher {
 		/**
 		 * @property {boolean} enabled
 		 */
-		this._enabled = false;
+		this._enabled = true;
 		Object.defineProperty(this, "enabled", {
 			set: function (value) {
 				if (value && !this._enabled)
