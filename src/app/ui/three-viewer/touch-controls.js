@@ -313,7 +313,7 @@ export class TouchControls extends EventDispatcher {
 				//let dx = -srcEvent.movementX / (this.domElement.clientHeight * window.devicePixelRatio * 0.5) * this.options.rotationSpeed;
 				//let dy = srcEvent.movementY / (this.domElement.clientHeight * window.devicePixelRatio * 0.5) * this.options.rotationSpeed;
 
-				if (srcEvent.altKey) {
+				if (srcEvent.ctrlKey || srcEvent.metaKey || srcEvent.shiftKey) {
 					const dx = -srcEvent.movementX / this.domElement.clientHeight * this.options.zoomStep * ZOOM_SPEED_TO_PAN;
 					const dy = srcEvent.movementY / this.domElement.clientHeight * this.options.zoomStep  * ZOOM_SPEED_TO_PAN;
 
