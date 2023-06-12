@@ -6,14 +6,13 @@
 
 	<!-- Controls -->
 	<div style="z-index: 2;">
-		<div class="cn-dz-show-layers" (click)="showLayers=true">
+		<div *ngIf="!item.options.disableLayers" class="cn-dz-show-layers" (click)="showLayers=true">
 			<button mat-mini-fab color="primary">
 				<mat-icon>layers</mat-icon>
 			</button>
 		</div>
 
-		<div class="cn-dz-layer-controls" [class.cn-show]="showLayers">
-
+		<div class="cn-dz-layer-controls" [class.cn-show]="!item.options.disableLayers && showLayers">
 			<mat-toolbar color="primary">
 				<span class="text-capitalize">{{ "layers" | cnLocalizedText }}</span>
 				<button class="ml-auto" mat-icon-button (click)="showLayers=false">
@@ -37,7 +36,7 @@
 			</div>
 		</div>
 
-		<app-navigator [item]="item" [bounds]="navigatorBounds" (navigatorPan)="onNavigatorPan($event)"></app-navigator>
+		<app-navigator *ngIf="!item.options.disableMinimap" [item]="item" [bounds]="navigatorBounds" (navigatorPan)="onNavigatorPan($event)"></app-navigator>
 
 		<div class="cn-dz-tools">
 

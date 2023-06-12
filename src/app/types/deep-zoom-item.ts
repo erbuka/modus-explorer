@@ -68,6 +68,8 @@ export interface DeepZoomItem extends ItemBase {
 			width: number,          // Lunghezza       
 			height: number          // Altezza
 		},
+    disableMinimap?: boolean,
+    disableLayers?: boolean,
 		minimapImage: string        // Miniatura per radar
 	},
 	layers: (DeepZoomItemDeepImageLayer | DeepZoomItemVectorLayer)[],   // Lista dei layer
