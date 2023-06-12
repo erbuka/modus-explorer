@@ -92,6 +92,7 @@ export class LeafletDeepZoomComponent implements OnInit, OnChanges {
 			const c = changes["item"];
 			if (c.previousValue !== c.currentValue && c.currentValue) {
 				this.createMap();
+        this.showLayers = this.item.options.showLayers !== undefined ? this.item.options.showLayers : true; 
 			}
 		}
 	}
