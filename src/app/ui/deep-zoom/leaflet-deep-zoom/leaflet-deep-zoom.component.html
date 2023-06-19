@@ -1,114 +1,128 @@
 <div class="h-100 cn-relative" style="user-select: none;">
 
-	<!-- Map container-->
-	<div class="cn-deep-zoom-container h-100" style="z-index: 0;" #mapContainer>
-	</div>
+  <!-- Map container-->
+  <div class="cn-deep-zoom-container h-100" style="z-index: 0;" #mapContainer>
+  </div>
 
-	<!-- Controls -->
-	<div style="z-index: 2;">
-		<div *ngIf="!item.options.disableLayers" class="cn-dz-show-layers" (click)="showLayers=true">
-			<button mat-mini-fab color="primary">
-				<mat-icon>layers</mat-icon>
-			</button>
-		</div>
+  <!-- Controls -->
+  <div style="z-index: 2;">
+    <div *ngIf="!item.options.disableLayers" class="cn-dz-show-layers" (click)="showLayers=true">
+      <button mat-mini-fab color="primary">
+        <mat-icon>layers</mat-icon>
+      </button>
+    </div>
 
-		<div class="cn-dz-layer-controls" [class.cn-show]="!item.options.disableLayers && showLayers">
-			<mat-toolbar color="primary">
-				<span class="text-capitalize">{{ "layers" | cnLocalizedText }}</span>
-				<button class="ml-auto" mat-icon-button (click)="showLayers=false">
-					<mat-icon>close</mat-icon>
-				</button>
-			</mat-toolbar>
-			<div class="cn-dz-layers">
-				<div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
-					<div class="cn-dz-layer-preview cn-bg-cover" [style.background-color]="l.color"
-						[appBgImage]="l.previewImage | cnUrl : item"></div>
-					<div class="mx-2">{{ l.title | cnLocalizedText }}</div>
-					<div class="ml-auto"></div>
-					<mat-slider *ngIf="l.opacityControl" color="primary" class="mr-2" min="0" step="0.01" max="1"
-						[disabled]="!l.visible" (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
-					</mat-slider>
-					<button mat-icon-button (click)="toggleLayerVisibility(l)">
-						<mat-icon *ngIf="l.visible">visibility</mat-icon>
-						<mat-icon *ngIf="!l.visible" style="opacity: 0.25;">visibility_off</mat-icon>
-					</button>
-				</div>
-			</div>
-		</div>
+    <div class="cn-dz-layer-controls" [class.cn-show]="!item.options.disableLayers && showLayers">
+      <mat-toolbar color="primary" class="d-none d-md-flex">
+        <span class="text-capitalize">{{ "layers" | cnLocalizedText }}</span>
+        <button class="ml-auto" mat-icon-button (click)="showLayers=false">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-toolbar>
+      <div class="cn-dz-layers">
 
-		<app-navigator *ngIf="!item.options.disableMinimap" [item]="item" [bounds]="navigatorBounds" (navigatorPan)="onNavigatorPan($event)"></app-navigator>
+        <div class="d-flex d-md-none align-items-center justify-content-center text-white bg-primary cn-dz-close-mobile" (click)="showLayers=false">
+          <mat-icon>close</mat-icon>
+        </div>
 
-		<div class="cn-dz-tools">
+        <div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
+          <div class="cn-dz-layer-preview cn-bg-cover" [style.background-color]="l.color"
+            (click)="toggleLayerVisibility(l)" [appBgImage]="l.previewImage | cnUrl : item">
+            <div class="cn-dz-hidden" *ngIf="!l.visible">
+              <mat-icon>visibility_off</mat-icon>
+            </div>
+          </div>
 
-			<mat-menu #unitsMenu>
-				<button mat-menu-item (click)="measureUnit='pixels'">
-					<span class="text-capitalize">{{ "pixels" | cnLocalizedText }}</span>
-				</button>
-				<button mat-menu-item (click)="measureUnit='inches'">
-					<span class="text-capitalize">{{ "inches" | cnLocalizedText }}</span>
-				</button>
-				<button mat-menu-item (click)="measureUnit='centimeters'">
-					<span class="text-capitalize">{{ "centimeters" | cnLocalizedText }}</span>
-				</button>
-			</mat-menu>
+          <div class="d-none d-md-block mx-2">{{ l.title | cnLocalizedText }}</div>
+          <div class="d-none d-md-block ml-auto"></div>
 
-			<div class="d-flex h-100 px-2 align-items-center">
-				<button mat-icon-button (click)="tool='pan'" [class.cn-opacity-50]="tool !== 'pan'">
-					<mat-icon>pan_tool</mat-icon>
-				</button>
+          <mat-slider class="d-none d-md-block mr-2" *ngIf="l.opacityControl"   min="0" step="0.01" max="1"
+            [disabled]="!l.visible" (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
+          </mat-slider>
+          <!--
+          <button mat-icon-button (click)="toggleLayerVisibility(l)">
+            <mat-icon *ngIf="l.visible">visibility</mat-icon>
+            <mat-icon *ngIf="!l.visible" style="opacity: 0.25;">visibility_off</mat-icon>
+          </button>
+        -->
+        </div>
+      </div>
+    </div>
 
-				<button mat-icon-button (click)="tool='measure'" [class.cn-opacity-50]="tool !== 'measure'">
-					<mat-icon>straighten</mat-icon>
-				</button>
+    <app-navigator *ngIf="!item.options.disableMinimap" [item]="item" [bounds]="navigatorBounds"
+      (navigatorPan)="onNavigatorPan($event)"></app-navigator>
+
+    <div class="cn-dz-tools">
+
+      <mat-menu #unitsMenu>
+        <button mat-menu-item (click)="measureUnit='pixels'">
+          <span class="text-capitalize">{{ "pixels" | cnLocalizedText }}</span>
+        </button>
+        <button mat-menu-item (click)="measureUnit='inches'">
+          <span class="text-capitalize">{{ "inches" | cnLocalizedText }}</span>
+        </button>
+        <button mat-menu-item (click)="measureUnit='centimeters'">
+          <span class="text-capitalize">{{ "centimeters" | cnLocalizedText }}</span>
+        </button>
+      </mat-menu>
+
+      <div class="d-flex h-100 px-2 align-items-center">
+        <button mat-icon-button (click)="tool='pan'" [class.cn-opacity-50]="tool !== 'pan'">
+          <mat-icon>pan_tool</mat-icon>
+        </button>
+
+        <button mat-icon-button (click)="tool='measure'" [class.cn-opacity-50]="tool !== 'measure'">
+          <mat-icon>straighten</mat-icon>
+        </button>
 
 
-				<div class="border border-white rounded p-2" style="width: 8rem;" [matMenuTriggerFor]="unitsMenu"
-					[class.cn-opacity-50]="tool !== 'measure'">
-					<div class="float-right">
-						<span>&#x25B4;</span>
-					</div>
-					<span class="text-capitalize" *ngIf="measureUnit==='pixels'">{{ "pixels" | cnLocalizedText }}</span>
-					<span class="text-capitalize" *ngIf="measureUnit==='inches'">{{ "inches" | cnLocalizedText }}</span>
-					<span class="text-capitalize" *ngIf="measureUnit==='centimeters'">{{ "centimeters" | cnLocalizedText }}</span>
-				</div>
+        <div class="border border-white rounded p-2" style="width: 8rem;" [matMenuTriggerFor]="unitsMenu"
+          [class.cn-opacity-50]="tool !== 'measure'">
+          <div class="float-right">
+            <span>&#x25B4;</span>
+          </div>
+          <span class="text-capitalize" *ngIf="measureUnit==='pixels'">{{ "pixels" | cnLocalizedText }}</span>
+          <span class="text-capitalize" *ngIf="measureUnit==='inches'">{{ "inches" | cnLocalizedText }}</span>
+          <span class="text-capitalize" *ngIf="measureUnit==='centimeters'">{{ "centimeters" | cnLocalizedText }}</span>
+        </div>
 
-				<!--
+        <!--
                 <button mat-button [matMenuTriggerFor]="unitsMenu" [class.cn-opacity-50]="tool !== 'measure'">
                     <span *ngIf="measureUnit==='pixels'">Pixels</span>
                     <span *ngIf="measureUnit==='inches'">Inches</span>
                     <span *ngIf="measureUnit==='centimeters'">Centimeters</span>
                 </button>
                 -->
-				<div class="ml-auto"></div>
-				<span style="width: 2.5rem">
-					{{formattedZoom}}
-				</span>
-				<button mat-icon-button (click)="map.zoomIn()">
-					<mat-icon>zoom_in</mat-icon>
-				</button>
-				<button mat-icon-button (click)="map.zoomOut()">
-					<mat-icon>zoom_out</mat-icon>
-				</button>
-				<button mat-icon-button (click)="resetCamera()">
-					<mat-icon>zoom_out_map</mat-icon>
-				</button>
-			</div>
-		</div>
+        <div class="ml-auto"></div>
+        <span style="width: 2.5rem">
+          {{formattedZoom}}
+        </span>
+        <button mat-icon-button (click)="map.zoomIn()">
+          <mat-icon>zoom_in</mat-icon>
+        </button>
+        <button mat-icon-button (click)="map.zoomOut()">
+          <mat-icon>zoom_out</mat-icon>
+        </button>
+        <button mat-icon-button (click)="resetCamera()">
+          <mat-icon>zoom_out_map</mat-icon>
+        </button>
+      </div>
+    </div>
 
 
-	</div>
+  </div>
 
 </div>
 
 <div #popupElement>
-	<ng-container *ngIf="activeShape">
-		<h2 *ngIf="activeShape.title">{{ activeShape.title }}</h2>
-		<ng-container *ngIf="activeShape.description"></ng-container>
-		<p *ngIf="activeShape.description" [innerHtml]="activeShape.description | cnLocalizedText"></p>
-		<p *ngIf="activeShape.href" class="text-right mb-0">
-			<a mat-mini-fab color="primary" [cnLink]="activeShape.href | cnUrl : item">
-				<mat-icon>open_in_new</mat-icon>
-			</a>
-		</p>
-	</ng-container>
+  <ng-container *ngIf="activeShape">
+    <h2 *ngIf="activeShape.title">{{ activeShape.title }}</h2>
+    <ng-container *ngIf="activeShape.description"></ng-container>
+    <p *ngIf="activeShape.description" [innerHtml]="activeShape.description | cnLocalizedText"></p>
+    <p *ngIf="activeShape.href" class="text-right mb-0">
+      <a mat-mini-fab color="primary" [cnLink]="activeShape.href | cnUrl : item">
+        <mat-icon>open_in_new</mat-icon>
+      </a>
+    </p>
+  </ng-container>
 </div>
