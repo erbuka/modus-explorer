@@ -81,6 +81,7 @@ export interface ThreeViewerItemPinLayer {
     description: LocalizedText;
     color: number;
     geometry: string;
+    transparent?: boolean;
 }
 
 

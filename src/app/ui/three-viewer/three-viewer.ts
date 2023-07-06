@@ -363,6 +363,7 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
 	description: LocalizedText = "";
 	geometry: BufferGeometry = null;
 	visible: boolean = true;
+	transparent: boolean = false;
 
 	get color(): Color {
 		return this._material.color;
@@ -416,6 +417,7 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
 			title: this.title,
 			description: this.description,
 			color: this.color.getHex(),
+			transparent: this.transparent,
 			geometry: await binData.store(await exportPlyMesh(this.geometry), "ply")
 		}
 	}

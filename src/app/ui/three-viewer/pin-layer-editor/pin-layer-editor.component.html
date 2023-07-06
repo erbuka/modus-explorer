@@ -40,6 +40,13 @@
                         [ngModel]="'#' + selectedLayer.color.getHexString()"
                         (ngModelChange)="selectedLayer.color.set($event)">
                 </div>
+
+                <div class="cn-three-viewer-editor-property">
+                    <mat-checkbox [checked]="selectedLayer.transparent" (change)="selectedLayer.transparent = $event.checked">
+                        Transparent
+                    </mat-checkbox>
+                </div>
+
             </div>
             <div class="flex-grow-1 cn-relative" #pinPreviewContainer [class.d-none]="!selectedLayer">
                 <div class="cn-absolute" style="top:16px;right:16px;z-index: 1;">

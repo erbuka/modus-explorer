@@ -441,6 +441,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 				layer.title = pinLayerDef.title;
 				layer.description = pinLayerDef.description || "";
 				layer.color.setHex(pinLayerDef.color);
+				layer.transparent = pinLayerDef.transparent;
 
 				// So here we're copying the pin geometry, since multiple pin layers might share the same mesh.
 				// Instead, since all the pins share of a layer share the same geometry, we need each layer to have
@@ -771,7 +772,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 		this.updateCamera(dt);
 
-		this.pins.children.forEach(pin => pin.visible = pin.layer.visible);
+		this.pins.children.forEach(pin => pin.visible = (pin.layer.visible && !pin.layer.transparent));
 
 		renderer.setClearColor(0, 0);
 		renderer.clear(true, true);
