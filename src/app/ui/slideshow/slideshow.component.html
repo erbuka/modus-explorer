@@ -23,7 +23,7 @@
 
     <ng-container *ngIf="currentSlideIndex !== null">
 
-        <div class="d-flex flex-column cn-slideshow-carousel animated fadeIn">
+        <div class="cn-slideshow-carousel animated fadeIn">
             <div class="cn-slideshow-slides-wrapper flex-grow-1">
 
                 <div [@fadeAnimation]="currentSlideIndex" class="cn-slideshow-slides">
@@ -79,8 +79,10 @@
             </div>
             <div class="cn-slideshow-controls mat-elevation-z1 p-4" *ngIf="!simpleMode">
                 <span><strong>{{ getSlideGroup(currentSlideIndex).title | cnLocalizedText }}</strong></span>
-                <span *ngIf="item.slides[currentSlideIndex].title"> -
-                    {{ item.slides[currentSlideIndex].title | cnLocalizedText }}</span>
+                <span *ngIf="item.slides[currentSlideIndex].title"> 
+                  <span class="mx-2">-</span> 
+                  <span>{{ item.slides[currentSlideIndex].title | cnLocalizedText }}</span>
+                </span>
             </div>
         </div>
 
