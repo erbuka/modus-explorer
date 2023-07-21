@@ -13,38 +13,34 @@
     </div>
 
     <div class="cn-dz-layer-controls" [class.cn-show]="!item.options.disableLayers && showLayers">
-      <mat-toolbar color="primary" class="d-none d-md-flex">
-        <span class="text-capitalize">{{ "layers" | cnLocalizedText }}</span>
-        <button class="ml-auto" mat-icon-button (click)="showLayers=false">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-toolbar>
+
       <div class="cn-dz-layers">
 
-        <div class="d-flex d-md-none align-items-center justify-content-center text-white bg-primary cn-dz-close-mobile" (click)="showLayers=false">
+        <div class="d-flex d-md-none align-items-center justify-content-center text-white bg-primary cn-dz-close-mobile"
+          (click)="showLayers=false">
           <mat-icon>close</mat-icon>
         </div>
 
-        <div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
+        <div *ngFor="let l of layerControls" class="d-flex flex-column align-items-center cn-dz-layer w-100">
           <div class="cn-dz-layer-preview cn-bg-cover" [style.background-color]="l.color"
-            (click)="toggleLayerVisibility(l)" [appBgImage]="l.previewImage | cnUrl : item">
-            <div class="cn-dz-hidden" *ngIf="!l.visible">
-              <mat-icon>visibility_off</mat-icon>
+            [appBgImage]="l.previewImage | cnUrl : item">
+
+            <div class="cn-dz-visibility-control" (click)="toggleLayerVisibility(l)">
+              <mat-icon *ngIf="!l.visible" class="cn-transparent">visibility_off</mat-icon>
+              <mat-icon *ngIf="l.visible">visibility_on</mat-icon>
             </div>
+
+            <div class="cn-dz-opacity-control">
+              <mat-slider class="d-none d-md-block mr-2" *ngIf="l.opacityControl" min="0" step="0.01" max="1"
+                [disabled]="!l.visible" (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
+              </mat-slider>
+            </div>
+
           </div>
 
-          <div class="d-none d-md-block mx-2">{{ l.title | cnLocalizedText }}</div>
-          <div class="d-none d-md-block ml-auto"></div>
+          <div class="d-none d-md-block m-2">{{ l.title | cnLocalizedText }}</div>
 
-          <mat-slider class="d-none d-md-block mr-2" *ngIf="l.opacityControl"   min="0" step="0.01" max="1"
-            [disabled]="!l.visible" (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
-          </mat-slider>
-          <!--
-          <button mat-icon-button (click)="toggleLayerVisibility(l)">
-            <mat-icon *ngIf="l.visible">visibility</mat-icon>
-            <mat-icon *ngIf="!l.visible" style="opacity: 0.25;">visibility_off</mat-icon>
-          </button>
-        -->
+
         </div>
       </div>
     </div>

@@ -1,6 +1,8 @@
 $cn-dz-tools-height: 4rem;
-$cn-dz-layer-height: 2.5rem;
-$cn-dz-layer-count: 12;
+
+$cn-dz-layer-preview-size: 8rem;
+$cn-dz-layer-preview-size-mobile: 4rem;
+
 
 .cn-deep-zoom-container {
   @extend .cn-relative;
@@ -33,18 +35,17 @@ $cn-dz-layer-count: 12;
   .cn-dz-layers {
 
     overflow-y: auto;
-    max-height: $cn-dz-layer-count * $cn-dz-layer-height;
+    //max-height: $cn-dz-layer-count * $cn-dz-layer-height;
 
     .cn-dz-close-mobile {
       cursor: pointer;
-      width: $cn-dz-layer-height;
-      height: $cn-dz-layer-height;
+      //width: $cn-dz-layer-height;
+      //height: $cn-dz-layer-height;
     }
 
     .cn-dz-layer {
 
       overflow-y: hidden;
-      height: $cn-dz-layer-height;
 
       &:not(:last-child) {
         @extend .border-bottom;
@@ -53,9 +54,60 @@ $cn-dz-layer-count: 12;
       .cn-dz-layer-preview {
         cursor: pointer;
         position: relative;
-        width: $cn-dz-layer-height;
-        height: $cn-dz-layer-height;
+        width: $cn-dz-layer-preview-size;
+        height: $cn-dz-layer-preview-size;
 
+
+        display: flex;
+        flex-direction: column;
+
+        .cn-dz-opacity-control {
+          .mat-slider-horizontal {
+            min-width: initial !important;
+          }
+
+          width: 100%;
+        }
+
+        .cn-dz-visibility-control {
+          flex-grow: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+
+          .mat-icon {
+            height: 2.5rem;
+            width: 2.5rem;
+            font-size: 2.5rem;
+
+            &.cn-transparent {
+              color: rgba(0, 0, 0, 0.5);
+            }
+
+          }
+
+        }
+
+
+        @include media-breakpoint-down(md) {
+          width: $cn-dz-layer-preview-size-mobile;
+          height: $cn-dz-layer-preview-size-mobile;
+
+          .cn-dz-visibility-control {
+            .mat-icon {
+              height: 1.5rem;
+              width: 1.5rem;
+              font-size: 1.5rem;
+            }
+  
+          }
+  
+
+        }
+
+        /*
         .cn-dz-hidden {
           background-color: rgba(0, 0, 0, .5);
           position: absolute;
@@ -66,6 +118,7 @@ $cn-dz-layer-count: 12;
           justify-content: center;
           color: white;
         }
+        */
 
       }
     }
