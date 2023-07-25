@@ -3,6 +3,13 @@ $cn-dz-tools-height: 4rem;
 $cn-dz-layer-preview-size: 8rem;
 $cn-dz-layer-preview-size-mobile: 4rem;
 
+$cn-dz-layer-margin-left: 3.5rem;
+$cn-dz-layer-margin-top: 2rem;
+
+$cn-dz-layer-margin-mobile: 1rem;
+
+$cn-dz-layer-count: 6;
+
 
 .cn-deep-zoom-container {
   @extend .cn-relative;
@@ -12,8 +19,14 @@ $cn-dz-layer-preview-size-mobile: 4rem;
 
 .cn-dz-show-layers {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: $cn-dz-layer-margin-top;
+  left: $cn-dz-layer-margin-left;
+
+  @include media-breakpoint-down(md) {
+    top: $cn-dz-layer-margin-mobile;
+    left: $cn-dz-layer-margin-mobile;
+  }
+
 }
 
 
@@ -25,17 +38,23 @@ $cn-dz-layer-preview-size-mobile: 4rem;
   background-color: rgba(0, 0, 0, 0.5);
   overflow: hidden;
   left: -100%;
-  top: 16px;
+  top: $cn-dz-layer-margin-top;
+  @include media-breakpoint-down(md) {
+    top: $cn-dz-layer-margin-mobile;
+  }
   transition: left 0.2s;
 
   &.cn-show {
-    left: 16px;
+    left: $cn-dz-layer-margin-left;
+    @include media-breakpoint-down(md) {
+      left: $cn-dz-layer-margin-mobile;
+    }
   }
 
   .cn-dz-layers {
 
     overflow-y: auto;
-    //max-height: $cn-dz-layer-count * $cn-dz-layer-height;
+    max-height: $cn-dz-layer-count * $cn-dz-layer-preview-size;
 
     .cn-dz-close-mobile {
       cursor: pointer;
@@ -101,9 +120,9 @@ $cn-dz-layer-preview-size-mobile: 4rem;
               width: 1.5rem;
               font-size: 1.5rem;
             }
-  
+
           }
-  
+
 
         }
 

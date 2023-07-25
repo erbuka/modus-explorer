@@ -1,13 +1,19 @@
 .cn-slideshow-carousel {
+
+  $cn-slidewhow-controls-height: 4rem;
+
   @extend .h-100;
   @extend .mat-elevation-z1;
+  
   position: relative;
+  display: flex;
+  flex-direction: column;
 
   .cn-slideshow-slides-wrapper {
     position: relative;
     overflow: show;
     width: 100%;
-    height: 100%;
+    flex-grow: 1;
     //background-color: rgba(0, 0, 0, 0.5);
 
     .cn-slideshow-slides {
@@ -27,12 +33,11 @@
   }
 
   .cn-slideshow-controls {
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
+    height: $cn-slidewhow-controls-height;
     background-color: rgba(0, 0, 0, .5);
     color: white;
 
   }
+  
 }
