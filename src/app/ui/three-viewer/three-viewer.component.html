@@ -307,6 +307,13 @@
                 </div>
 
                 <div class="cn-three-viewer-editor-property">
+                    <span>Transparent</span>
+                    <div class="ml-auto"></div>
+                    <mat-checkbox [checked]="selectedObject.transparent" (change)="selectedObject.transparent=$event.checked">
+                    </mat-checkbox>
+                </div>
+
+                <div class="cn-three-viewer-editor-property">
                     <span>Opacity</span>
                     <div class="ml-auto"></div>
                     <input class="cn-slider cn-slider-primary" style="width:10rem" type="range" min="0" max="1"

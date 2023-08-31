@@ -30,6 +30,7 @@ export interface ThreeViewerItemModel extends ThreeViewerItemObject {
     activeMaterial?: number;
     visible?: boolean;
     opacity?: number;
+    transparent?:boolean,
     materials: {
         title: LocalizedText,
         description?: LocalizedText,

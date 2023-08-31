@@ -702,6 +702,7 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
 	description: LocalizedText = "";
 	previewImage: string = null;
 
+	private _transparent: boolean = false;
 	private _opacity: number = 1;
 	private _currentMaterialIndex: number = null;
 
@@ -723,6 +724,17 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
 		return this._currentMaterialIndex;
 	}
 
+	set transparent(value: boolean) {
+		this._transparent = value;
+		this._materials
+			.reduce((prev, curr) => [...prev, ...curr.meshMaterials], <MeshStandardMaterial[]>[])
+			.forEach(mat => {
+				mat.transparent = value;
+				mat.needsUpdate = true;
+			});
+	}
+
+	get transparent() { return this._transparent; }
 
 	set opacity(value: number) {
 		this._opacity = value;
@@ -843,6 +855,7 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
 			title: this.title,
 			description: this.description,
 			previewImage: previewImage,
+			transparent: this._transparent,
 			visible: this.visible,
 			opacity: this._opacity,
 			position: [pos.x, pos.y, pos.z],

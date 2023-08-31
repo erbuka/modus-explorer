@@ -372,7 +372,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 					let materials: MeshStandardMaterial[] = [];
 
 					for (let meshMaterialDef of materialDef.meshMaterials) {
-						let mat = resources.createStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
+						let mat = resources.createStandardMaterial({ premultipliedAlpha: false, color: meshMaterialDef.color });
 
 						if (meshMaterialDef.map)
 							mat.map = (await resourcePromises[meshMaterialDef.map]) as Texture;
@@ -391,6 +391,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 				model.currentMaterial = modelDef.activeMaterial || 0;
 				model.opacity = typeof modelDef.opacity === "number" ? modelDef.opacity : 1.0;
+				model.transparent = !!modelDef.transparent;
 
 				this.models.add(model);
 				this.onObjectAdded(model);
