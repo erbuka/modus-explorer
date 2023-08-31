@@ -1,5 +1,6 @@
 $cn-three-viewer-layer-height: 2.5rem;
 $cn-three-viewer-visible-layers: 12;
+$cn-three-viewer-user-popup-padding: 1rem;
 
 .cn-three-viewer-loading {
   z-index: 1;
@@ -30,6 +31,44 @@ $cn-three-viewer-visible-layers: 12;
   @extend .h-100;
   overflow: hidden;
   z-index: 0;
+
+  .cn-three-viewer-user-popup-open {
+    position: absolute;
+    bottom: $cn-three-viewer-user-popup-padding;
+    right: $cn-three-viewer-user-popup-padding;
+    z-index: 1;
+  }
+
+  .cn-three-viewer-user-popup {
+    position: absolute;
+    bottom: $cn-three-viewer-user-popup-padding;
+    right: $cn-three-viewer-user-popup-padding;
+    max-width: calc(100% - 2*$cn-three-viewer-user-popup-padding);
+    max-height: calc(100% - 2*$cn-three-viewer-user-popup-padding);
+    overflow: auto;
+    background: white;
+    z-index: 1;
+    border-radius: 0.25rem;
+
+    .cn-close {
+      cursor: pointer;
+      position: absolute;
+      right: 0.5rem;
+      top: 0.5rem;
+    }
+
+    @include media-breakpoint-down(md) {
+      width: 100%;
+      height: 100%;
+      max-width: initial;
+      max-height: initial;
+      top: 0;
+      left: 0;
+      bottom: initial;
+      right: initial;
+    }
+
+  }
 
   .cn-three-viewer-container {
     @extend .cn-absolute;

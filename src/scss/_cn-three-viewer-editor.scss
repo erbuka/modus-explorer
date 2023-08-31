@@ -9,6 +9,8 @@
 
   }
 
+  z-index: 1;
+
   &.cn-hierarchy {
     @include cn-window();
     top: 0;

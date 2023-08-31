@@ -18,6 +18,8 @@ import { PinLayerEditorComponent, PinLayerEditorData } from './pin-layer-editor/
 import { moveItemInArray } from '@angular/cdk/drag-drop'
 import { LocationRouterService } from 'src/app/location-router.service';
 import { State } from 'src/app/classes/state';
+import { PageItem } from 'src/app/types/page-item';
+import { Item } from 'src/app/types/item';
 
 
 type EditorTab = "models" | "lights" | "pins" | "colliders";
@@ -28,6 +30,12 @@ type LoadingScreenData = {
 	text: string;
 	current: number;
 	total: number;
+}
+
+type UserPopup = {
+	itemUri: string;
+	item: PageItem;
+	open: boolean;
 }
 
 class AnimationFrameHandler {
@@ -74,6 +82,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 	@Input() item: ThreeViewerItem;
 
 	cdkMoveItemInArray = moveItemInArray;
+
+	userPopup: UserPopup;
 
 	activeEditorHierarchyGroup: ThreeViewerGroup<any> = null;
 
@@ -198,7 +208,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 	private _loadedItem: ThreeViewerItem = null;
 
 	constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
-		public router: LocationRouterService, private dialog: MatDialog, private state: State) {
+		public router: LocationRouterService, private dialog: MatDialog, private state: State, private locationRouter: LocationRouterService) {
 		this.allowEditorMode = !environment.production;
 
 		// Create renderer
@@ -513,6 +523,29 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 			}
 		}
 
+		// User popup 
+		// TODO: temp
+		if (this.item.userPopup) {
+
+
+			try {
+				const itemUri = this.locationRouter.resolve(this.item.userPopup.pageItemUri, this.item);
+				const item: Item = await this.context.getItem(itemUri, false).toPromise();
+				if (item.type === "page") {
+					this.userPopup = {
+						itemUri: this.item.userPopup.pageItemUri,
+						item: item,
+						open: true
+					}
+				} else {
+					throw new Error(`Invalid item type: ${item.type}`);
+				}
+			}
+			catch (e) {
+				console.error(e)
+			}
+		}
+
 		// Close loading screen
 		this.loadingScreen.show = false;
 
@@ -535,7 +568,14 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 	}
 
-	loadControls():void {
+	toggleUserPopup(open: boolean): void {
+		this.userPopup.open = open;
+		if (open) {
+			// TODO: timer
+		}
+	}
+
+	loadControls(): void {
 		const controlsType: ThreeViewerItemCameraControls = this.item.camera.controls || "fly";
 
 		if (controlsType === "fly") {
@@ -806,6 +846,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 				orbitMinDistance: this.item.camera.orbitMinDistance,
 				orbitMaxDistance: this.item.camera.orbitMaxDistance
 			},
+			userPopup: this.userPopup ? {
+				pageItemUri: this.userPopup.itemUri
+			} : undefined,
 			models: await Promise.all(this.models.children.map(model => model.serialize(binFiles))),
 			lights: await Promise.all(this.lights.children.map(light => light.serialize(binFiles))),
 			pinLayers: await Promise.all(this.pinLayers.map(pinLayer => pinLayer.serialize(binFiles))),

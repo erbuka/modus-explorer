@@ -30,7 +30,7 @@ export interface ThreeViewerItemModel extends ThreeViewerItemObject {
     activeMaterial?: number;
     visible?: boolean;
     opacity?: number;
-    transparent?:boolean,
+    transparent?: boolean,
     materials: {
         title: LocalizedText,
         description?: LocalizedText,
@@ -101,6 +101,9 @@ export interface ThreeViewerItem extends ItemBase {
         controls?: ThreeViewerItemCameraControls,
         orbitMinDistance?: number,
         orbitMaxDistance?: number,
+    },
+    userPopup?: {
+        pageItemUri: string,
     },
     layerControls?: boolean;
     loadingBackgroundImage?: string;
