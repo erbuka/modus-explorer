@@ -1,5 +1,23 @@
 {
     "title": "Modus Explorer - Starter Project",
     "backgroundImage": "assets/images/background.jpg",
-    "entry": "assets/home"
+    "entry": "assets/home",
+		"internationalization" : {
+			"defaultLocale" : "it",
+			"locales" : [
+				{
+					"id" : "it",
+					"description" : "Italiano",
+					"translations" : {
+						"inches" : "pollici",
+						"centimeters" : "centimetri",
+						"layers" : "livelli"
+					}
+				},
+				{
+					"id" : "en",
+					"description" : "English"
+				}
+			]
+		}
 }

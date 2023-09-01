@@ -70,6 +70,18 @@
         {
             "group": "other",
             "previewImage": "assets/images/tmpl.jpg",
+            "href": "../3d-sample",
+            "title": "3D Sample"
+        },
+        {
+            "group": "other",
+            "previewImage": "assets/images/tmpl.jpg",
+            "href": "../deepzoom-sample",
+            "title": "Deepzoom Sample"
+        },
+        {
+            "group": "other",
+            "previewImage": "assets/images/tmpl.jpg",
             "href": "../templates-samples/simple-page",
             "title": "Simple page"
         }
