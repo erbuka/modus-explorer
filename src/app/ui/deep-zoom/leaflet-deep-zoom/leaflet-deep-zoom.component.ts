@@ -317,7 +317,10 @@ export class LeafletDeepZoomComponent implements OnInit, OnChanges {
 
 				shape.on("click", evt => {
 					this.activeShape = s;
-					const popup = L.popup({ content: this.popupElement.nativeElement }, shape)
+					const popup = L.popup({ 
+						content: this.popupElement.nativeElement, 
+						maxWidth: 768
+					}, shape)
 						.setLatLng(shape.getBounds().getCenter().clone())
 					setTimeout(() => popup.addTo(this.map), 0);
 				});

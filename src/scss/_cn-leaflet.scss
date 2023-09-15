@@ -21,12 +21,15 @@
 .leaflet-popup-content {
 	@extend .m-0;
 	@extend .p-4;
+	max-width: 90vw;
 }
 
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
 	//color: mat.get-color-from-palette($cn-mat-primary, default-contrast);
-	@extend .bg-white;
+	//@extend .bg-white;
+	background-color: rgba(0, 0, 0, .75);
+	color: white;
 	@extend .mat-elevation-z1;
 }
 

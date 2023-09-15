@@ -6,6 +6,7 @@ import { ThreeViewerItem } from './three-viewer-item';
 
 export interface ItemBase {
   type: string;
+  title?: string;
   uri?: string;
 }
 
