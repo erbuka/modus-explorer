@@ -3,7 +3,7 @@
         <div class="cn-app-header d-flex">
             <div *ngIf="!context.config.headerTemplate" class="p-2 align-self-start cn-app-default-header">
                 <h1 class="cn-app-title m-0">{{ context.config.title | cnLocalizedText }}</h1>
-                <h2 class="cn-item-title" *ngIf="item && item.title">{{ item.title }}</h2>
+                <h2 class="cn-item-title" *ngIf="item && item.title">{{ item.title | cnLocalizedText }}</h2>
             </div>
             <div *ngIf="context.config.headerTemplate" class="h-100">
                 <ng-container *ngTemplateOutlet="context.getTemplate(context.config.headerTemplate)"></ng-container>
