@@ -6,7 +6,8 @@
                 <h2 class="cn-item-title" *ngIf="item && item.title">{{ item.title | cnLocalizedText }}</h2>
             </div>
             <div *ngIf="context.config.headerTemplate" class="h-100">
-                <ng-container *ngTemplateOutlet="context.getTemplate(context.config.headerTemplate)"></ng-container>
+                <ng-container
+                    *ngTemplateOutlet="context.getTemplate(context.config.headerTemplate); context: { $implicit : { item: item } }"></ng-container>
             </div>
             <div class="ml-auto"></div>
             <div class="align-self-end d-flex flex-column h-100 text-right">
