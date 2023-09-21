@@ -5,7 +5,7 @@
                 <h1 class="cn-app-title m-0">{{ context.config.title | cnLocalizedText }}</h1>
                 <h2 class="cn-item-title" *ngIf="item && item.title">{{ item.title | cnLocalizedText }}</h2>
             </div>
-            <div *ngIf="context.config.headerTemplate" class="h-100">
+            <div *ngIf="context.config.headerTemplate" class="h-100 w-100">
                 <ng-container
                     *ngTemplateOutlet="context.getTemplate(context.config.headerTemplate); context: { $implicit : { item: item } }"></ng-container>
             </div>
