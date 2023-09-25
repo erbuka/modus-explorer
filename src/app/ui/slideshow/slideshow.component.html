@@ -37,7 +37,7 @@
 
                 <!-- Video link-->
                 <div *ngIf="it.video" class="w-100 h-100 cn-relative">
-                  <video autoplay controls disablePictureInPicture controlsList="nodownload" class="w-100 h-100"
+                  <video autoplay controls disablePictureInPicture controlsList="nodownload" class="w-100 h-100 d-block"
                     [src]="it.video | cnUrl : item"></video>
                 </div>
 
@@ -54,21 +54,21 @@
           </div>
         </div>
 
-        <div class="cn-absolute" style="right: 0.5rem; top: 0.5rem;z-index: 1;" *ngIf="!simpleMode">
+        <div class="cn-absolute" style="right: 0.5rem; top: 0.5rem; z-index: 1;" *ngIf="!simpleMode">
           <button mat-mini-fab color="primary" (click)="clearSlide()" class="cn-absolute">
             <mat-icon>close</mat-icon>
           </button>
         </div>
 
-        <div class="cn-absolute d-none d-lg-block"
-          style="left: 0.5rem; top:50%; transform: translateY(-50%); z-index: 1;" *ngIf="currentSlideIndex !== 0">
+        <div class="cn-absolute cn-slideshow-prev"
+           *ngIf="currentSlideIndex !== 0">
           <button mat-mini-fab color="primary" (click)="previousSlide()" class="cn-absolute">
             <mat-icon>chevron_left</mat-icon>
           </button>
         </div>
 
 
-        <div class="cn-absolute d-none d-lg-block" style="right: 0.5rem; top:50%; transform: translateY(-50%);"
+        <div class="cn-absolute cn-slideshow-next"
           *ngIf="currentSlideIndex !== item.slides.length - 1">
           <button mat-mini-fab color="primary" (click)="nextSlide()" class="cn-absolute">
             <mat-icon>chevron_right</mat-icon>

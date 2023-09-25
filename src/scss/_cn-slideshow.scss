@@ -4,10 +4,38 @@
 
   @extend .h-100;
   @extend .mat-elevation-z1;
-  
+
   position: relative;
   display: flex;
   flex-direction: column;
+
+  .cn-slideshow-prev,
+  .cn-slideshow-next {
+    position: absolute;
+    z-index: 1;
+  }
+
+  .cn-slideshow-prev {
+    left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .cn-slideshow-next {
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  @include media-breakpoint-down(lg) {
+
+    .cn-slideshow-prev,
+    .cn-slideshow-next {
+      transform: initial;
+      bottom: 0.5rem;
+      top: initial;
+    }
+  }
 
   .cn-slideshow-slides-wrapper {
     position: relative;
@@ -39,5 +67,5 @@
     color: white;
 
   }
-  
+
 }

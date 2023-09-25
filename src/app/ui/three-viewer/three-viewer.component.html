@@ -130,12 +130,12 @@
     </div>
 
     <ng-container *ngIf="userPopup">
-        <div class="cn-three-viewer-user-popup" *ngIf="userPopup.open">
+        <div class="cn-three-viewer-user-popup d-none d-lg-block" *ngIf="userPopup.open">
             <mat-icon class="cn-close" (click)="toggleUserPopup(false)">close</mat-icon>
             <app-page [item]="userPopup.item"></app-page>
         </div>
 
-        <button mat-mini-fab color="primary" class="cn-three-viewer-user-popup-open" *ngIf="!userPopup.open" (click)="toggleUserPopup(true)">
+        <button mat-mini-fab color="primary" class="cn-three-viewer-user-popup-open d-none d-lg-block" *ngIf="!userPopup.open" (click)="toggleUserPopup(true)">
             <mat-icon>info</mat-icon>
         </button>
     </ng-container>

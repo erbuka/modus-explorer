@@ -73,9 +73,9 @@ export class ContextService {
       let translation = text[locale.id];
       return translation ? translation : `Translation not found for locale "${locale.id}"`;
     } else if (typeof text === "string") {
-			if(locale?.translations?.[text])
-				return locale.translations[text];
-			return text;
+      if (locale?.translations?.[text])
+        return locale.translations[text];
+      return text;
     } else {
       return `Invalid text type: ${typeof text}`;
     }
@@ -124,8 +124,7 @@ export class ContextService {
         .pipe(map((config: Config) => {
           let valid = this.jsonValidator.validate(CONFIG_SCHEMA, config);
           if (!valid) {
-            throw new Error(`Config file doesn't validate against the schema:<br> ${
-              this.jsonValidator.errors.reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
+            throw new Error(`Config file doesn't validate against the schema:<br> ${this.jsonValidator.errors.reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
               }`);
           }
           return config;
@@ -159,15 +158,21 @@ export class ContextService {
 
     uri = this.router.normalize(uri);
 
-    let obs = this.httpClient.get<any>(this.router.join(uri, "item.json"), { responseType: "json" });
+    let obs = this.httpClient.get<any>(this.router.join(uri, "item.json"), {
+      responseType: "json",
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
 
     obs = obs.pipe(tap((v: Item) => {
       let valid = this.jsonValidator.validate(ITEM_SCHEMA, v);
 
       if (!valid) {
         this.raiseError({
-          description: `Some errors occured during schema validation (${uri}):<br> ${
-            this.jsonValidator.errors.reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
+          description: `Some errors occured during schema validation (${uri}):<br> ${this.jsonValidator.errors.reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
             }`
         })
       }

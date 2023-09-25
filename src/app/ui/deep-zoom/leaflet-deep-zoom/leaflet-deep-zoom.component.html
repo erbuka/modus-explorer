@@ -48,7 +48,7 @@
     <app-navigator *ngIf="!item.options.disableMinimap" [item]="item" [bounds]="navigatorBounds"
       (navigatorPan)="onNavigatorPan($event)"></app-navigator>
 
-    <div class="cn-dz-tools">
+    <div class="cn-dz-tools d-none d-lg-block">
 
       <mat-menu #unitsMenu>
         <button mat-menu-item (click)="measureUnit='pixels'">
