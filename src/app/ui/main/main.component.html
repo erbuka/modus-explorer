@@ -1,31 +1,95 @@
+<ng-template #explorerLogo>
+    <img class="h-100" src="core-assets/images/logo-light.png">
+</ng-template>
 <ng-container *ngIf="item">
+
+    <div class="cn-app-mobile-menu" [class.cn-show]="showMobileMenu">
+        <div class="d-flex w-100 p-2 align-items-center cn-app-mobile-menu-header">
+
+            <div class="cn-logo">
+                <ng-container *ngTemplateOutlet="explorerLogo" class="cn-logo"></ng-container>
+            </div>
+                
+
+            <div class="ml-auto">
+                <button mat-icon-button (click)="toggleMobileMenu()">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="cn-app-mobile-menu-items">
+            <div (click)="goBack(); toggleMobileMenu()">
+                <mat-icon>chevron_left</mat-icon> <span>{{ "back" | cnLocalizedText }}</span>
+            </div>
+            <div (click)="goUp(); toggleMobileMenu()">
+                <mat-icon>arrow_upward</mat-icon> <span>{{ "up" | cnLocalizedText }}</span>
+            </div>
+            <div (click)="goHome(); toggleMobileMenu()">
+                <mat-icon>home</mat-icon> <span>{{ "home" | cnLocalizedText }}</span>
+            </div>
+
+            <ng-container *ngIf="context.config.headerLinks">
+                <ng-container *ngFor="let link of context.config.headerLinks">
+                    <div [cnLink]="link.href | cnUrl" (click)=" toggleMobileMenu()">
+                        <mat-icon>link</mat-icon> <span>{{ link.title | cnLocalizedText }}</span>
+                    </div>
+                </ng-container>
+            </ng-container>
+
+        </div>
+
+    </div>
+
     <div class="cn-app-container" [appBgImage]="context.config.backgroundImage">
         <div class="cn-app-header d-flex">
-            <div *ngIf="!context.config.headerTemplate" class="p-2 align-self-start cn-app-default-header">
-                <h1 class="cn-app-title m-0">{{ context.config.title | cnLocalizedText }}</h1>
-                <h2 class="cn-item-title" *ngIf="item && item.title">{{ item.title | cnLocalizedText }}</h2>
+            <div *ngIf="!context.config.headerTemplate" class="p-2 align-self-start cn-app-default-header h-100">
+                <div class="d-none d-lg-block">
+                    <h1 class="cn-app-title m-0">{{ context.config.title | cnLocalizedText }}</h1>
+                    <h2 class="cn-item-title" *ngIf="item && item.title">{{ item.title | cnLocalizedText }}</h2>
+                </div>
+                <div class="d-flex align-items-center d-lg-none h-100">
+                    <img class="h-100" src="core-assets/images/logo-light.png">
+                </div>  
             </div>
             <div *ngIf="context.config.headerTemplate" class="h-100 w-100">
                 <ng-container
                     *ngTemplateOutlet="context.getTemplate(context.config.headerTemplate); context: { $implicit : { item: item } }"></ng-container>
             </div>
             <div class="ml-auto"></div>
-            <div class="align-self-end d-flex flex-column h-100 text-right">
+
+            <!-- Header Right Mobile -->
+            <div class="d-none d-flex d-lg-none align-items-center h-100 p-2">
+
+                <div (click)="nextLocale()">
+                    <span class="text-uppercase" *ngIf="!context.getCurrentLocale().flagIcon">{{ context.getCurrentLocale().id }}</span>
+                    <img *ngIf="context.getCurrentLocale().flagIcon" class="d-block"
+                        [src]="context.getCurrentLocale().flagIcon" style="height: 1rem;">
+                </div>
+
+                <span class="ml-4 mr-3 border-left border-dark" style="height: 1.5rem;"></span>
+
+                <button mat-icon-button (click)="toggleMobileMenu()">
+                    <mat-icon>menu</mat-icon>
+                </button>
+            </div>  
+            <!-- Header Right Desktop -->
+            <div class="align-self-end d-none d-lg-flex flex-column h-100 text-right">
 
                 <img style="height: 4rem;" class="pr-2 pt-2 align-self-end" src="core-assets/images/logo-light.png">
 
                 <div class="mt-auto"></div>
-                                    
+
 
                 <div class="d-flex align-items-center p-2">
 
-                    <div class="cn-app-header-links d-none d-lg-block" *ngIf="context.config.headerLinks">
+                    <mat-menu #linksMenu>
                         <ng-container *ngFor="let link of context.config.headerLinks">
-                            <a [cnLink]="link.href | cnUrl">
-                                {{ link.title }}
-                            </a>
-                        </ng-container> 
-                    </div>
+                            <button mat-menu-item [cnLink]="link.href | cnUrl">
+                                {{ link.title | cnLocalizedText }}
+                            </button>
+                        </ng-container>
+                    </mat-menu>
 
                     <ng-container *ngIf="locales && locales.length > 1">
                         <mat-menu #localeMenu>
@@ -46,16 +110,18 @@
 
                     </ng-container>
 
-                    <button class="mx-1" mat-mini-fab color="primary" (click)="goBack()">
+                    <button class="mx-1" mat-icon-button (click)="goBack()">
                         <mat-icon>chevron_left</mat-icon>
                     </button>
-                    <button class="mx-1" mat-mini-fab color="primary" (click)="goUp()">
+                    <button class="mx-1" mat-icon-button (click)="goUp()">
                         <mat-icon>arrow_upward</mat-icon>
                     </button>
-                    <button class="mx-1" mat-mini-fab color="primary" (click)="goHome()">
+                    <button class="mx-1" mat-icon-button (click)="goHome()">
                         <mat-icon>home</mat-icon>
                     </button>
-
+                    <button mat-icon-button *ngIf="context.config.headerLinks" [matMenuTriggerFor]="linksMenu">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
 
                 </div>
             </div>

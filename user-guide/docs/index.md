@@ -258,9 +258,13 @@ export interface Config {
 	backgroundImage: string;        // Immagine di sfondo
 	entry: string;                  // Link alla homepage
 	headerTemplate?: string;        // Template grafico per testata
+	headerLinks?: {                 // Links fissi da inserire nell'header (crediti, ecc)
+		title: LocalizedText,         // Titolo del link 
+		href: string                  // URL (assoluto)
+	}[]
 	internationalization?: {        // Parametri internazionalizzazione
-		defaultLocale: string,      // Lingua di default, es "it"
-		locales: ConfigLocale[],     // Lingue disponibili
+		defaultLocale: string,      	// Lingua di default, es "it"
+		locales: ConfigLocale[],     	// Lingue disponibili
 	}
 }
 ```
@@ -268,25 +272,45 @@ export interface Config {
 Esempio:
 ```json
 {
-    "title": "Test App",
-    "backgroundImage": "assets/bg.png",
-    "entry": "assets/main",
-    "headerTemplate" : "header",
-    "internationalization": {
-        "defaultLocale": "it",
-        "locales": [
-            {
-                "id": "it",
-                "flagIcon": "https://www.countryflags.io/it/flat/64.png",
-                "description": "Italiano"
-            },
-            {
-                "id": "en",
-                "flagIcon": "https://www.countryflags.io/us/flat/64.png",
-                "description": "English"
-            }
-        ]
-    }
+    "title": "Modus Explorer - Starter Project",
+    "backgroundImage": "assets/images/background.jpg",
+    "entry": "assets/home",
+		"headerLinks" : [
+			{
+				"title" : {
+					"it" : "Crediti",
+					"en" : "Credits"
+				},
+				"href" : "assets/credits"
+			},
+			{
+				"title" : "Link 2",
+				"href" : "assets/home/templates-samples"
+			}
+		],
+		"internationalization" : {
+			"defaultLocale" : "it",
+			"locales" : [
+				{
+					"id" : "it",
+					"description" : "Italiano",
+					"flagIcon" : "assets/images/it.png",
+					"translations" : {
+						"inches" : "pollici",
+						"centimeters" : "centimetri",
+						"layers" : "livelli",
+						"back" : "indietro",
+						"up" : "su",
+						"home" : "home"
+					}
+				},
+				{
+					"id" : "en",
+					"flagIcon" : "assets/images/en.png",
+					"description" : "English"
+				}
+			]
+		}
 }
 ```
 

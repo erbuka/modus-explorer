@@ -13,8 +13,8 @@ export interface Config {
 	backgroundImage: string;        // Immagine di sfondo
 	entry: string;                  // Link alla homepage
 	headerTemplate?: string;        // Template grafico per testata
-	headerLinks: {
-		title: string,
+	headerLinks?: {
+		title: LocalizedText,
 		href: string
 	}[]
 	internationalization?: {        // Parametri internazionalizzazione

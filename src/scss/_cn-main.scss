@@ -1,7 +1,8 @@
 $cn-header-height: 8rem;
+$cn-header-height-mobile: 4rem;
 
 .cn-app-container {
-  
+
     @extend .cn-bg-cover;
 
     .cn-app-header {
@@ -15,21 +16,12 @@ $cn-header-height: 8rem;
         height: $cn-header-height;
         z-index: 1;
 
+        @include media-breakpoint-down(md) {
+            height: $cn-header-height-mobile;
+        }
+
     }
 
-    .cn-app-header-links {
-        a, a:link, a:visited {
-            display: inline-flex;
-            align-items: center;
-            color: inherit;
-            opacity: 0.75;
-            text-decoration: none;
-        }
-        a:hover {
-            color: theme-color("primary");
-            opacity: 1;
-        }
-    }
 
     .cn-app-content {
         position: relative;
@@ -37,5 +29,65 @@ $cn-header-height: 8rem;
         overflow-y: auto;
         //margin-top: $cn-header-height;
         height: calc(100vh - #{$cn-header-height});
+
+        @include media-breakpoint-down(md) {
+            height: calc(100vh - #{$cn-header-height-mobile});
+        }
+    }
+}
+
+.cn-app-mobile-menu {
+    position: fixed;
+    top: -100%;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: white;
+    z-index: 10;
+
+
+
+    @include media-breakpoint-up(lg) {
+        display: none;
+    }
+
+    transition: top 0.25s ease-in-out;
+
+    &.cn-show {
+        top: 0;
+    }
+
+    .cn-app-mobile-menu-header {
+        height: $cn-header-height-mobile;
+        background-color: black;
+        color: white;
+
+        .cn-logo {
+            height: 100%;
+        }
+    }
+
+    .cn-app-mobile-menu-items {
+        height: calc(100% - #{$cn-header-height-mobile});
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        &>div {
+            display: flex;
+            width: 80%;
+            padding: 1rem;
+            align-items: center;
+            &>span {
+                text-transform: capitalize;
+            }
+            &>mat-icon {
+                margin-right: 0.5rem;
+            }
+
+            &:not(:last-child) {
+                border-bottom: 1px solid $border-color;
+            }
+        }
     }
 }

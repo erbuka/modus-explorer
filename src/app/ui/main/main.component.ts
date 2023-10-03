@@ -12,14 +12,15 @@ import { State, StateData } from 'src/app/classes/state';
   providers: [{ provide: State, useExisting: forwardRef(() => MainComponent) }]
 })
 export class MainComponent extends State implements OnInit {
- 
+
 
   @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
   locales: ConfigLocale[] = null;
   item: Item = null;
+  showMobileMenu: boolean = false;
 
-  constructor(public context: ContextService, private router: LocationRouterService) { 
+  constructor(public context: ContextService, private router: LocationRouterService) {
     super();
   }
 
@@ -27,8 +28,18 @@ export class MainComponent extends State implements OnInit {
     this.router.saveState(data);
   }
 
-  getState():StateData {
+  getState(): StateData {
     return this.router.getState();
+  }
+
+  toggleMobileMenu(): void {
+    this.showMobileMenu = !this.showMobileMenu;
+  }
+
+  nextLocale(): void {
+    const index = this.locales.findIndex(x => x.id === this.context.getCurrentLocale().id);
+    const nextIndex = (index + 1) % this.locales.length;
+    this.context.setCurrentLocale(this.locales[nextIndex].id, true);
   }
 
   ngOnInit(): void {

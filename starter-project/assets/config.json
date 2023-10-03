@@ -4,8 +4,15 @@
     "entry": "assets/home",
 		"headerLinks" : [
 			{
-				"title" : "Credits",
-				"href" : "/assets/credits"
+				"title" : {
+					"it" : "Crediti",
+					"en" : "Credits"
+				},
+				"href" : "assets/credits"
+			},
+			{
+				"title" : "Link 2",
+				"href" : "assets/home/templates-samples"
 			}
 		],
 		"internationalization" : {
@@ -14,14 +21,19 @@
 				{
 					"id" : "it",
 					"description" : "Italiano",
+					"flagIcon" : "assets/images/it.png",
 					"translations" : {
 						"inches" : "pollici",
 						"centimeters" : "centimetri",
-						"layers" : "livelli"
+						"layers" : "livelli",
+						"back" : "indietro",
+						"up" : "su",
+						"home" : "home"
 					}
 				},
 				{
 					"id" : "en",
+					"flagIcon" : "assets/images/en.png",
 					"description" : "English"
 				}
 			]
