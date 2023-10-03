@@ -15,8 +15,18 @@
                 <img style="height: 4rem;" class="pr-2 pt-2 align-self-end" src="core-assets/images/logo-light.png">
 
                 <div class="mt-auto"></div>
+                                    
 
                 <div class="d-flex align-items-center p-2">
+
+                    <div class="cn-app-header-links d-none d-lg-block" *ngIf="context.config.headerLinks">
+                        <ng-container *ngFor="let link of context.config.headerLinks">
+                            <a [cnLink]="link.href | cnUrl">
+                                {{ link.title }}
+                            </a>
+                        </ng-container> 
+                    </div>
+
                     <ng-container *ngIf="locales && locales.length > 1">
                         <mat-menu #localeMenu>
                             <button mat-menu-item class="text-right" *ngFor="let l of locales"
@@ -45,6 +55,8 @@
                     <button class="mx-1" mat-mini-fab color="primary" (click)="goHome()">
                         <mat-icon>home</mat-icon>
                     </button>
+
+
                 </div>
             </div>
         </div>

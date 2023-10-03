@@ -2,6 +2,12 @@
     "title": "Modus Explorer - Starter Project",
     "backgroundImage": "assets/images/background.jpg",
     "entry": "assets/home",
+		"headerLinks" : [
+			{
+				"title" : "Credits",
+				"href" : "/assets/credits"
+			}
+		],
 		"internationalization" : {
 			"defaultLocale" : "it",
 			"locales" : [

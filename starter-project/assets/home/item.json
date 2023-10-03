@@ -4,6 +4,10 @@
         "itemWidth": "20rem",
         "itemAspectRatio": 1
     },
+    "title" : {
+        "it" : "Sottotitolo pagina",
+        "en" : "Page subtitle"
+    },
     "links": [
         {
             "href": "./templates-samples",

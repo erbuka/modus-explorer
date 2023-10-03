@@ -13,8 +13,12 @@ export interface Config {
 	backgroundImage: string;        // Immagine di sfondo
 	entry: string;                  // Link alla homepage
 	headerTemplate?: string;        // Template grafico per testata
+	headerLinks: {
+		title: string,
+		href: string
+	}[]
 	internationalization?: {        // Parametri internazionalizzazione
-		defaultLocale: string,      // Lingua di default, es "it"
-		locales: ConfigLocale[],     // Lingue disponibili
+		defaultLocale: string,      	// Lingua di default, es "it"
+		locales: ConfigLocale[],     	// Lingue disponibili
 	}
 }
