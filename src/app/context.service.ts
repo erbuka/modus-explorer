@@ -3,16 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { map, tap } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
 
-import * as ajv from "ajv";
 import { Item, LocalizedText } from './types/item';
 import { LocationRouterService } from './location-router.service';
 import { ConfigLocale, Config } from './types/config';
 import { DOCUMENT } from '@angular/common';
+import { JsonValidator } from './json-validator.service';
 
 const ITEM_SCHEMA = require('./types/item-schema.json');
-const CONFIG_SCHEMA = require('./types/config-schema.json');
 
-const SS_LOCALE_ID_KEY = "cn-locale-id";
+export const SS_LOCALE_ID_KEY = "cn-locale-id";
 
 export type FileChooserConfig = {
   accept: string,
@@ -45,6 +44,7 @@ export type TextEditEvent = {
 }
 
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -60,12 +60,7 @@ export class ContextService {
   onFileChoose: EventEmitter<FileChooserEvent> = new EventEmitter();
   onError: EventEmitter<ErrorEvent> = new EventEmitter();
 
-  private jsonValidator: ajv.Ajv = null;
-  private initializeSubject: BehaviorSubject<boolean>;
-
-  constructor(private httpClient: HttpClient, private router: LocationRouterService, @Inject(DOCUMENT) private document: Document) {
-    this.jsonValidator = new ajv();
-  }
+  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService, @Inject(DOCUMENT) private document: Document) {}
 
   translate(text: LocalizedText) {
     let locale = this.getCurrentLocale();
@@ -113,47 +108,12 @@ export class ContextService {
     return this._currentLocale;
   }
 
-
-  initialize(): BehaviorSubject<boolean> {
-
-    if (!this.initializeSubject) {
-
-      this.initializeSubject = new BehaviorSubject(false);
-
-      this.httpClient.get<Config>(this.router.normalize("assets/config.json"))
-        .pipe(map((config: Config) => {
-          let valid = this.jsonValidator.validate(CONFIG_SCHEMA, config);
-          if (!valid) {
-            throw new Error(`Config file doesn't validate against the schema:<br> ${this.jsonValidator.errors.reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
-              }`);
-          }
-          return config;
-        }))
-        .subscribe({
-          next: (config: Config) => {
-
-            this.config = config;
-
-            if (this.config.internationalization) {
-
-              try {
-                this.setCurrentLocale(sessionStorage.getItem(SS_LOCALE_ID_KEY));
-              }
-              catch (e) {
-                this.setCurrentLocale(this.config.internationalization.defaultLocale);
-              }
-
-            }
-
-            this.initializeSubject.next(true);
-          },
-          error: e => this.document.write(e)
-        })
-    }
-
-    return this.initializeSubject;
-  }
-
+  /**
+   * @deprecated
+   * @param uri 
+   * @param handleError 
+   * @returns 
+   */
   getItem(uri: string, handleError: boolean = true): Observable<Item> {
 
     uri = this.router.normalize(uri);
@@ -172,7 +132,7 @@ export class ContextService {
 
       if (!valid) {
         this.raiseError({
-          description: `Some errors occured during schema validation (${uri}):<br> ${this.jsonValidator.errors.reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
+          description: `Some errors occured during schema validation (${uri}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
             }`
         })
       }

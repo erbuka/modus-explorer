@@ -1,0 +1,29 @@
+GET https://www.google.it
+
+###
+
+@base_url=https://modus.culturanuova.com/api
+@username=info@culturanuova.it
+@password=modus.117
+@access_token=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbmZvQGN1bHR1cmFudW92YS5pdCIsImF1ZGllbmNlIjoid2ViIiwiY3JlYXRlZCI6MTY5OTE4OTU5NTc1NywiZXhwIjoxNjk5MzYyMzk1fQ.dWS5JEdv7LmQ_BVBhkKSXlY2riUtvjaoYL5P9tDNpTbqQLWIeRti3aAfHvJ6MfXdamQ43-Am4NVmTXk0Q1IpMg
+
+POST {{base_url}}/auth-service/auth
+Content-Type: application/x-www-form-urlencoded
+
+username={{username}}&password={{password}}
+
+### File Gallery
+
+GET {{base_url}}/file-service/files/gallery/5e33f04ae59c94152510426a
+
+
+### Record
+
+GET {{base_url}}/dataaccess-service/records/record/64a425f4e59c9467e660bdac?lang=it&group=5b55ccbee59c945cdab9b9c1
+Authorization: {{access_token}}
+
+
+### Block List
+
+GET {{base_url}}/dataaccess-service/records/record/65479bfae59c9446ae49f46c?lang=it&group=5b55ccbee59c945cdab9b9c1
+Authorization: {{access_token}}

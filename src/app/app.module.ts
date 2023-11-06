@@ -1,9 +1,11 @@
-import { BrowserModule, HammerModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { BrowserModule, HammerModule } from '@angular/platform-browser';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+
 
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,9 +40,14 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { EditableLocalizedTextComponent } from './ui/editable-localized-text/editable-localized-text.component';
 import { MaterialEditorComponent } from './ui/three-viewer/material-editor/material-editor.component';
 import { PinLayerEditorComponent } from './ui/three-viewer/pin-layer-editor/pin-layer-editor.component';
-import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
+
 import { LinkDirective } from './link.directive';
 import { EmbedComponent } from './ui/slideshow/embed/embed.component';
+
+import { initialize } from './init';
+import { JsonValidator } from './json-validator.service';
+import { LocationRouterService } from './location-router.service';
+import { ContextService } from './context.service';
 
 
 
@@ -93,7 +100,8 @@ import { EmbedComponent } from './ui/slideshow/embed/embed.component';
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "outline", floatLabel: "always" } },
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } },
     { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { color: "primary" } },
-    { provide: APP_BASE_HREF, useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(), deps: [PlatformLocation] }
+    { provide: APP_BASE_HREF, useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(), deps: [PlatformLocation] },
+    { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] }
   ],
   bootstrap: [AppComponent]
 })
