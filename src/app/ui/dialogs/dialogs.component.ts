@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, TemplateRef } from '@angular/core';
-import { ContextService, FileChooserEvent, ErrorEvent, TextEditEvent } from 'src/app/context.service';
+import { ContextService, FileChooserEvent, ErrorEvent, TextEditEvent, ModusOperandiLoginForm } from 'src/app/context.service';
 import { MatDialog } from '@angular/material/dialog';
 import { LocalizedText } from 'src/app/types/item';
 
@@ -13,7 +13,7 @@ export class DialogsComponent implements OnInit {
   @ViewChild("fileChooser", { static: true, read: ElementRef }) fileChooser: ElementRef;
   @ViewChild("errorDialogTmpl", { static: true }) errorDialogTmpl: TemplateRef<ErrorEvent> = null;
   @ViewChild("textEditDialogTmpl", { static: true, read: TemplateRef }) textEditDialogTmpl: TemplateRef<TextEditEvent & { closeDialog: () => void }> = null;
-
+  @ViewChild("moLoginDialogTmpl", { static: true, read: TemplateRef }) moLoginDialogTmpl: TemplateRef<any> = null;
 
   private currentFileChooserEvent: FileChooserEvent = null;
 
@@ -23,6 +23,7 @@ export class DialogsComponent implements OnInit {
     this.initErrorDialog();
     this.initFileChooser();
     this.initTextEditor();
+    this.initMOLogin();
   }
 
   isMultilanguage(txt: LocalizedText): boolean {
@@ -64,6 +65,32 @@ export class DialogsComponent implements OnInit {
       evt.reject();
     }
 
+  }
+
+  private initMOLogin() {
+    this.context.onModusOperandiLogin.subscribe(evt => {
+
+      const result: ModusOperandiLoginForm = {
+        username: "",
+        password: ""
+      }
+
+      let ref = this.dialog.open(this.moLoginDialogTmpl, {
+        maxWidth: "800px",
+        width: "80%",
+        data: {
+          formData: result,
+          confirmClick: () => {
+            result.username = result.username.trim();
+            result.password = result.password.trim();
+            if (result.username && result.password) {
+              evt.confirm(result)
+              ref.close()
+            }
+          }
+        }
+      })
+    })
   }
 
   private initTextEditor(): void {

@@ -12,7 +12,7 @@ export class BlockListComponent implements OnInit {
 
   @Input() item: BlockListItem = null;
 
-  constructor(private context:ContextService) { }
+  constructor(private context: ContextService) { }
 
   ngOnInit() {
   }

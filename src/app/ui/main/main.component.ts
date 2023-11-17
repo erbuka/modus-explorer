@@ -4,6 +4,7 @@ import { Item } from 'src/app/types/item';
 import { LocationRouterService } from 'src/app/location-router.service';
 import { ConfigLocale } from 'src/app/types/config';
 import { State, StateData } from 'src/app/classes/state';
+import { ContentProviderService } from 'src/app/content-provider.service';
 
 @Component({
   selector: 'app-main',
@@ -20,7 +21,7 @@ export class MainComponent extends State implements OnInit {
   item: Item = null;
   showMobileMenu: boolean = false;
 
-  constructor(public context: ContextService, private router: LocationRouterService) {
+  constructor(private contentProvider: ContentProviderService, public context: ContextService, private router: LocationRouterService) {
     super();
   }
 
@@ -46,17 +47,17 @@ export class MainComponent extends State implements OnInit {
 
     this.locales = this.context.getLocales();
 
-    this.router.path.subscribe(v => {
+    this.router.path.subscribe(async v => {
 
-      this.context.getItem(v, false).subscribe({
-        next: item => {
-          this.item = item;
-          this.resetContentScrollTop();
-        }, error: (e) => {
-          this.router.navigate(this.context.config.entry, true);
-          console.error(e.message);
-        }
-      })
+      try {
+        this.item = await this.contentProvider.getItem(v);
+        this.resetContentScrollTop()
+      }
+      catch (e) {
+        this.router.navigate(this.context.config.entry, true);
+        console.error(e.message);
+      }
+
     });
 
   }

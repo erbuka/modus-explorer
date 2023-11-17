@@ -20,6 +20,7 @@ import { LocationRouterService } from 'src/app/location-router.service';
 import { State } from 'src/app/classes/state';
 import { PageItem } from 'src/app/types/page-item';
 import { Item } from 'src/app/types/item';
+import { ContentProviderService } from 'src/app/content-provider.service';
 
 
 type EditorTab = "models" | "lights" | "pins" | "colliders";
@@ -207,7 +208,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 	private _animFrameHandler: AnimationFrameHandler = null;
 	private _loadedItem: ThreeViewerItem = null;
 
-	constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
+	constructor(private contentProvider: ContentProviderService, private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
 		public router: LocationRouterService, private dialog: MatDialog, private state: State, private locationRouter: LocationRouterService) {
 		this.allowEditorMode = !environment.production;
 
@@ -530,7 +531,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 			try {
 				const itemUri = this.locationRouter.resolve(this.item.userPopup.pageItemUri, this.item);
-				const item: Item = await this.context.getItem(itemUri, false).toPromise();
+				const item: Item = await this.contentProvider.getItem(itemUri);
 				if (item.type === "page") {
 					this.userPopup = {
 						itemUri: this.item.userPopup.pageItemUri,

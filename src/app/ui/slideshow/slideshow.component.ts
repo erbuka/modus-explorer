@@ -13,6 +13,7 @@ import { SlideshowItem, SlideShowItemGroup } from 'src/app/types/slideshow-item'
 import { LocationRouterService } from 'src/app/location-router.service';
 import { State, StateData } from 'src/app/classes/state';
 import { Subscription } from 'rxjs';
+import { ContentProviderService } from 'src/app/content-provider.service';
 
 type Styles = { [key: string]: string | number };
 
@@ -69,7 +70,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
   slideItemsCache: Item[] = null;
   subscription: Subscription = null;
 
-  constructor(private context: ContextService, private router: LocationRouterService, @SkipSelf() private state: State) {
+  constructor(private contentProvider: ContentProviderService, private context: ContextService, private router: LocationRouterService, @SkipSelf() private state: State) {
     super();
   }
 
@@ -99,7 +100,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
 
           if (this.item.slides[slideIndex].href && this.slideItemsCache[slideIndex] === null) {
             let url = this.router.resolve(this.item.slides[slideIndex].href, this.item);
-            this.context.getItem(url).subscribe(item => this.slideItemsCache[slideIndex] = item);
+            this.contentProvider.getItem(url).then(item => this.slideItemsCache[slideIndex] = item);
           }
 
         }

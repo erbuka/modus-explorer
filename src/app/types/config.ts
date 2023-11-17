@@ -7,14 +7,16 @@ export interface ConfigLocale {
 	translations?: { [key: string]: string } // Traduzioni testi statici	
 }
 
-export type ConfigServerType = {
-	type: "local"
-} | {
-	type : "modus-operandi",
-	baseUrl : string,
-	username : string, 
+export type LocalServerType = { type: "local" }
+
+export type ModusOperandiServerType = {
+	type: "modus-operandi",
+	baseUrl: string,
+	username: string,
 	password: string
 }
+
+export type ConfigServerType = LocalServerType | ModusOperandiServerType;
 
 export interface Config {
 	serverType: ConfigServerType;

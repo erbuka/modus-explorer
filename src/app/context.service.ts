@@ -9,7 +9,7 @@ import { ConfigLocale, Config } from './types/config';
 import { DOCUMENT } from '@angular/common';
 import { JsonValidator } from './json-validator.service';
 
-const ITEM_SCHEMA = require('./types/item-schema.json');
+export const ITEM_SCHEMA = require('./types/item-schema.json');
 
 export const SS_LOCALE_ID_KEY = "cn-locale-id";
 
@@ -29,12 +29,19 @@ export type FileChooserEvent = {
   reject: () => void
 }
 
+export type ModusOperandiLoginForm = {
+  username: string,
+  password: string
+}
 
 
 export type ErrorEvent = {
   description: string;
 }
 
+export type ModusOperandiLoginEvent = {
+  confirm: (data: ModusOperandiLoginForm) => void;
+}
 
 export type TextEditEvent = {
   text: LocalizedText;
@@ -42,8 +49,6 @@ export type TextEditEvent = {
   resolve: (data: LocalizedText) => void,
   reject: () => void
 }
-
-
 
 @Injectable({
   providedIn: 'root'
@@ -56,11 +61,12 @@ export class ContextService {
 
   templates: Map<string, TemplateRef<any>> = new Map();
 
+  onModusOperandiLogin: EventEmitter<ModusOperandiLoginEvent> = new EventEmitter();
   onTextEdit: EventEmitter<TextEditEvent> = new EventEmitter();
   onFileChoose: EventEmitter<FileChooserEvent> = new EventEmitter();
   onError: EventEmitter<ErrorEvent> = new EventEmitter();
 
-  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService, @Inject(DOCUMENT) private document: Document) {}
+  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService, @Inject(DOCUMENT) private document: Document) { }
 
   translate(text: LocalizedText) {
     let locale = this.getCurrentLocale();
@@ -114,48 +120,49 @@ export class ContextService {
    * @param handleError 
    * @returns 
    */
-  getItem(uri: string, handleError: boolean = true): Observable<Item> {
-
-    uri = this.router.normalize(uri);
-
-    let obs = this.httpClient.get<any>(this.router.join(uri, "item.json"), {
-      responseType: "json",
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    });
-
-    obs = obs.pipe(tap((v: Item) => {
-      let valid = this.jsonValidator.validate(ITEM_SCHEMA, v);
-
-      if (!valid) {
-        this.raiseError({
-          description: `Some errors occured during schema validation (${uri}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
-            }`
-        })
-      }
-
-    }));
-
-    if (handleError) {
-      obs = obs.pipe(tap(x => x, e => {
-        this.raiseError({ description: e.message })
+  /*
+    getItem(uri: string, handleError: boolean = true): Observable<Item> {
+  
+      uri = this.router.normalize(uri);
+  
+      let obs = this.httpClient.get<any>(this.router.join(uri, "item.json"), {
+        responseType: "json",
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+  
+      obs = obs.pipe(tap((v: Item) => {
+        let valid = this.jsonValidator.validate(ITEM_SCHEMA, v);
+  
+        if (!valid) {
+          this.raiseError({
+            description: `Some errors occured during schema validation (${uri}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
+              }`
+          })
+        }
+  
       }));
+  
+      if (handleError) {
+        obs = obs.pipe(tap(x => x, e => {
+          this.raiseError({ description: e.message })
+        }));
+      }
+  
+  
+      obs = obs.pipe(
+        map((x: Item) => {
+          x.uri = uri;
+          return x;
+        })
+      );
+  
+      return obs;
     }
-
-
-    obs = obs.pipe(
-      map((x: Item) => {
-        x.uri = uri;
-        return x;
-      })
-    );
-
-    return obs;
-  }
-
+  */
   getTemplate(name: string): TemplateRef<any> {
     return this.templates.get(name);
   }
@@ -164,6 +171,13 @@ export class ContextService {
     this.templates.set(name, ref);
   }
 
+  modusOperandiLogin(): Promise<ModusOperandiLoginForm> {
+    return new Promise<ModusOperandiLoginForm>((resolve, reject) => {
+      this.onModusOperandiLogin.emit({
+        confirm: (data: ModusOperandiLoginForm) => resolve(data)
+      })
+    })
+  }
 
   editText(text: LocalizedText, multiline: boolean = false): Promise<LocalizedText> {
     let textCopy = typeof text === "string" ? text : Object.assign({}, text);

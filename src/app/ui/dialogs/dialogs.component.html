@@ -1,5 +1,22 @@
 <input type="file" style="display: none;" #fileChooser (change)="fileChooserChange($event.target.files)">
 
+
+<ng-template #moLoginDialogTmpl let-data>
+    <div class="row">
+        <mat-form-field class="col-12">
+            <mat-label>Username</mat-label>
+            <input matInput type="text" name="username" [(ngModel)]="data.formData.username">
+        </mat-form-field>
+        <mat-form-field class="col-12">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" name="password" [(ngModel)]="data.formData.password">
+        </mat-form-field>
+        <div class="col-12">
+            <button mat-raised-button (click)="data.confirmClick()">Login</button>
+        </div>
+    </div>
+</ng-template>
+
 <ng-template #textEditDialogTmpl let-data>
     <mat-slide-toggle class="mb-2" color="primary" [checked]="isMultilanguage(data.text)" (change)="multilanguageToggle(data)">Multilanguage</mat-slide-toggle>
     <ng-container *ngIf="isMultilanguage(data.text)">

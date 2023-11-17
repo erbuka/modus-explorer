@@ -65,10 +65,23 @@ const common = require("./common");
                 res.send();
             });
         });
+
+        // TODO: Questo è uno schifo, funziona ma va fatto meglio
+        app.use("/*", (req, res) => {
+            const path0 = path.resolve("./build-dev", req.originalUrl.substring(1));
+            const path1 = path.resolve(".", req.originalUrl.substring(1));
+
+            if(fs.existsSync(path0) && fs.lstatSync(path0).isFile()) res.sendFile(path0);
+            else if(fs.existsSync(path1) && fs.lstatSync(path1).isFile()) res.sendFile(path1);
+            else res.sendFile(path.resolve("./build-dev/index.html"));
+        });
+
+        /*
         app.use("/assets", express.static("assets"), (req, res) => {
             res.sendFile(path.resolve("./build-dev/index.html"))
         });
-        app.use("/", express.static("build-dev"));
+        */
+        //app.use("/", express.static("build-dev"));
 
         app.listen(port);
 

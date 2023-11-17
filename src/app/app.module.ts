@@ -48,6 +48,7 @@ import { initialize } from './init';
 import { JsonValidator } from './json-validator.service';
 import { LocationRouterService } from './location-router.service';
 import { ContextService } from './context.service';
+import { ContentProviderService, LocalContentProviderService } from './content-provider.service';
 
 
 
@@ -101,7 +102,8 @@ import { ContextService } from './context.service';
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } },
     { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { color: "primary" } },
     { provide: APP_BASE_HREF, useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(), deps: [PlatformLocation] },
-    { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] }
+    { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] },
+    { provide: ContentProviderService, useFactory: ContentProviderService.factory, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] }
   ],
   bootstrap: [AppComponent]
 })
