@@ -55,11 +55,15 @@ export type TextEditEvent = {
 })
 export class ContextService {
 
+  private _editorMode: boolean = false;
+
   _currentLocale: ConfigLocale;
 
   config: Config = null;
 
   templates: Map<string, TemplateRef<any>> = new Map();
+
+  editorMode: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   onModusOperandiLogin: EventEmitter<ModusOperandiLoginEvent> = new EventEmitter();
   onTextEdit: EventEmitter<TextEditEvent> = new EventEmitter();
@@ -67,6 +71,7 @@ export class ContextService {
   onError: EventEmitter<ErrorEvent> = new EventEmitter();
 
   constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService, @Inject(DOCUMENT) private document: Document) { }
+
 
   translate(text: LocalizedText) {
     let locale = this.getCurrentLocale();

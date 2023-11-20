@@ -56,9 +56,11 @@
         <button mat-mini-fab color="primary" class="ml-2" (click)="resetCamera()">
             <mat-icon>3d_rotation</mat-icon>
         </button>
+        <!--
         <button *ngIf="allowEditorMode" color="primary" class="ml-2" mat-mini-fab (click)="editorMode=true">
             <mat-icon>create</mat-icon>
         </button>
+    -->
     </div>
 
 
@@ -140,7 +142,7 @@
         </button>
     </ng-container>
 
-    <div class="cn-three-viewer-editor cn-inspector" *ngIf="allowEditorMode" [class.cn-hidden]="!editorMode">
+    <div class="cn-three-viewer-editor cn-inspector"  [class.cn-hidden]="!context.editorMode.value">
 
         <div class="p-2 text-center" *ngIf="!selectedObject">
             <em>No object selected</em>
@@ -354,16 +356,18 @@
         </div>
     </div>
 
-    <div class="cn-three-viewer-editor cn-hierarchy" *ngIf="allowEditorMode" [class.cn-hidden]="!editorMode">
+    <div class="cn-three-viewer-editor cn-hierarchy" [class.cn-hidden]="!context.editorMode.value">
 
         <div class="p-2 bg-primary text-primary-contrast d-flex align-items-center">
             <button mat-icon-button [matMenuTriggerFor]="mainMenu">
                 <mat-icon>menu</mat-icon>
             </button>
             <div class="ml-auto"></div>
-            <button mat-icon-button (click)="editorMode=false">
+            <!--
+            <button mat-icon-button (click)="contexteditorMode=false">
                 <mat-icon>close</mat-icon>
             </button>
+            -->
         </div>
 
         <div class="px-2">

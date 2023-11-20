@@ -43,6 +43,7 @@
 
     <div class="cn-app-container" [appBgImage]="context.config.backgroundImage">
         <div class="cn-app-header d-flex">
+
             <div *ngIf="!context.config.headerTemplate" class="p-2 align-self-start cn-app-default-header h-100">
                 <div class="d-none d-lg-block">
                     <h1 class="cn-app-title m-0">{{ context.config.title | cnLocalizedText }}</h1>
@@ -73,6 +74,7 @@
                     <mat-icon>menu</mat-icon>
                 </button>
             </div>  
+
             <!-- Header Right Desktop -->
             <div class="align-self-end d-none d-lg-flex flex-column h-100 text-right">
 
@@ -110,6 +112,9 @@
 
                     </ng-container>
 
+                    <button class="mx-1" mat-icon-button (click)="toggleEditorMode()">
+                        <mat-icon>edit</mat-icon>
+                    </button>
                     <button class="mx-1" mat-icon-button (click)="goBack()">
                         <mat-icon>chevron_left</mat-icon>
                     </button>

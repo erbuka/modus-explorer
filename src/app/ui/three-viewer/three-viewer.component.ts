@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, ChangeDetectorRef, OnChanges, DoCheck, forwardRef, SkipSelf } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, DoCheck } from '@angular/core';
 import { ThreeViewerItem, ThreeViewerItemLightType, ThreeViewerItemCameraControls } from 'src/app/types/three-viewer-item';
 import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper, BufferGeometry, Texture } from 'three';
 import { environment } from 'src/environments/environment';
@@ -21,6 +21,7 @@ import { State } from 'src/app/classes/state';
 import { PageItem } from 'src/app/types/page-item';
 import { Item } from 'src/app/types/item';
 import { ContentProviderService } from 'src/app/content-provider.service';
+import { Subscription } from 'rxjs';
 
 
 type EditorTab = "models" | "lights" | "pins" | "colliders";
@@ -153,32 +154,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 		return this._editorActiveTab;
 	}
 
-
-	set editorMode(value: boolean) {
-		this._editorMode = value;
-
-		this.controls.enabled = !value;
-		this.editorControls.enabled = value;
-		this.transformControls.enabled = value;
-		this.gridHelper.visible = value;
-		this.selectedObject = null;
-		this.selectedPin = null;
-
-		this.models.children.forEach(m => m.setEditorMode(value));
-		this.lights.children.forEach(l => l.setEditorMode(value));
-		this.colliders.children.forEach(c => c.setEditorMode(value));
-
-		if (value) {
-			this.editorControls.update();
-		} else {
-			this.controls.update();
-		}
-	}
-
-	get editorMode(): boolean {
-		return this._editorMode;
-	}
-
 	set selectedObject(obj: any) {
 
 		if (obj === this._selectedObject)
@@ -203,14 +178,13 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 	}
 
 	private _selectedObject: any = null;
-	private _editorMode: boolean = false;
 	private _editorActiveTab: EditorTab = "models";
 	private _animFrameHandler: AnimationFrameHandler = null;
 	private _loadedItem: ThreeViewerItem = null;
+	private _subscription: Subscription = new Subscription();
 
 	constructor(private contentProvider: ContentProviderService, private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
 		public router: LocationRouterService, private dialog: MatDialog, private state: State, private locationRouter: LocationRouterService) {
-		this.allowEditorMode = !environment.production;
 
 		// Create renderer
 		this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true, antialias: true });
@@ -226,6 +200,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 		// Camera
 		this.camera = new PerspectiveCamera(50, 1, 0.1, 2000.0);
 		this.camera.matrixAutoUpdate = true;
+
 	}
 
 	ngDoCheck(): void {
@@ -264,6 +239,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 		// Orbit and touch controls
 		this.editorControls = new OrbitControls(this.camera, this.renderer.domElement);
 		this.editorControls.enabled = false;
+
+
 
 		// Grid helper
 		this.gridHelper = new GridHelper(20, 20);
@@ -553,6 +530,33 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 		// Save the state again
 		this.saveState();
 
+		// Editor mode. This must be done here after the scene has been created
+		const sub = this.context.editorMode.subscribe({
+			next: value => {
+
+				this.controls.enabled = !value;
+				this.editorControls.enabled = value;
+				this.transformControls.enabled = value;
+				this.gridHelper.visible = value;
+				this.selectedObject = null;
+				this.selectedPin = null;
+
+				this.models.children.forEach(m => m.setEditorMode(value));
+				this.lights.children.forEach(l => l.setEditorMode(value));
+				this.colliders.children.forEach(c => c.setEditorMode(value));
+
+				if (value) {
+					this.editorControls.update();
+				} else {
+					this.controls.update();
+				}
+
+			}
+		});
+
+		this._subscription.add(sub);
+
+
 		// Run the animation loop
 		this.zone.runOutsideAngular(() => {
 
@@ -564,7 +568,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 			this.router.locked = false;
 
 			// Switch editor mode off
-			setTimeout(() => this.editorMode = false, 0);
+			// this.context.editorMode.next(false)
+			// setTimeout(() =>  = false, 0);
 		});
 
 	}
@@ -669,7 +674,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 		if (obj.onAdd)
 			obj.onAdd(this.scene);
 
-		obj.setEditorMode(this.editorMode);
+		obj.setEditorMode(this.context.editorMode.value);
 
 		if (obj instanceof ThreeViewerCollider)
 			this.updateCollisionBounds();
@@ -755,13 +760,14 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 		};
 
+		this._subscription.unsubscribe();
+
 		this.resources.dispose();
 
 		this._animFrameHandler.cancel();
 
 		this.controls.dispose();
 		this.transformControls.dispose();
-
 
 		// Traverse the scene for all the remaining objects, moslty should be helper controls and
 		// dispose their meshes. Don't look for textures, there shouldn't be any
@@ -877,7 +883,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 	onCanvasClick(evt: PointerEvent): void {
 
-		if (this.editorMode) {
+		if (this.context.editorMode.value) {
 			// In editor mode, we just want to select objects that are clicked
 			// So we use raycast on every object of the scene to check if one is clicked
 
@@ -977,7 +983,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 	@HostListener("keydown", ["$event"])
 	onKeyDown(evt: KeyboardEvent) {
-		if (this.editorMode) {
+		if (this.context.editorMode.value) {
 			switch (evt.code) {
 				case "KeyR": this.transformControls.mode = "rotate"; break;
 				case "KeyT": this.transformControls.mode = "translate"; break;

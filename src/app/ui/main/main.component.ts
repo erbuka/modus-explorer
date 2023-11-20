@@ -62,6 +62,10 @@ export class MainComponent extends State implements OnInit {
 
   }
 
+  toggleEditorMode():void {
+    this.context.editorMode.next(!this.context.editorMode.value)
+  }
+
   goHome(): void {
     this.router.navigate("/");
   }
