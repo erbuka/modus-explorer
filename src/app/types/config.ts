@@ -12,8 +12,6 @@ export type LocalServerType = { type: "local" }
 export type ModusOperandiServerType = {
 	type: "modus-operandi",
 	baseUrl: string,
-	username: string,
-	password: string
 }
 
 export type ConfigServerType = LocalServerType | ModusOperandiServerType;

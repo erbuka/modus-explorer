@@ -192,7 +192,7 @@ export namespace V1 {
             return {
               href: links.field("Link").value(idx)?.[0]['id'],
               title: links.field("Title *").value(idx)[0],
-              image: `${this.serverType.baseUrl}${links.field("Image").value(idx)?.[0]['view']}`
+              image: `${this.serverType.baseUrl}${links.field("Image").value(idx)?.[0]['thumbnail']}`
             };
           })
         }
