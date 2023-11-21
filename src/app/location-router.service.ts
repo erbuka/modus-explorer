@@ -26,6 +26,7 @@ export class LocationRouterService {
   constructor(private location: Location, @Inject(APP_BASE_HREF) private baseHref: string, @Inject(DOCUMENT) private document: Document) {
     this.location.onUrlChange((url, state) => this.update());
     this.update();
+    console.log(`Base Href is '${baseHref}'`)
   }
 
   isRoot(): boolean {

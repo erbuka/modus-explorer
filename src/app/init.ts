@@ -6,7 +6,7 @@ import { ContextService, SS_LOCALE_ID_KEY } from './context.service';
 
 const CONFIG_SCHEMA = require('./types/config-schema.json');
 
-export function initialize(context: ContextService, router: LocationRouterService, httpClient: HttpClient, jsonValidator: JsonValidator): () => Promise<any> {
+export function initialize( context: ContextService, router: LocationRouterService, httpClient: HttpClient, jsonValidator: JsonValidator): () => Promise<any> {
 
   return async () => {
 
@@ -15,6 +15,8 @@ export function initialize(context: ContextService, router: LocationRouterServic
     if (!jsonValidator.validate(CONFIG_SCHEMA, config)) {
       throw new Error("Config file doesn't validate against the schema");
     }
+
+    console.log("Configuration loaded");
 
     context.config = config;
 

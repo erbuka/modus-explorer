@@ -1,0 +1,29 @@
+.cn-editor-mode-toolbar {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &>div {
+    position: relative;
+    z-index: 1;
+    padding: $spacer * 0.5;
+    background-color: white;
+    border-radius: 0.25rem;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, .5);
+    margin-top: 1rem;
+  }
+
+}
+
+.cn-editor-mode-context {
+  .cn-block-list-editor {
+    border-radius: 0.25rem;
+    overflow: hidden;
+    background-color: white;
+
+    &>div:not(:last-child) {
+      border-bottom: 1px solid $border-color;
+    }
+  }
+}

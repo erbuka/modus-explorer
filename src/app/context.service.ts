@@ -70,7 +70,7 @@ export class ContextService {
   onFileChoose: EventEmitter<FileChooserEvent> = new EventEmitter();
   onError: EventEmitter<ErrorEvent> = new EventEmitter();
 
-  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService, @Inject(DOCUMENT) private document: Document) { }
+  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService) { }
 
 
   translate(text: LocalizedText) {
@@ -119,55 +119,6 @@ export class ContextService {
     return this._currentLocale;
   }
 
-  /**
-   * @deprecated
-   * @param uri 
-   * @param handleError 
-   * @returns 
-   */
-  /*
-    getItem(uri: string, handleError: boolean = true): Observable<Item> {
-  
-      uri = this.router.normalize(uri);
-  
-      let obs = this.httpClient.get<any>(this.router.join(uri, "item.json"), {
-        responseType: "json",
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      });
-  
-      obs = obs.pipe(tap((v: Item) => {
-        let valid = this.jsonValidator.validate(ITEM_SCHEMA, v);
-  
-        if (!valid) {
-          this.raiseError({
-            description: `Some errors occured during schema validation (${uri}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
-              }`
-          })
-        }
-  
-      }));
-  
-      if (handleError) {
-        obs = obs.pipe(tap(x => x, e => {
-          this.raiseError({ description: e.message })
-        }));
-      }
-  
-  
-      obs = obs.pipe(
-        map((x: Item) => {
-          x.uri = uri;
-          return x;
-        })
-      );
-  
-      return obs;
-    }
-  */
   getTemplate(name: string): TemplateRef<any> {
     return this.templates.get(name);
   }
