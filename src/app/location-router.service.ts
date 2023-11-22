@@ -122,12 +122,12 @@ export class LocationRouterService {
 
     if (uri.startsWith(".") || uri.startsWith("..")) {
 
-      if (!this.isNormalized(item.uri)) {
+      if (!this.isNormalized(item.id)) {
         console.error("LocationRouterService.resolve(): item url must be normalized");
         return null;
       }
 
-      let pieces = item.uri.split("/").filter(v => v.trim().length > 0);
+      let pieces = item.id.split("/").filter(v => v.trim().length > 0);
       if (this.baseHref !== "/")
         pieces.shift();
 

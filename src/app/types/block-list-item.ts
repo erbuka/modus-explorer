@@ -1,7 +1,7 @@
 import { ItemBase, LocalizedText } from './item';
 
 export type BlockListItemLink = {                        // Lista dei link
-    href: string,               // Percorso link      
+    itemId: string,               // Percorso link      
     title: LocalizedText,       // Titolo visualizzato
     image: string               // Percorso immagine
 }

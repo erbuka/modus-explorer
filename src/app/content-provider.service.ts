@@ -17,7 +17,7 @@ type ModusOperandiLoginData = {
 }
 
 export abstract class ContentProviderService {
-  abstract getItem(uri: string): Promise<Item>;
+  abstract getItem(id: string): Promise<Item>;
 
   static factory(context: ContextService, router: LocationRouterService, httpClient: HttpClient, jsonValidator: JsonValidator): ContentProviderService {
 
@@ -39,11 +39,10 @@ export class LocalContentProviderService extends ContentProviderService {
     super();
   }
 
-  async getItem(uri: string): Promise<Item> {
+  async getItem(id: string): Promise<Item> {
 
-    uri = this.router.normalize(uri);
 
-    let item = await this.httpClient.get<Item>(this.router.join(uri, "item.json"), {
+    let item = await this.httpClient.get<Item>(`assets/items/${id}/item.json`, {
       responseType: "json",
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
@@ -56,12 +55,12 @@ export class LocalContentProviderService extends ContentProviderService {
 
     if (!valid) {
       this.context.raiseError({
-        description: `Some errors occured during schema validation (${uri}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
+        description: `Some errors occured during schema validation (${id}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
           }`
       })
     }
 
-    item.uri = uri;
+    item.id = id;
     return item;
 
   }

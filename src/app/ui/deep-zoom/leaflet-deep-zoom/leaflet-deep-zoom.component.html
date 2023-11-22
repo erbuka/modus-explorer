@@ -115,8 +115,8 @@
     <h2 *ngIf="activeShape.title">{{ activeShape.title }}</h2>
     <ng-container *ngIf="activeShape.description"></ng-container>
     <p *ngIf="activeShape.description" [innerHtml]="activeShape.description | cnLocalizedText"></p>
-    <p *ngIf="activeShape.href" class="text-right mb-0">
-      <a mat-mini-fab color="primary" [cnLink]="activeShape.href | cnUrl : item">
+    <p *ngIf="activeShape.itemId" class="text-right mb-0">
+      <a mat-mini-fab color="primary" [routerLink]="['/', activeShape.itemId]">
         <mat-icon>open_in_new</mat-icon>
       </a>
     </p>

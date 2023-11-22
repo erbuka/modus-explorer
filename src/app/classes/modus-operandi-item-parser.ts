@@ -190,7 +190,7 @@ export namespace V1 {
           title: helper.field("object-title").value() as LocalizedText,
           links: range(links.groupSize()).map(idx => {
             return {
-              href: links.field("Link").value(idx)?.[0]['id'],
+              itemId: links.field("Link").value(idx)?.[0]['id'],
               title: links.field("Title *").value(idx)[0],
               image: `${this.serverType.baseUrl}${links.field("Image").value(idx)?.[0]['thumbnail']}`
             };

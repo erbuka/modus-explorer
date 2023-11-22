@@ -23,7 +23,7 @@ export interface SlideshowItem extends ItemBase {
     previewImage: string,       // Miniatura
     image?: string,             // Immagine
     title?: LocalizedText,      // Titolo
-    href?: string,              // Link ad un altro elemento
+    itemId?: string,              // Link ad un altro elemento
     video?: string,             // Link a video
   }[]
 }

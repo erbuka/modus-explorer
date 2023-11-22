@@ -98,9 +98,8 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
 
           this.currentSlideIndex = slideIndex;
 
-          if (this.item.slides[slideIndex].href && this.slideItemsCache[slideIndex] === null) {
-            let url = this.router.resolve(this.item.slides[slideIndex].href, this.item);
-            this.contentProvider.getItem(url).then(item => this.slideItemsCache[slideIndex] = item);
+          if (this.item.slides[slideIndex].itemId && this.slideItemsCache[slideIndex] === null) {
+            this.contentProvider.getItem(this.item.slides[slideIndex].itemId).then(item => this.slideItemsCache[slideIndex] = item)
           }
 
         }
@@ -122,7 +121,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
   }
 
   clearSlide(): void {
-    this.router.navigate(this.item.uri);
+    this.router.navigate(this.item.id);
   }
 
   nextSlide(): void {
@@ -138,7 +137,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
 
   gotoSlide(s: number | object, replaceUrl: boolean = false): void {
     let idx = typeof s === "number" ? s : this.item.slides.findIndex(x => x === s);
-    this.router.navigate(`${this.item.uri}?s=${idx}`);
+    this.router.navigate(`${this.item.id}?s=${idx}`);
   }
 
   getSlidesForGroup(groupName: string) {

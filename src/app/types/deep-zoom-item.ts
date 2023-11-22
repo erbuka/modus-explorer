@@ -5,7 +5,7 @@ export interface DeepZoomItemShape {
   type: string;               // Tipo, per adesso solo "circle" o "polygon"
   title?: LocalizedText;      // Titolo
   description?: LocalizedText; // Descrizione
-  href?: string;              // Link al click
+  itemId?: string;              // Link al click
   drawAttributes: {           // Parametri per il rendering            
     stroke: boolean;        // Disegnare il bordo?
     fill: boolean;          // Riempiere l'interno?           

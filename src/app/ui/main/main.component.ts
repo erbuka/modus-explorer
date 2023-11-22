@@ -1,7 +1,9 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterContentInit, forwardRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, forwardRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+
 import { ContextService } from 'src/app/context.service';
 import { Item } from 'src/app/types/item';
-import { LocationRouterService } from 'src/app/location-router.service';
 import { ConfigLocale } from 'src/app/types/config';
 import { State, StateData } from 'src/app/classes/state';
 import { ContentProviderService } from 'src/app/content-provider.service';
@@ -21,16 +23,17 @@ export class MainComponent extends State implements OnInit {
   item: Item = null;
   showMobileMenu: boolean = false;
 
-  constructor(private contentProvider: ContentProviderService, public context: ContextService, private router: LocationRouterService) {
+  constructor(private route: ActivatedRoute, private router: Router, private location:Location, private contentProvider: ContentProviderService, public context: ContextService) {
     super();
   }
 
   saveState(data: StateData): void {
-    this.router.saveState(data);
+    //this.router.saveState(data);
   }
 
   getState(): StateData {
-    return this.router.getState();
+    //return this.router.getState();
+    return null;
   }
 
   toggleMobileMenu(): void {
@@ -47,35 +50,35 @@ export class MainComponent extends State implements OnInit {
 
     this.locales = this.context.getLocales();
 
-    this.router.path.subscribe(async v => {
-
-      try {
-        this.item = await this.contentProvider.getItem(v);
-        this.resetContentScrollTop()
+    this.route.paramMap.subscribe({
+      next: async params => {
+        try {
+          this.item = await this.contentProvider.getItem(params.get("id"));
+          this.resetContentScrollTop()
+        }
+        catch (e) {
+          this.router.navigate(['/not-found'], { replaceUrl: true });
+        }
       }
-      catch (e) {
-        this.router.navigate(this.context.config.entry, true);
-        console.error(e.message);
-      }
-
-    });
+    })
 
   }
 
-  toggleEditorMode():void {
+  toggleEditorMode(): void {
     this.context.editorMode.next(!this.context.editorMode.value)
   }
 
   goHome(): void {
-    this.router.navigate("/");
+    this.router.navigate([this.context.config.entry]);
   }
 
   goBack(): void {
-    this.router.back();
+    this.location.back();
   }
 
   goUp(): void {
-    this.router.navigate(this.router.resolve("..", this.item));
+    //this.router.navigate(this.router.resolve("..", this.item));
+    throw new Error("Not implemented")
   }
 
   resetContentScrollTop(): void {

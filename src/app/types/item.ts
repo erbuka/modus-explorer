@@ -7,7 +7,7 @@ import { ThreeViewerItem } from './three-viewer-item';
 export interface ItemBase {
   type: string;
   title?: LocalizedText;
-  uri?: string;
+  id?: string;
 }
 
 export type LocalizedText = string | { [locale: string]: string }

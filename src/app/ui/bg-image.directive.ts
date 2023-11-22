@@ -13,8 +13,8 @@ export class BgImageDirective implements OnChanges {
     if (changes['url']) {
 
       if(this.url) {
-        let css = this.url.indexOf("blob") >= 0 ? this.url : `url('${this.url}`;
-        this.renderer.setStyle(this.element.nativeElement, "background-image",  `url('${this.url}`);
+        let css = this.url.indexOf("blob") >= 0 ? this.url : `url(${this.url})`;
+        this.renderer.setStyle(this.element.nativeElement, "background-image",  `url("${this.url}")`);
       } else {
         this.renderer.setStyle(this.element.nativeElement, "background-image",  null);
       }

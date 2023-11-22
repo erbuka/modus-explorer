@@ -30,7 +30,7 @@ export class BlockListComponent implements OnInit {
   addLink(idx?: number) {
     idx = typeof idx !== 'number' ? this.item.links.length : idx;
     const newLink: BlockListItemLink = {
-      href: "",
+      itemId: "",
       title: "Title",
       image: ""
     }

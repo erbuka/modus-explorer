@@ -49,6 +49,8 @@ import { JsonValidator } from './json-validator.service';
 import { LocationRouterService } from './location-router.service';
 import { ContextService } from './context.service';
 import { ContentProviderService, LocalContentProviderService } from './content-provider.service';
+import { AppRoutingModule } from './app-ruoting.module';
+import { NotFoundComponent } from './ui/not-found/not-found.component';
 
 
 
@@ -75,6 +77,7 @@ import { ContentProviderService, LocalContentProviderService } from './content-p
     PinLayerEditorComponent,
     LinkDirective,
     EmbedComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -83,6 +86,8 @@ import { ContentProviderService, LocalContentProviderService } from './content-p
     FormsModule,
     HammerModule,
     DragDropModule,
+
+    AppRoutingModule,
 
     MatButtonModule,
     MatIconModule,
