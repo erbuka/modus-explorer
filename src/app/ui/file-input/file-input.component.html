@@ -1,1 +1,6 @@
-<div (appFileDrop)="onFileDrop($event)">{{ url }}</div>
+<div class="cn-file-input" (appFileDrop)="onFileDrop($event)">
+  <img *ngIf="url" [src]="url">
+  <div class="py-2 flex-grow-1 d-flex justify-content-center align-items-center">
+    <mat-icon>file_upload</mat-icon> <span class="mx-2">Drop files here</span>
+  </div>
+</div>
