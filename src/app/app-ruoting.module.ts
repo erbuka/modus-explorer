@@ -10,9 +10,15 @@ const routes: Routes = [
     component: NotFoundComponent,
   },
   {
+    path: "",
+    pathMatch: "full",
+    component: MainComponent
+  },
+  {
     path: ":id",
     component: MainComponent
-  }]; // sets up routes constant where you define your routes
+  }
+]; // sets up routes constant where you define your routes
 
 // configures NgModule imports and exports
 @NgModule({

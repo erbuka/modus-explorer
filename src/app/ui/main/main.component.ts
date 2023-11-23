@@ -78,8 +78,16 @@ export class MainComponent extends State implements OnInit {
 
     this.route.paramMap.subscribe({
       next: async params => {
+
+        const itemId = params.get("id");
+
+        if(!itemId) {
+          this.router.navigate(["/", this.context.config.entry])
+          return;
+        }
+
         try {
-          this.item = await this.contentProvider.getItem(params.get("id"));
+          this.item = await this.contentProvider.getItem(itemId);
           this.resetContentScrollTop()
         }
         catch (e) {
