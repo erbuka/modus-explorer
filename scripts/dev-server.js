@@ -37,42 +37,53 @@ const common = require("./common");
 
     /** Development Server */
     {
-        app.delete("/assets/*", (req, res) => {
-            let dirPath = path.resolve(path.join("./", req.url));
 
-            if (fs.lstatSync(dirPath).isDirectory()) {
-                let files = path.join(dirPath, "*");
-                rimraf(files, (error) => {
-                    if (error) {
-                        res.statusCode = 400;
-                        res.send(error);
+        app.post("/items", express.json(), (req, res) => {
+            const itemId = req.body.id || "___";
+            const itemFolder = path.resolve(`./assets/items/${itemId}`)
+            const itemPath = path.resolve(`${itemFolder}/item.json`);
+            fs.mkdirSync(itemFolder, { recursive: true })
+            fs.writeFileSync(itemPath, JSON.stringify(req.body), { encoding: "utf-8" })
+            res.json({ id: itemId });
+        });
+
+        /*
+                app.delete("/assets/*", (req, res) => {
+                    let dirPath = path.resolve(path.join("./", req.url));
+        
+                    if (fs.lstatSync(dirPath).isDirectory()) {
+                        let files = path.join(dirPath, "*");
+                        rimraf(files, (error) => {
+                            if (error) {
+                                res.statusCode = 400;
+                                res.send(error);
+                            } else {
+                                res.statusCode = 200;
+                                res.send(dirPath);
+                            }
+                        });
                     } else {
-                        res.statusCode = 200;
-                        res.send(dirPath);
+                        res.statusCode = 400;
+                        res.send(`Not a valid directory: ${dirPath}`);
                     }
+        
                 });
-            } else {
-                res.statusCode = 400;
-                res.send(`Not a valid directory: ${dirPath}`);
-            }
-
-        });
-
-        app.post("/assets/*", express.raw({ type: ["text/html", "application/octet-stream"], limit: "512mb" }), (req, res, next) => {
-            let filePath = path.resolve(path.join("./", req.url));
-            fs.writeFile(filePath, req.body, () => {
-                res.statusCode = 200;
-                res.send();
-            });
-        });
-
+        
+                app.post("/assets/*", express.raw({ type: ["text/html", "application/octet-stream"], limit: "512mb" }), (req, res, next) => {
+                    let filePath = path.resolve(path.join("./", req.url));
+                    fs.writeFile(filePath, req.body, () => {
+                        res.statusCode = 200;
+                        res.send();
+                    });
+                });
+        */
         // TODO: Questo è uno schifo, funziona ma va fatto meglio
         app.use("/*", (req, res) => {
             const path0 = path.resolve("./build-dev", req.originalUrl.substring(1));
             const path1 = path.resolve(".", req.originalUrl.substring(1));
 
-            if(fs.existsSync(path0) && fs.lstatSync(path0).isFile()) res.sendFile(path0);
-            else if(fs.existsSync(path1) && fs.lstatSync(path1).isFile()) res.sendFile(path1);
+            if (fs.existsSync(path0) && fs.lstatSync(path0).isFile()) res.sendFile(path0);
+            else if (fs.existsSync(path1) && fs.lstatSync(path1).isFile()) res.sendFile(path1);
             else res.sendFile(path.resolve("./build-dev/index.html"));
         });
 

@@ -7,6 +7,7 @@ import { Item } from 'src/app/types/item';
 import { ConfigLocale } from 'src/app/types/config';
 import { State, StateData } from 'src/app/classes/state';
 import { ContentProviderService } from 'src/app/content-provider.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-main',
@@ -23,7 +24,7 @@ export class MainComponent extends State implements OnInit {
   item: Item = null;
   showMobileMenu: boolean = false;
 
-  constructor(private route: ActivatedRoute, private router: Router, private location:Location, private contentProvider: ContentProviderService, public context: ContextService) {
+  constructor(private route: ActivatedRoute, private router: Router, private location: Location, private contentProvider: ContentProviderService, public context: ContextService, private snackBar: MatSnackBar) {
     super();
   }
 
@@ -62,6 +63,20 @@ export class MainComponent extends State implements OnInit {
       }
     })
 
+  }
+
+  async saveItem() {
+    const saveFn = this.context.editorSaveClick.value;
+    if (saveFn) {
+      try {
+        await saveFn();
+        this.snackBar.open("Item saved!");
+      }
+      catch (e) {
+        console.error(e);
+        this.snackBar.open("An error has occurred", null, { panelClass: "text-danger" });
+      }
+    }
   }
 
   toggleEditorMode(): void {

@@ -136,7 +136,7 @@
 
             <div class="cn-editor-mode-toolbar">
                 <div>
-                    <button [disabled]="!context.editorMode.value" class="mx-1"  mat-icon-button>
+                    <button (click)="saveItem()" [disabled]="!context.editorMode.value" class="mx-1" mat-icon-button>
                         <mat-icon>save</mat-icon>
                     </button>
                     <button class="mx-1" [class.text-accent]="context.editorMode.value" mat-icon-button

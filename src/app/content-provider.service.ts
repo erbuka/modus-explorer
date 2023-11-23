@@ -17,6 +17,9 @@ type ModusOperandiLoginData = {
 }
 
 export abstract class ContentProviderService {
+
+  abstract storeItem(item: Item): Promise<{ id: string }>;
+
   abstract getItem(id: string): Promise<Item>;
 
   static factory(context: ContextService, router: LocationRouterService, httpClient: HttpClient, jsonValidator: JsonValidator): ContentProviderService {
@@ -34,9 +37,14 @@ export abstract class ContentProviderService {
 
 @Injectable()
 export class LocalContentProviderService extends ContentProviderService {
-
+  
   constructor(private router: LocationRouterService, private jsonValidator: JsonValidator, private httpClient: HttpClient, private context: ContextService) {
     super();
+  }
+
+  
+  async storeItem(item: Item): Promise<{ id: string; }> {
+    return this.httpClient.post<{ id: string; }>("/items", item).toPromise();
   }
 
   async getItem(id: string): Promise<Item> {
@@ -70,6 +78,10 @@ export class LocalContentProviderService extends ContentProviderService {
 
 @Injectable()
 export class ModusOperandiContentProviderService extends ContentProviderService {
+  
+  storeItem(item: Item): Promise<{ id: string; }> {
+    throw new Error('Method not implemented.');
+  }
 
   private server: ModusOperandiServerType;
 

@@ -1,6 +1,7 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, TemplateRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ContentProviderService } from 'src/app/content-provider.service';
 import { ContextService } from 'src/app/context.service';
 import { BlockListItem, BlockListItemLink } from 'src/app/types/block-list-item';
 
@@ -10,15 +11,25 @@ import { BlockListItem, BlockListItemLink } from 'src/app/types/block-list-item'
   templateUrl: './block-list.component.html',
   styleUrls: ['./block-list.component.scss']
 })
-export class BlockListComponent implements OnInit {
+export class BlockListComponent implements OnInit, OnDestroy {
 
   @ViewChild("editBlockDialogTmpl", { static: true, read: TemplateRef }) editBlockDialogTmpl: TemplateRef<any>;
 
   @Input() item: BlockListItem = null;
 
-  constructor(public context: ContextService, private dialog: MatDialog) { }
+  constructor(public context: ContextService, private dialog: MatDialog, private contentProvider: ContentProviderService) { }
 
-  ngOnInit() { }
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
+  }
+
+  ngOnInit() {
+    this.context.editorSaveClick.next(() => this.saveItem())
+  }
+
+  saveItem() {
+    return this.contentProvider.storeItem(this.item);
+  }
 
   editLink(link: BlockListItemLink) {
     this.dialog.open(this.editBlockDialogTmpl, {
@@ -38,7 +49,7 @@ export class BlockListComponent implements OnInit {
     this.editLink(newLink);
   }
 
-  onLinkDropped(drop:CdkDragDrop<any[]>) {
+  onLinkDropped(drop: CdkDragDrop<any[]>) {
     moveItemInArray(this.item.links, drop.previousIndex, drop.currentIndex);
   }
 
