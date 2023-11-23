@@ -8,6 +8,7 @@ import { LocationRouterService } from './location-router.service';
 import { ConfigLocale, Config } from './types/config';
 import { DOCUMENT } from '@angular/common';
 import { JsonValidator } from './json-validator.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export const ITEM_SCHEMA = require('./types/item-schema.json');
 
@@ -71,7 +72,7 @@ export class ContextService {
   onFileChoose: EventEmitter<FileChooserEvent> = new EventEmitter();
   onError: EventEmitter<ErrorEvent> = new EventEmitter();
 
-  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService) { }
+  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService, private snackBar: MatSnackBar) { }
 
 
   translate(text: LocalizedText) {
@@ -173,9 +174,10 @@ export class ContextService {
 
   }
 
-  raiseError(err: ErrorEvent): void {
+  raiseError(err: any): void {
     console.error(err);
-    this.onError.emit(err);
+    this.snackBar.open(`An error occurred. Check the console`, null, { panelClass: "text-danger" });
+    //this.onError.emit(err);
   }
 
   assign<T, X, Y>(t: T, x: X, y: Y): T & X & Y;

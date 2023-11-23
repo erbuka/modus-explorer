@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, forwardRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, forwardRef, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -8,6 +8,30 @@ import { ConfigLocale } from 'src/app/types/config';
 import { State, StateData } from 'src/app/classes/state';
 import { ContentProviderService } from 'src/app/content-provider.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { NgForm } from '@angular/forms';
+import { BlockListItem } from 'src/app/types/block-list-item';
+
+
+const DEFAULT_BLOCK_LIST: BlockListItem = {
+  type: "block-list",
+  links: [],
+  options: {
+    itemWidth: "20rem",
+    itemAspectRatio: 1
+  }
+}
+
+
+const DEFAULT_ITEMS: { [type in Item['type']]?: Item } = {
+  "block-list": DEFAULT_BLOCK_LIST,
+  "slideshow": null,
+  "deep-zoom": null,
+  "3d": null,
+  "page": null,
+}
+
+
 
 @Component({
   selector: 'app-main',
@@ -18,13 +42,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class MainComponent extends State implements OnInit {
 
 
+  @ViewChild("newItemDialogTmpl", { read: TemplateRef, static: true }) newItemDialogTmpl;
   @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
   locales: ConfigLocale[] = null;
   item: Item = null;
   showMobileMenu: boolean = false;
 
-  constructor(private route: ActivatedRoute, private router: Router, private location: Location, private contentProvider: ContentProviderService, public context: ContextService, private snackBar: MatSnackBar) {
+  constructor(private route: ActivatedRoute, private router: Router, private location: Location, private contentProvider: ContentProviderService, public context: ContextService, private snackBar: MatSnackBar, private dialog: MatDialog) {
     super();
   }
 
@@ -65,6 +90,26 @@ export class MainComponent extends State implements OnInit {
 
   }
 
+  newItem() {
+    const ref = this.dialog.open(this.newItemDialogTmpl, {
+      width: "512px",
+      data: {
+        submit: (form: NgForm) => {
+          if (form.valid) {
+            const { id, type }: { id: string, type: Item['type'] } = form.value;
+            const defaultValue = DEFAULT_ITEMS[type];
+            this.contentProvider.storeItem(Object.assign({ id }, defaultValue))
+              .then(({ id }) => {
+                ref.close()
+                this.router.navigate(['/', id])
+              })
+              .catch(e => this.context.raiseError(e))
+          }
+        }
+      }
+    })
+  }
+
   async saveItem() {
     const saveFn = this.context.editorSaveClick.value;
     if (saveFn) {
@@ -73,8 +118,7 @@ export class MainComponent extends State implements OnInit {
         this.snackBar.open("Item saved!");
       }
       catch (e) {
-        console.error(e);
-        this.snackBar.open("An error has occurred", null, { panelClass: "text-danger" });
+        this.context.raiseError(e);
       }
     }
   }

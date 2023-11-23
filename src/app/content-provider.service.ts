@@ -37,12 +37,12 @@ export abstract class ContentProviderService {
 
 @Injectable()
 export class LocalContentProviderService extends ContentProviderService {
-  
+
   constructor(private router: LocationRouterService, private jsonValidator: JsonValidator, private httpClient: HttpClient, private context: ContextService) {
     super();
   }
 
-  
+
   async storeItem(item: Item): Promise<{ id: string; }> {
     return this.httpClient.post<{ id: string; }>("/items", item).toPromise();
   }
@@ -62,10 +62,7 @@ export class LocalContentProviderService extends ContentProviderService {
     let valid = this.jsonValidator.validate(ITEM_SCHEMA, item);
 
     if (!valid) {
-      this.context.raiseError({
-        description: `Some errors occured during schema validation (${id}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
-          }`
-      })
+      this.context.raiseError(`Some errors occured during schema validation (${id}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "") }`)
     }
 
     item.id = id;
@@ -78,7 +75,7 @@ export class LocalContentProviderService extends ContentProviderService {
 
 @Injectable()
 export class ModusOperandiContentProviderService extends ContentProviderService {
-  
+
   storeItem(item: Item): Promise<{ id: string; }> {
     throw new Error('Method not implemented.');
   }

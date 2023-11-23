@@ -1,6 +1,28 @@
 <ng-template #explorerLogo>
     <img class="h-100" src="core-assets/images/logo-light.png">
 </ng-template>
+
+<ng-template #newItemDialogTmpl let-data>
+    <h2>New Item</h2>
+    <form #self="ngForm" (ngSubmit)="data.submit(self)">
+        <div class="row">
+            <mat-form-field class="col-12">
+                <mat-label>ID</mat-label>
+                <input type="text" matInput name="id" [(ngModel)]="data.name">
+            </mat-form-field>
+            <mat-form-field class="col-12">
+                <mat-label>Type</mat-label>
+                <mat-select name="type" required [(ngModel)]="data.type">
+                    <mat-option value="block-list">Block List</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="col-12 text-right">
+                <button type="submit" mat-raised-button>Create</button>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
 <ng-container *ngIf="item">
 
     <div class="cn-app-mobile-menu" [class.cn-show]="showMobileMenu">
@@ -142,6 +164,9 @@
                     <button class="mx-1" [class.text-accent]="context.editorMode.value" mat-icon-button
                         (click)="toggleEditorMode()">
                         <mat-icon>edit</mat-icon>
+                    </button>
+                    <button (click)="newItem()" [disabled]="context.editorMode.value" class="mx-1" mat-icon-button>
+                        <mat-icon>add</mat-icon>
                     </button>
                 </div>
             </div>
