@@ -5,6 +5,18 @@
             <mat-label>Title</mat-label>
             <app-editable-localized-text [(data)]="data.link.title"></app-editable-localized-text>
         </mat-form-field>
+
+        <mat-form-field class="col-12">
+            <mat-label>Destination Item</mat-label>
+            <mat-select [(ngModel)]="data.link.itemId">
+                <mat-option *ngFor="let item of data.items | async" [value]="item.id">
+                    <span>{{ item.id }}</span>
+                    <span *ngIf="item.title">
+                        ({{ item?.title | cnLocalizedText }})
+                    </span> 
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
     </div>
 </ng-template>
 <ng-container *ngIf="item">

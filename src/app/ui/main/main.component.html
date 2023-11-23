@@ -11,6 +11,10 @@
                 <input type="text" matInput name="id" [(ngModel)]="data.name">
             </mat-form-field>
             <mat-form-field class="col-12">
+                <mat-label>Title</mat-label>
+                <input type="text" matInput name="title" [(ngModel)]="data.title" required>
+            </mat-form-field>
+            <mat-form-field class="col-12">
                 <mat-label>Type</mat-label>
                 <mat-select name="type" required [(ngModel)]="data.type">
                     <mat-option value="block-list">Block List</mat-option>

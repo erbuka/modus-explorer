@@ -18,8 +18,8 @@ type ModusOperandiLoginData = {
 
 export abstract class ContentProviderService {
 
+  abstract listItems(): Promise<{ id: string }[]>;
   abstract storeItem(item: Item): Promise<{ id: string }>;
-
   abstract getItem(id: string): Promise<Item>;
 
   static factory(context: ContextService, router: LocationRouterService, httpClient: HttpClient, jsonValidator: JsonValidator): ContentProviderService {
@@ -38,10 +38,14 @@ export abstract class ContentProviderService {
 @Injectable()
 export class LocalContentProviderService extends ContentProviderService {
 
+
   constructor(private router: LocationRouterService, private jsonValidator: JsonValidator, private httpClient: HttpClient, private context: ContextService) {
     super();
   }
 
+  async listItems(): Promise<{ id: string; }[]> {
+    return this.httpClient.get<{ id: string; }[]>("/items").toPromise();
+  }
 
   async storeItem(item: Item): Promise<{ id: string; }> {
     return this.httpClient.post<{ id: string; }>("/items", item).toPromise();
@@ -62,7 +66,7 @@ export class LocalContentProviderService extends ContentProviderService {
     let valid = this.jsonValidator.validate(ITEM_SCHEMA, item);
 
     if (!valid) {
-      this.context.raiseError(`Some errors occured during schema validation (${id}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "") }`)
+      this.context.raiseError(`Some errors occured during schema validation (${id}):<br> ${this.jsonValidator.getErrors().reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")}`)
     }
 
     item.id = id;
@@ -76,9 +80,6 @@ export class LocalContentProviderService extends ContentProviderService {
 @Injectable()
 export class ModusOperandiContentProviderService extends ContentProviderService {
 
-  storeItem(item: Item): Promise<{ id: string; }> {
-    throw new Error('Method not implemented.');
-  }
 
   private server: ModusOperandiServerType;
 
@@ -86,6 +87,14 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   constructor(private context: ContextService, private httpClient: HttpClient) {
     super();
     this.server = context.config.serverType as ModusOperandiServerType;
+  }
+
+  listItems(): Promise<{ id: string; }[]> {
+    throw new Error('Method not implemented.');
+  }
+
+  storeItem(item: Item): Promise<{ id: string; }> {
+    throw new Error('Method not implemented.');
   }
 
   private getUrl(uri: string) {

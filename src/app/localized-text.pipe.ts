@@ -8,10 +8,10 @@ import { LocalizedText } from './types/item';
 export class LocalizedTextPipe implements PipeTransform {
 
 
-  constructor(private context: ContextService) {  }
+  constructor(private context: ContextService) { }
 
   transform(value: LocalizedText, ...args: unknown[]): string {
-    return this.context.translate(value);
+    return value ? this.context.translate(value) : "";
   }
 
 }

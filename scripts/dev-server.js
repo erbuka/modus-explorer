@@ -5,6 +5,7 @@ const rimraf = require("rimraf");
 const colors = require("colors");
 const ncp = require("ncp");
 const { argv } = require("yargs");
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const port = 8080;
@@ -38,8 +39,24 @@ const common = require("./common");
     /** Development Server */
     {
 
+        app.get("/items", (req, res) => {
+            const result = fs.readdirSync(path.resolve("./assets/items"))
+                .map(file => {
+                    const itemPath = path.resolve(`./assets/items/${file}/item.json`);
+                    if (fs.existsSync(itemPath)) {
+                        const item = JSON.parse(fs.readFileSync(itemPath, { encoding: "utf-8" }));
+                        return {
+                            id: file,
+                            title: item.title || null
+                        }
+                    } else return null
+
+                }).filter(x => x !== null)
+            res.json(result);
+        })
+
         app.post("/items", express.json(), (req, res) => {
-            const itemId = req.body.id || "___";
+            const itemId = req.body.id || uuidv4();
             const itemFolder = path.resolve(`./assets/items/${itemId}`)
             const itemPath = path.resolve(`${itemFolder}/item.json`);
             fs.mkdirSync(itemFolder, { recursive: true })

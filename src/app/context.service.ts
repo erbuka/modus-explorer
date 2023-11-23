@@ -74,7 +74,6 @@ export class ContextService {
 
   constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService, private snackBar: MatSnackBar) { }
 
-
   translate(text: LocalizedText) {
     let locale = this.getCurrentLocale();
     if (typeof text === "object" && locale) {

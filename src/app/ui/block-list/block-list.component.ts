@@ -11,17 +11,13 @@ import { BlockListItem, BlockListItemLink } from 'src/app/types/block-list-item'
   templateUrl: './block-list.component.html',
   styleUrls: ['./block-list.component.scss']
 })
-export class BlockListComponent implements OnInit, OnDestroy {
+export class BlockListComponent implements OnInit {
 
   @ViewChild("editBlockDialogTmpl", { static: true, read: TemplateRef }) editBlockDialogTmpl: TemplateRef<any>;
 
   @Input() item: BlockListItem = null;
 
   constructor(public context: ContextService, private dialog: MatDialog, private contentProvider: ContentProviderService) { }
-
-  ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
-  }
 
   ngOnInit() {
     this.context.editorSaveClick.next(() => this.saveItem())
@@ -32,8 +28,12 @@ export class BlockListComponent implements OnInit, OnDestroy {
   }
 
   editLink(link: BlockListItemLink) {
+
     this.dialog.open(this.editBlockDialogTmpl, {
-      data: { link },
+      data: { 
+        link,
+        items: this.contentProvider.listItems() 
+      },
       width: "768px"
     })
   }
