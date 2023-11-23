@@ -4,8 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng build --watch --base-href=/ --output-path build-dev",
-    "start:server": "node ./scripts/dev-server.js",
-    "start:dev-server": "node ./scripts/dev-server.js --templates --types",
+    "start:server": "node ./scripts/dev-server.mjs",
+    "start:dev-server": "node ./scripts/dev-server.mjs --templates --types",
     "build": "ng build --configuration production --base-href=/ --output-path build-prod",
     "build:ghpages": "ng build --configuration production --output-path docs --base-href /cultura-nuova/ && ncp ./assets ./docs/assets",
     "test": "ng test",

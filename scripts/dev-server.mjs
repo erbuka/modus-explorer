@@ -1,16 +1,19 @@
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
-const rimraf = require("rimraf");
-const colors = require("colors");
-const ncp = require("ncp");
-const { argv } = require("yargs");
-const { v4: uuidv4 } = require('uuid');
+import express from "express";
+import path from "path";
+import fs from "fs";
+import rimraf from "rimraf";
+import colors from "colors";
+import ncp from "ncp";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import { v4 as uuidv4 } from 'uuid';
+
+import { generateJsonSchema, generateJsonTemplate } from "./common.mjs";
 
 const app = express();
 const port = 8080;
-
-const common = require("./common");
+const argv = yargs(hideBin(process.argv)).parse();
+//const common = require("./common.mjs");
 
 (async function () {
     const ncpWithPromise = async (src, dst) => {
@@ -120,6 +123,7 @@ const common = require("./common");
     /** Item Type Schema Generator */
     if (argv.types) {
 
+
         console.log(`${colors.green("[Dev-Server]")} - Starting type schema generator`);
 
         const types = [
@@ -143,7 +147,7 @@ const common = require("./common");
         ];
 
         for (let type of types) {
-            common.generateJsonSchema(type.files, type.name, r => {
+            generateJsonSchema(type.files, type.name, r => {
                 let p = path.resolve(type.dest);
                 fs.writeFileSync(p, JSON.stringify(r));
                 console.log(`${colors.green("[Types]")} - Rebuild ${colors.yellow(path.basename(p))}`);
@@ -159,7 +163,7 @@ const common = require("./common");
         console.log(`${colors.green("[Dev-Server]")} - Starting template generator`);
 
         try {
-            common.generateJsonTemplate("./templates", function (result) {
+            generateJsonTemplate("./templates", function (result) {
                 let templates = result.reduce((prev, curr) => prev + `<ng-template let-data let-item="item" appTemplateDef="${curr.name}">${curr.contents}</ng-template>`, "");
                 fs.writeFileSync(path.resolve(dest), templates, { encoding: "utf-8" });
                 console.log(`${colors.green("[Templates]")} - Rebuild ${colors.yellow(path.basename(dest))}`);

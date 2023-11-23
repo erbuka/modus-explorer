@@ -24,7 +24,7 @@ export interface Config {
 	headerTemplate?: string;        // Template grafico per testata
 	headerLinks?: {
 		title: LocalizedText,
-		href: string
+		itemId: string
 	}[]
 	internationalization?: {        // Parametri internazionalizzazione
 		defaultLocale: string,      	// Lingua di default, es "it"

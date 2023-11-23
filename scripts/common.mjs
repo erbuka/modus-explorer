@@ -1,14 +1,14 @@
-const tjs = require("typescript-json-schema");
-const path = require("path");
-const nw = require("node-watch");
-const fs = require("fs");
+import fs from "fs";
+import path from "path";
+import * as tjs from "typescript-json-schema";
+import nw from "node-watch";
 
 const settings = {
     required: true,
     noExtraProps: true
 }
 
-const generateJsonSchema = function (files, type, watchCallback) {
+export function generateJsonSchema(files, type, watchCallback) {
 
     files = files.map(f => path.resolve(f));
 
@@ -31,7 +31,7 @@ const generateJsonSchema = function (files, type, watchCallback) {
 }
 
 
-const generateJsonTemplate = function (rootDir, watchCallback) {
+export function generateJsonTemplate(rootDir, watchCallback) {
 
     const getTemplates = function () {
         let toExplore = [path.resolve(rootDir)];
@@ -77,9 +77,4 @@ const generateJsonTemplate = function (rootDir, watchCallback) {
         return getTemplates();
     }
 
-}
-
-module.exports = {
-    generateJsonSchema: generateJsonSchema,
-    generateJsonTemplate: generateJsonTemplate
 }

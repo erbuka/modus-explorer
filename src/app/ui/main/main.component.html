@@ -57,7 +57,7 @@
 
             <ng-container *ngIf="context.config.headerLinks">
                 <ng-container *ngFor="let link of context.config.headerLinks">
-                    <div [cnLink]="link.href | cnUrl" (click)=" toggleMobileMenu()">
+                    <div [routerLink]="['/', link.itemId]" (click)=" toggleMobileMenu()">
                         <mat-icon>link</mat-icon> <span>{{ link.title | cnLocalizedText }}</span>
                     </div>
                 </ng-container>
@@ -116,7 +116,7 @@
 
                     <mat-menu #linksMenu>
                         <ng-container *ngFor="let link of context.config.headerLinks">
-                            <button mat-menu-item [cnLink]="link.href | cnUrl">
+                            <button mat-menu-item [routerLink]="['/', link.itemId]">
                                 {{ link.title | cnLocalizedText }}
                             </button>
                         </ng-container>
