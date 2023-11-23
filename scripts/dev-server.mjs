@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import multer, { memoryStorage } from "multer";
 import rimraf from "rimraf";
 import colors from "colors";
 import ncp from "ncp";
@@ -13,7 +14,6 @@ import { generateJsonSchema, generateJsonTemplate } from "./common.mjs";
 const app = express();
 const port = 8080;
 const argv = yargs(hideBin(process.argv)).parse();
-//const common = require("./common.mjs");
 
 (async function () {
     const ncpWithPromise = async (src, dst) => {
@@ -41,6 +41,26 @@ const argv = yargs(hideBin(process.argv)).parse();
 
     /** Development Server */
     {
+
+        const upload = multer({ storage: memoryStorage() })
+
+        app.post("/files", upload.single("file"), (req, res) => {
+
+            const itemId = req.body.itemId || "__global";
+
+
+            if (req.file) {
+                const dirPath = path.resolve(`./assets/files/${itemId}`);
+                const fileName = `${uuidv4()}${path.extname(req.file.originalname)}`;
+                const filePath = path.join(dirPath, fileName);
+                fs.mkdirSync(dirPath, { recursive: true });
+                fs.writeFileSync(filePath, req.file.buffer);
+                res.json({ fileUrl: `assets/files/${itemId}/${fileName}` });
+            } else {
+                res.sendStatus(404);
+            }
+
+        })
 
         app.get("/items", (req, res) => {
             const result = fs.readdirSync(path.resolve("./assets/items"))

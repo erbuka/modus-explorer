@@ -18,6 +18,8 @@ type ModusOperandiLoginData = {
 
 export abstract class ContentProviderService {
 
+  abstract storeFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }>
+
   abstract listItems(): Promise<{ id: string }[]>;
   abstract storeItem(item: Item): Promise<{ id: string }>;
   abstract getItem(id: string): Promise<Item>;
@@ -42,6 +44,23 @@ export class LocalContentProviderService extends ContentProviderService {
   constructor(private router: LocationRouterService, private jsonValidator: JsonValidator, private httpClient: HttpClient, private context: ContextService) {
     super();
   }
+
+  async storeFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
+
+    const formData = new FormData();
+
+    formData.append("file", new Blob([data]), fileName);
+
+    if (item)
+      formData.append("itemId", item.id);
+
+    return this.httpClient.post<{ fileUrl: string }>("/files", formData, {
+      headers: {
+        "enc-type": "multipart/form-data"
+      }
+    }).toPromise()
+  }
+
 
   async listItems(): Promise<{ id: string; }[]> {
     return this.httpClient.get<{ id: string; }[]>("/items").toPromise();
@@ -80,14 +99,17 @@ export class LocalContentProviderService extends ContentProviderService {
 @Injectable()
 export class ModusOperandiContentProviderService extends ContentProviderService {
 
-
   private server: ModusOperandiServerType;
-
 
   constructor(private context: ContextService, private httpClient: HttpClient) {
     super();
     this.server = context.config.serverType as ModusOperandiServerType;
   }
+
+  async storeFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
+    throw new Error('Method not implemented.');
+  }
+
 
   listItems(): Promise<{ id: string; }[]> {
     throw new Error('Method not implemented.');

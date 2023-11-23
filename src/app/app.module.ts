@@ -52,6 +52,8 @@ import { ContextService } from './context.service';
 import { ContentProviderService, LocalContentProviderService } from './content-provider.service';
 import { AppRoutingModule } from './app-ruoting.module';
 import { NotFoundComponent } from './ui/not-found/not-found.component';
+import { FileInputComponent } from './ui/file-input/file-input.component';
+import { FileDropDirective } from './file-drop.directive';
 
 
 
@@ -60,6 +62,7 @@ import { NotFoundComponent } from './ui/not-found/not-found.component';
     AppComponent,
     BlockListComponent,
     BgImageDirective,
+    FileDropDirective,
     PageComponent,
     TemplatesComponent,
     TemplateDefDirective,
@@ -79,6 +82,7 @@ import { NotFoundComponent } from './ui/not-found/not-found.component';
     LinkDirective,
     EmbedComponent,
     NotFoundComponent,
+    FileInputComponent,
   ],
   imports: [
     BrowserModule,

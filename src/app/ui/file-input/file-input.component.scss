@@ -1,0 +1,8 @@
+:host {
+  &>div {
+    position: relative;
+    background: red;
+    width: 100px;
+    height: 100px;
+  }
+}

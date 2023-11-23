@@ -1,6 +1,11 @@
 <ng-template #editBlockDialogTmpl let-data>
     <h2>Edit Link</h2>
     <div class="row">
+
+        <div class="col-12">
+            <app-file-input [item]="this.item" [(url)]="data.link.image"></app-file-input>
+        </div>
+
         <mat-form-field class="col-12">
             <mat-label>Title</mat-label>
             <app-editable-localized-text [(data)]="data.link.title"></app-editable-localized-text>
