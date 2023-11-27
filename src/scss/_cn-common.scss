@@ -21,6 +21,16 @@ body {
   animation-duration: 0.5s;
 }
 
+.cn-object-contain {
+  object-fit: contain;
+  object-position: center center;
+}
+
+.cn-object-cover {
+  object-fit: cover;
+  object-position: center center;
+}
+
 .cn-bg-contain {
   background-repeat: no-repeat;
   background-size: contain;
@@ -53,7 +63,7 @@ body {
 }
 
 .cn-overlay {
-  @extend .cn-absolute;
+  position: absolute;
   width: 100%;
   height: 100%;
   top: 0;

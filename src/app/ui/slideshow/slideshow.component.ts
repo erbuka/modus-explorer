@@ -9,12 +9,14 @@ import {
   group
 } from '@angular/animations';
 import { Item } from 'src/app/types/item';
-import { SlideshowItem, SlideShowItemGroup } from 'src/app/types/slideshow-item';
+import { SlideshowItem, SlideShowItemGroup, SlideShowItemSlide } from 'src/app/types/slideshow-item';
 import { LocationRouterService } from 'src/app/location-router.service';
 import { State, StateData } from 'src/app/classes/state';
 import { Subscription } from 'rxjs';
 import { ContentProviderService } from 'src/app/content-provider.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, ActivationEnd, Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 type Styles = { [key: string]: string | number };
 
@@ -68,10 +70,18 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
   @Input() item: SlideshowItem = null;
 
   currentSlideIndex: number = null;
+  allSlides: SlideShowItemSlide[] = [];
+  slideCount: number = 0;
   slideItemsCache: Item[] = null;
   subscription: Subscription = null;
 
-  constructor(private snackBar: MatSnackBar, private contentProvider: ContentProviderService, public context: ContextService, private router: LocationRouterService, @SkipSelf() private state: State) {
+  get simpleMode(): boolean {
+    return this.item.options.mode === "simple";
+  }
+
+
+  constructor(private location: Location, private snackBar: MatSnackBar, private route: ActivatedRoute,
+    private contentProvider: ContentProviderService, public context: ContextService, private router: Router, @SkipSelf() private state: State) {
     super();
   }
 
@@ -92,50 +102,49 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
     this.context.editorSaveClick.next(this.saveItem.bind(this));
+    this.reload();
 
-    this.slideItemsCache = new Array<Item>(this.item.slides.length);
-    this.slideItemsCache.fill(null, 0, this.slideItemsCache.length);
+    this.subscription = this.route.queryParamMap.subscribe({
+      next: params => {
+        const slideIdx = parseInt(params.get("s"));
 
-    this.subscription = this.router.queryParams.subscribe(params => {
+        // slideIdx could be NaN
+        this.currentSlideIndex = slideIdx || null;
 
-      if (params["s"]) {
-
-        let slideIndex = parseInt(params["s"]);
-
-        if (slideIndex >= 0) {
-
-          this.currentSlideIndex = slideIndex;
-
-          if (this.item.slides[slideIndex].itemId && this.slideItemsCache[slideIndex] === null) {
-            this.contentProvider.getItem(this.item.slides[slideIndex].itemId).then(item => this.slideItemsCache[slideIndex] = item)
+        if (!isNaN(slideIdx)) {
+          this.currentSlideIndex = slideIdx;
+          const slide = this.allSlides[slideIdx];
+          if (slide.type === "item" && this.slideItemsCache[slideIdx] === null) {
+            this.contentProvider.getItem(slide.itemId).then(item => this.slideItemsCache[slideIdx] = item)
           }
-
         }
-
-      } else {
-        this.currentSlideIndex = this.simpleMode ? 0 : null;
       }
-    });
+    })
   }
 
 
   ngOnDestroy() {
-    if (this.subscription)
-      this.subscription.unsubscribe();
+    this.subscription.unsubscribe();
   }
 
-  get simpleMode(): boolean {
-    return this.item.options.mode === "simple";
+
+
+  reload() {
+    // Reloads helper variables
+    this.allSlides = this.item.groups.map(grp => grp.slides).reduce((p, c) => [...p, ...c], []);
+    this.slideCount = this.allSlides.length;
+    this.slideItemsCache = new Array<Item>(this.slideCount);
+    this.slideItemsCache.fill(null);
   }
 
   clearSlide(): void {
-    this.router.navigate(this.item.id);
+
+    this.router.navigate(["/", this.item.id]);
   }
 
   nextSlide(): void {
-    let idx = Math.min(this.currentSlideIndex + 1, this.item.slides.length - 1);
+    let idx = Math.min(this.currentSlideIndex + 1, this.slideCount - 1);
     this.gotoSlide(idx, true);
   }
 
@@ -146,16 +155,17 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
   }
 
   gotoSlide(s: number | object, replaceUrl: boolean = false): void {
-    let idx = typeof s === "number" ? s : this.item.slides.findIndex(x => x === s);
-    this.router.navigate(`${this.item.id}?s=${idx}`);
+    let idx = typeof s === "number" ? s : this.allSlides.findIndex(x => x === s);
+    this.router.navigate(["/", this.item.id], {
+      queryParamsHandling: "merge",
+      queryParams: {
+        s: idx
+      }
+    })
   }
 
-  getSlidesForGroup(groupName: string) {
-    return this.item.slides.filter(s => s.group === groupName);
-  }
-
-  getSlideGroup(s: number): SlideShowItemGroup {
-    return this.item.groups.find(x => x.name === this.item.slides[s].group);
+  getSlideGroup(idx: number): SlideShowItemGroup {
+    return this.item.groups.find(grp => grp.slides.includes(this.allSlides[idx]));
   }
 
   trackByIdx(idx: number): number {
