@@ -1,30 +1,3 @@
-<ng-template #editBlockDialogTmpl let-data>
-    <h2>Edit Link</h2>
-    <div class="row">
-
-        <mat-form-field class="col-12">
-            <mat-label>Image</mat-label>
-            <app-file-input [item]="this.item" [(url)]="data.link.image"></app-file-input>
-        </mat-form-field>
-
-        <mat-form-field class="col-12">
-            <mat-label>Title</mat-label>
-            <app-editable-localized-text [(data)]="data.link.title"></app-editable-localized-text>
-        </mat-form-field>
-
-        <mat-form-field class="col-12">
-            <mat-label>Destination Item</mat-label>
-            <mat-select [(ngModel)]="data.link.itemId">
-                <mat-option *ngFor="let item of data.items | async" [value]="item.id">
-                    <span>{{ item.id }}</span>
-                    <span *ngIf="item.title">
-                        ({{ item?.title | cnLocalizedText }})
-                    </span> 
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
-    </div>
-</ng-template>
 <ng-container *ngIf="item">
     <div class="d-flex h-100 p-4" *ngIf="!context.editorMode.value">
         <div class="d-flex flex-wrap justify-content-center cn-block-list m-auto">
@@ -56,28 +29,92 @@
     </div>
 
     <ng-container *ngIf="context.editorMode.value">
-        <div class="d-flex w-100 h-100 align-items-center justify-content-center cn-editor-mode-context">
-            <div class="cn-block-list-editor mat-elevation-z1" cdkDropList (cdkDropListDropped)="onLinkDropped($event)">
-                <div *ngFor="let l of item.links;index as i" cdkDrag class="d-flex align-items-center px-3 py-2">
-                    <button mat-icon-button (click)="item.links.splice(i, 1)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="editLink(l)">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button cdkDragHandle mat-icon-button >
-                        <mat-icon>drag_handle</mat-icon>
-                    </button>
+        <div class="cn-editor-mode-context">
+            <div class="cn-block-list-editor cn-editor">
 
-                    <div [innerHTML]="l.title | cnLocalizedText"></div>
+                <div class="border-right">
+
+                    <div class="p-3">
+                        <mat-form-field class="d-block">
+                            <mat-label>Title</mat-label>
+                            <app-editable-localized-text [(data)]="item.title"></app-editable-localized-text>
+                        </mat-form-field>
+
+                        <mat-form-field class="d-block">
+                            <mat-label>Item Width</mat-label>
+                            <input type="text" matInput [(ngModel)]="item.options.itemWidth">
+                        </mat-form-field>
+                        <mat-form-field class="d-block">
+                            <mat-label>Item Aspect Ratio</mat-label>
+                            <input type="text" matInput [(ngModel)]="item.options.itemAspectRatio">
+                        </mat-form-field>
+                        <div class="text-center">
+                            <button mat-raised-button color="accent" (click)="addLink()">
+                                <mat-icon>add</mat-icon> New Link
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="cn-list" cdkDropList (cdkDropListDropped)="onLinkDropped($event)">
+
+                        <div *ngFor="let l of item.links;index as i" cdkDrag class="d-flex align-items-center px-3 py-2"
+                            [class.cn-selected]="editorMode.selectedLink === l">
+                            <button mat-icon-button (click)="deleteLink(i)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                            <button mat-icon-button (click)="editorMode.selectedLink = l">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button cdkDragHandle mat-icon-button>
+                                <mat-icon>drag_handle</mat-icon>
+                            </button>
+
+                            <div class="cn-label" [innerHTML]="l.title | cnLocalizedText"></div>
+                        </div>
+
+
+
+                    </div>
                 </div>
 
-                <div class="d-flex justify-content-center align-items-center px-3 py-2" (click)="addLink()">
-                    <mat-icon>add</mat-icon>
-                </div>
+                <div class="p-3 flex-grow-1">
+                    <ng-container *ngIf="editorMode.selectedLink">
+                        <div class="row">
+                            <mat-form-field class="col-12">
+                                <mat-label>Image</mat-label>
+                                <app-file-input [item]="this.item"
+                                    [(url)]="editorMode.selectedLink.image"></app-file-input>
+                            </mat-form-field>
 
+                            <mat-form-field class="col-12">
+                                <mat-label>Title</mat-label>
+                                <app-editable-localized-text
+                                    [(data)]="editorMode.selectedLink.title"></app-editable-localized-text>
+                            </mat-form-field>
+
+                            <mat-form-field class="col-12">
+                                <mat-label>Destination Item</mat-label>
+                                <mat-select [(ngModel)]="editorMode.selectedLink.itemId">
+                                    <mat-option *ngFor="let item of editorMode.items | async" [value]="item.id">
+                                        <span>{{ item.id }}</span>
+                                        <span *ngIf="item.title">
+                                            ({{ item?.title | cnLocalizedText }})
+                                        </span>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                    </ng-container>
+                    <ng-container *ngIf="!editorMode.selectedLink">
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center">Please select a link
+                        </div>
+                    </ng-container>
+                </div>
             </div>
         </div>
+
+
     </ng-container>
 
 </ng-container>

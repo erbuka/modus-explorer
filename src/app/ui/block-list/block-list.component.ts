@@ -6,6 +6,11 @@ import { ContextService } from 'src/app/context.service';
 import { BlockListItem, BlockListItemLink } from 'src/app/types/block-list-item';
 
 
+type BlockListEditorMode = {
+  selectedLink: BlockListItemLink,
+  items: Promise<{ id: string }[]>
+}
+
 @Component({
   selector: 'app-block-list',
   templateUrl: './block-list.component.html',
@@ -13,30 +18,36 @@ import { BlockListItem, BlockListItemLink } from 'src/app/types/block-list-item'
 })
 export class BlockListComponent implements OnInit {
 
+  editorMode: BlockListEditorMode = {
+    selectedLink: null,
+    items: null
+  }
+
   @ViewChild("editBlockDialogTmpl", { static: true, read: TemplateRef }) editBlockDialogTmpl: TemplateRef<any>;
 
   @Input() item: BlockListItem = null;
 
-  constructor(public context: ContextService, private dialog: MatDialog, private contentProvider: ContentProviderService) { }
+  constructor(public context: ContextService, private contentProvider: ContentProviderService) { }
 
   ngOnInit() {
     this.context.editorSaveClick.next(() => this.saveItem())
+    this.editorMode.items = this.contentProvider.listItems();
   }
 
   saveItem() {
     return this.contentProvider.storeItem(this.item);
   }
 
-  editLink(link: BlockListItemLink) {
 
-    this.dialog.open(this.editBlockDialogTmpl, {
-      data: { 
-        link,
-        items: this.contentProvider.listItems() 
-      },
-      width: "768px"
-    })
+  deleteLink(idx: number) {
+    const link = this.item.links[idx];
+    this.item.links.splice(idx, 1);
+
+    if (this.editorMode.selectedLink === link)
+      this.editorMode.selectedLink = null;
+
   }
+
 
   addLink(idx?: number) {
     idx = typeof idx !== 'number' ? this.item.links.length : idx;
@@ -46,7 +57,7 @@ export class BlockListComponent implements OnInit {
       image: ""
     }
     this.item.links.splice(idx, 0, newLink);
-    this.editLink(newLink);
+    this.editorMode.selectedLink = newLink;
   }
 
   onLinkDropped(drop: CdkDragDrop<any[]>) {

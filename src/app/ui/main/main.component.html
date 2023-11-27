@@ -48,9 +48,6 @@
             <div (click)="goBack(); toggleMobileMenu()">
                 <mat-icon>chevron_left</mat-icon> <span>{{ "back" | cnLocalizedText }}</span>
             </div>
-            <div (click)="goUp(); toggleMobileMenu()">
-                <mat-icon>arrow_upward</mat-icon> <span>{{ "up" | cnLocalizedText }}</span>
-            </div>
             <div (click)="goHome(); toggleMobileMenu()">
                 <mat-icon>home</mat-icon> <span>{{ "home" | cnLocalizedText }}</span>
             </div>
@@ -122,6 +119,23 @@
                         </ng-container>
                     </mat-menu>
 
+                    <ng-container>
+                        <mat-menu #editorModeMenu>
+                            <button (click)="saveItem()" [disabled]="!context.editorMode.value" mat-menu-item>
+                                <mat-icon>save</mat-icon> Save
+                            </button>
+                            <button  mat-menu-item (click)="toggleEditorMode()">
+                                <mat-icon>edit</mat-icon> Enable/Disable
+                            </button>
+                            <button (click)="newItem()" [disabled]="context.editorMode.value" mat-menu-item>
+                                <mat-icon>add</mat-icon> Create New Item
+                            </button>
+                        </mat-menu>
+                        <button mat-button [matMenuTriggerFor]="editorModeMenu" [class.text-accent]="context.editorMode.value">
+                            Editor Mode
+                        </button>
+                    </ng-container>
+
                     <ng-container *ngIf="locales && locales.length > 1">
                         <mat-menu #localeMenu>
                             <button mat-menu-item class="text-right" *ngFor="let l of locales"
@@ -145,9 +159,6 @@
                     <button class="mx-1" mat-icon-button (click)="goBack()">
                         <mat-icon>chevron_left</mat-icon>
                     </button>
-                    <button class="mx-1" mat-icon-button (click)="goUp()">
-                        <mat-icon>arrow_upward</mat-icon>
-                    </button>
                     <button class="mx-1" mat-icon-button (click)="goHome()">
                         <mat-icon>home</mat-icon>
                     </button>
@@ -159,22 +170,6 @@
             </div>
         </div>
         <div class="cn-app-content" #appContent>
-
-            <div class="cn-editor-mode-toolbar">
-                <div>
-                    <button (click)="saveItem()" [disabled]="!context.editorMode.value" class="mx-1" mat-icon-button>
-                        <mat-icon>save</mat-icon>
-                    </button>
-                    <button class="mx-1" [class.text-accent]="context.editorMode.value" mat-icon-button
-                        (click)="toggleEditorMode()">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button (click)="newItem()" [disabled]="context.editorMode.value" class="mx-1" mat-icon-button>
-                        <mat-icon>add</mat-icon>
-                    </button>
-                </div>
-            </div>
-
             <app-item [item]="item"></app-item>
         </div>
     </div>

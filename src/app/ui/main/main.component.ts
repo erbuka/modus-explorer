@@ -53,6 +53,7 @@ export class MainComponent extends State implements OnInit {
     super();
   }
 
+  // TODO: this has to be reimplemented
   saveState(data: StateData): void {
     //this.router.saveState(data);
   }
@@ -141,11 +142,6 @@ export class MainComponent extends State implements OnInit {
 
   goBack(): void {
     this.location.back();
-  }
-
-  goUp(): void {
-    //this.router.navigate(this.router.resolve("..", this.item));
-    throw new Error("Not implemented")
   }
 
   resetContentScrollTop(): void {
