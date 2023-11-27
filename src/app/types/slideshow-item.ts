@@ -13,7 +13,7 @@ export interface SlideShowItemGroup {
 export interface SlideshowItem extends ItemBase {
   type: "slideshow",            // Tipo
   options: {                    // Opzioni  
-    mode?: SlideShowItemMode,   // Modalità, default "normal"
+    mode: SlideShowItemMode,   // Modalità, default "normal"
     itemWidth: string,          // Lunghezza blocchi
     itemAspectRatio: number     // Aspect ratio dei blocchi
   },

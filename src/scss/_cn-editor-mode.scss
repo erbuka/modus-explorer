@@ -1,3 +1,5 @@
+$cn-editor-sidebar-width: 21rem;
+
 .cn-editor-mode-context {
 
   display: flex;
@@ -6,16 +8,13 @@
   align-items: center;
   justify-content: center;
 
+  .cn-slideshow-editor {
+    display: flex;
+  }
+
 
   .cn-block-list-editor {
-
     display: flex;
-    overflow: hidden;
-
-    .cn-list {
-      height: 100%;
-    }
-
   }
 
   .cn-editor {
@@ -26,6 +25,19 @@
     height: 100%;
     max-width: 1024px;
     max-height: 768px;
+    overflow: hidden;
+  }
+
+  .cn-content {
+    flex-grow: 1;
+    padding: $spacer;
+  }
+
+  .cn-sidebar {
+    width: $cn-editor-sidebar-width;
+    flex-shrink: 0;
+    border-right: 1px solid $border-color;
+    overflow-y: auto;
   }
 
   .cn-list {
@@ -34,7 +46,6 @@
     overflow-y: auto;
 
     &>div {
-      width: 20rem;
       .cn-label {
         white-space: nowrap;
         overflow: hidden;

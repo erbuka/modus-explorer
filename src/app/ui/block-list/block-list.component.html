@@ -31,8 +31,7 @@
     <ng-container *ngIf="context.editorMode.value">
         <div class="cn-editor-mode-context">
             <div class="cn-block-list-editor cn-editor">
-
-                <div class="border-right">
+                <div class="cn-sidebar">
 
                     <div class="p-3">
                         <mat-form-field class="d-block">
@@ -77,7 +76,7 @@
                     </div>
                 </div>
 
-                <div class="p-3 flex-grow-1">
+                <div class="cn-content">
                     <ng-container *ngIf="editorMode.selectedLink">
                         <div class="row">
                             <mat-form-field class="col-12">

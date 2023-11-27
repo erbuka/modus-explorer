@@ -20,6 +20,7 @@ import { MatCheckboxModule, MAT_CHECKBOX_DEFAULT_OPTIONS } from '@angular/materi
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { AppComponent } from './app.component';
 import { BlockListComponent } from './ui/block-list/block-list.component';
@@ -107,6 +108,7 @@ import { FileDropDirective } from './file-drop.directive';
     MatSnackBarModule,
     MatProgressBarModule,
     MatSelectModule,
+    MatTabsModule,
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "outline", floatLabel: "always" } },

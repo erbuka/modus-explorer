@@ -14,6 +14,7 @@ import { LocationRouterService } from 'src/app/location-router.service';
 import { State, StateData } from 'src/app/classes/state';
 import { Subscription } from 'rxjs';
 import { ContentProviderService } from 'src/app/content-provider.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 type Styles = { [key: string]: string | number };
 
@@ -70,20 +71,29 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
   slideItemsCache: Item[] = null;
   subscription: Subscription = null;
 
-  constructor(private contentProvider: ContentProviderService, private context: ContextService, private router: LocationRouterService, @SkipSelf() private state: State) {
+  constructor(private snackBar: MatSnackBar, private contentProvider: ContentProviderService, public context: ContextService, private router: LocationRouterService, @SkipSelf() private state: State) {
     super();
   }
 
   saveState(data: StateData): void {
+    // TODO: this has to be reimplmented
     this.state.saveState(data);
   }
 
   getState(): StateData {
+    // TODO: this has to be reimplmented
     return this.state.getState();
   }
 
+  saveItem() {
+    this.contentProvider.storeItem(this.item)
+      .then(() => this.snackBar.open("Item Saved!"))
+      .catch(error => this.context.raiseError(error));
+  }
 
   ngOnInit() {
+
+    this.context.editorSaveClick.next(this.saveItem.bind(this));
 
     this.slideItemsCache = new Array<Item>(this.item.slides.length);
     this.slideItemsCache.fill(null, 0, this.slideItemsCache.length);
