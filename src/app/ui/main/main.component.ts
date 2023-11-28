@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, forwardRef, TemplateRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { ContextService } from 'src/app/context.service';
@@ -32,7 +32,6 @@ const DEFAULT_ITEMS: { [type in Item['type']]?: Item } = {
 }
 
 
-
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -45,6 +44,7 @@ export class MainComponent extends State implements OnInit {
   @ViewChild("newItemDialogTmpl", { read: TemplateRef, static: true }) newItemDialogTmpl;
   @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
+  savedState: StateData = null;
   locales: ConfigLocale[] = null;
   item: Item = null;
   showMobileMenu: boolean = false;
@@ -53,14 +53,19 @@ export class MainComponent extends State implements OnInit {
     super();
   }
 
-  // TODO: this has to be reimplemented
+  // TODO: fine for now, I'm disabling it because it is not the best for performance
   saveState(data: StateData): void {
-    //this.router.saveState(data);
+    return;
+    this.router.navigate([], {
+      queryParams: { state: btoa(JSON.stringify(data)) },
+      queryParamsHandling: "merge",
+      replaceUrl: true
+    });
   }
 
   getState(): StateData {
-    //return this.router.getState();
     return null;
+    return this.savedState;
   }
 
   toggleMobileMenu(): void {
@@ -77,12 +82,27 @@ export class MainComponent extends State implements OnInit {
 
     this.locales = this.context.getLocales();
 
+    this.router.events.subscribe({
+      next: evt => console.log(evt)
+    });
+
+    this.route.queryParamMap.subscribe({
+      next: params => {
+        if (params.has("state")) {
+          const state = JSON.parse(atob(params.get("state")))
+          this.savedState = state
+        } else {
+          this.savedState = null
+        }
+      }
+    });
+
     this.route.paramMap.subscribe({
       next: async params => {
 
         const itemId = params.get("id");
 
-        if(!itemId) {
+        if (!itemId) {
           this.router.navigate(["/", this.context.config.entry])
           return;
         }
@@ -147,6 +167,15 @@ export class MainComponent extends State implements OnInit {
   resetContentScrollTop(): void {
     if (this.appContentElmt != null) {
       this.appContentElmt.nativeElement.scrollTop = 0;
+    }
+  }
+
+  private parseLocation(url: string) {
+    let [path, queryString] = url.split("?");
+    return {
+      url: url,
+      path: path,
+      queryString: queryString ? queryString : ""
     }
   }
 
