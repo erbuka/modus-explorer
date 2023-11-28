@@ -18,7 +18,11 @@ export class EditableLocalizedTextComponent implements OnInit, MatFormFieldContr
 
   private static _nextId = 1;
 
-  @Input() data: LocalizedText;
+  private _data: LocalizedText;
+
+  @Input() set data(d: LocalizedText) { this._data = d || ""; }
+  get data() { return this._data; }
+
   @Output() dataChange: EventEmitter<LocalizedText> = new EventEmitter();
 
   @Input() set multiline(v: string | boolean) {

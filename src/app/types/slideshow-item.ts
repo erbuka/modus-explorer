@@ -2,26 +2,15 @@ import { ItemBase, LocalizedText } from './item';
 
 export type SlideShowItemMode = "normal" | "simple";  // Modalità normale/semplice
 
-export type SlideShowItemSlideImage = {
-  type: "image",
-  image: string
-}
-
-export type SlideShowItemSlideItem = {
-  type: "item",
-  itemId: string
-}
-
-export type SlideShowItemSlideVideo = {
-  type: "video",
-  video: string
-}
 
 export type SlideShowItemSlide = {
   previewImage: string,       // Miniatura
   type: "image" | "item" | "video",
   title?: LocalizedText,      // Titolo
-} & (SlideShowItemSlideImage | SlideShowItemSlideItem | SlideShowItemSlideVideo)
+  image?: string,
+  video?: string,
+  itemId?: string,
+}
 
 // Gruppo di slide
 export type SlideShowItemGroup = {

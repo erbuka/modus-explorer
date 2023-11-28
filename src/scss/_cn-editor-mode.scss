@@ -46,20 +46,35 @@ $cn-editor-sidebar-width: 21rem;
     overflow-y: auto;
 
     &>div {
-      .cn-label {
+
+      &:not(:last-child) {
+        border-bottom: 1px solid $border-color;
+      }
+
+      flex-wrap: wrap;
+      display: flex;
+      align-items: center;
+      padding: $spacer * 0.25 $spacer * 0.5;
+
+      &>.cn-list-label {
+        flex-grow: 1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
+      &>.cn-list-content {
+        width: 100%;
+      }
+
+      &.cn-selected {
+        &>.cn-list-label {
+          color: theme-color("accent");
+        }
+      }
+
     }
 
-    .cn-selected {
-      background-color: #ccc;
-    }
-
-    &>div:not(:last-child) {
-      border-bottom: 1px solid $border-color;
-    }
   }
 
 

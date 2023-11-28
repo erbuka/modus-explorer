@@ -54,9 +54,7 @@
                     </div>
 
                     <div class="cn-list" cdkDropList (cdkDropListDropped)="onLinkDropped($event)">
-
-                        <div *ngFor="let l of item.links;index as i" cdkDrag class="d-flex align-items-center px-3 py-2"
-                            [class.cn-selected]="editorMode.selectedLink === l">
+                        <div *ngFor="let l of item.links;index as i" cdkDrag [class.cn-selected]="editorMode.selectedLink === l">
                             <button mat-icon-button (click)="deleteLink(i)">
                                 <mat-icon>delete</mat-icon>
                             </button>

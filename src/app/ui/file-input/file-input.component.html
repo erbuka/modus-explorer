@@ -1,5 +1,15 @@
 <div class="cn-file-input" (appFileDrop)="onFileDrop($event)">
-  <img *ngIf="url" [src]="url">
+
+  <ng-container *ngIf="url">
+    <img class="cn-file-input-preview" *ngIf="contentType === 'image'" [src]="url">
+    <div class="cn-file-input-preview" *ngIf="contentType === 'video'">
+      <mat-icon>videocam</mat-icon>
+    </div>
+    <div class="cn-file-input-preview" *ngIf="contentType === 'unknown'">
+      <mat-icon>description</mat-icon>
+    </div>
+  </ng-container>
+
   <div class="py-2 flex-grow-1 d-flex justify-content-center align-items-center">
     <mat-icon>file_upload</mat-icon> <span class="mx-2">Drop files here</span>
   </div>

@@ -17,8 +17,15 @@ import { ContentProviderService } from 'src/app/content-provider.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ActivationEnd, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatRadioChange } from '@angular/material/radio';
 
 type Styles = { [key: string]: string | number };
+
+type SlideShowEditorMode = {
+  selectedGroup: SlideShowItemGroup,
+  selectedSlide: SlideShowItemSlide,
+}
 
 const createSlideAnimation = function (normal: Styles, next: Styles, previous: Styles) {
 
@@ -68,6 +75,11 @@ const createSlideAnimation = function (normal: Styles, next: Styles, previous: S
 export class SlideshowComponent extends State implements OnInit, OnDestroy {
 
   @Input() item: SlideshowItem = null;
+
+  editorMode: SlideShowEditorMode = {
+    selectedGroup: null,
+    selectedSlide: null
+  }
 
   currentSlideIndex: number = null;
   allSlides: SlideShowItemSlide[] = [];
@@ -170,6 +182,35 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
 
   trackByIdx(idx: number): number {
     return idx;
+  }
+
+
+  addGroup() {
+    const grp: SlideShowItemGroup = {
+      name: "group-name",
+      title: "Group Title",
+      slides: []
+    }
+    this.item.groups = [...this.item.groups, grp];
+    this.selectGroup(grp);
+  }
+
+  selectGroup(grp: SlideShowItemGroup) {
+    this.editorMode.selectedGroup = grp
+    this.editorMode.selectedSlide = null
+  }
+
+  selectSlide(slide: SlideShowItemSlide) {
+    this.editorMode.selectedGroup = null
+    this.editorMode.selectedSlide = slide
+  }
+
+  onGroupDrop(evt: CdkDragDrop<any[]>) {
+    moveItemInArray(this.item.groups, evt.previousIndex, evt.currentIndex)
+  }
+
+  onSlideDrop(evt: CdkDragDrop<any[]>) {
+    moveItemInArray(this.editorMode.selectedGroup.slides, evt.previousIndex, evt.currentIndex)
   }
 
 }
