@@ -23,7 +23,7 @@ export function initialize(context: ContextService, router: LocationRouterServic
         context.setCurrentLocale(sessionStorage.getItem(SS_LOCALE_ID_KEY));
       }
       catch (e) {
-        context.setCurrentLocale(this.config.internationalization.defaultLocale);
+        context.setCurrentLocale(context.config.internationalization.defaultLocale);
       }
     }
   }
