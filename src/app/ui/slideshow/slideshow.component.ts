@@ -129,13 +129,9 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
         // slideIdx could be NaN
         this.currentSlideIndex = slideIdx || null;
 
-        if (!isNaN(slideIdx)) {
+        if (!isNaN(slideIdx))
           this.currentSlideIndex = slideIdx;
-          const slide = this.allSlides[slideIdx];
-          if (slide.type === "item" && this.slideItemsCache[slideIdx] === null) {
-            this.contentProvider.getItem(slide.itemId).then(item => this.slideItemsCache[slideIdx] = item)
-          }
-        }
+        
       }
     })
 
