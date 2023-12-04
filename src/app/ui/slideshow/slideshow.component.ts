@@ -10,7 +10,6 @@ import {
 } from '@angular/animations';
 import { Item } from 'src/app/types/item';
 import { SlideshowItem, SlideShowItemGroup, SlideShowItemSlide } from 'src/app/types/slideshow-item';
-import { LocationRouterService } from 'src/app/location-router.service';
 import { State, StateData } from 'src/app/classes/state';
 import { Subscription } from 'rxjs';
 import { ContentProviderService } from 'src/app/content-provider.service';
@@ -18,7 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ActivationEnd, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { MatRadioChange } from '@angular/material/radio';
+import { skip } from 'rxjs/operators';
 
 type Styles = { [key: string]: string | number };
 
@@ -117,7 +116,13 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
     this.context.editorSaveClick.next(this.saveItem.bind(this));
     this.reload();
 
-    this.subscription = this.route.queryParamMap.subscribe({
+    this.subscription = this.context.editorMode
+      .pipe(skip(1))
+      .subscribe({
+        next: v => v === false ? this.reload() : undefined
+      })
+
+    this.route.queryParamMap.subscribe({
       next: params => {
         const slideIdx = parseInt(params.get("s"));
 
@@ -133,6 +138,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
         }
       }
     })
+
   }
 
 
@@ -184,6 +190,16 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
     return idx;
   }
 
+  addSlide(grp: SlideShowItemGroup) {
+
+    const slide: SlideShowItemSlide = {
+      type: "image",
+      title: "New Slide",
+      previewImage: null
+    }
+    grp.slides = [...grp.slides, slide];
+    this.selectSlide(slide);
+  }
 
   addGroup() {
     const grp: SlideShowItemGroup = {
@@ -193,6 +209,22 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
     }
     this.item.groups = [...this.item.groups, grp];
     this.selectGroup(grp);
+  }
+
+  deleteGroup(grp: SlideShowItemGroup) {
+    this.item.groups = this.item.groups.filter(g => g !== grp);
+
+    if (this.editorMode.selectedGroup === grp)
+      this.editorMode.selectedGroup = null;
+
+  }
+
+  deleteSlide(grp: SlideShowItemGroup, slide: SlideShowItemSlide) {
+    grp.slides = grp.slides.filter(s => s !== slide);
+
+    if (this.editorMode.selectedSlide === slide)
+      this.editorMode.selectedSlide = null;
+
   }
 
   selectGroup(grp: SlideShowItemGroup) {
@@ -205,12 +237,17 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
     this.editorMode.selectedSlide = slide
   }
 
-  onGroupDrop(evt: CdkDragDrop<any[]>) {
+  onGroupDrop(evt: CdkDragDrop<void>) {
     moveItemInArray(this.item.groups, evt.previousIndex, evt.currentIndex)
   }
 
-  onSlideDrop(evt: CdkDragDrop<any[]>) {
-    moveItemInArray(this.editorMode.selectedGroup.slides, evt.previousIndex, evt.currentIndex)
+  onSlideDrop(evt: CdkDragDrop<SlideShowItemGroup>) {
+    if (evt.container === evt.previousContainer) {
+      moveItemInArray(evt.container.data.slides, evt.previousIndex, evt.currentIndex)
+    } else {
+      throw "Fuck off";
+    }
+    
   }
 
 }

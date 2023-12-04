@@ -82,9 +82,7 @@ export class MainComponent extends State implements OnInit {
 
     this.locales = this.context.getLocales();
 
-    this.router.events.subscribe({
-      next: evt => console.log(evt)
-    });
+
 
     this.route.queryParamMap.subscribe({
       next: params => {

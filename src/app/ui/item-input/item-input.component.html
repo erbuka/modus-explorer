@@ -1,0 +1,18 @@
+<ng-container *ngIf="selectedItem as item">
+  <mat-chip-list>
+    <mat-chip color="accent" selected *ngIf="item !== '#INVALID_REF#'">{{ item.id }}</mat-chip>
+    <mat-chip *ngIf="item === '#INVALID_REF#'">#ERROR</mat-chip>
+  </mat-chip-list>
+</ng-container>
+
+<input [placeholder]="placeholder" #filterInput type="text" [matAutocomplete]="itemsAuto" (input)="filterItems()" >
+<mat-autocomplete #itemsAuto="matAutocomplete" (optionSelected)="onOptionSelected($event)">
+  <mat-option *ngFor="let item of filteredItems" [value]="item.id">
+    <ng-container *ngIf="item.title">
+      {{item.title | cnLocalizedText}}
+    </ng-container>
+    <ng-container *ngIf="!item.title">
+      {{item.id}}
+    </ng-container> 
+  </mat-option>
+</mat-autocomplete>

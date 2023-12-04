@@ -124,19 +124,28 @@
 
                 <div cdkDropList (cdkDropListDropped)="onGroupDrop($event)" class="cn-list">
                   <div cdkDrag *ngFor="let grp of item.groups" [class.cn-selected]="editorMode.selectedGroup === grp">
-                    <button mat-icon-button><mat-icon>delete</mat-icon></button>
+                    <button mat-icon-button (click)="deleteGroup(grp)"><mat-icon>delete</mat-icon></button>
                     <button mat-icon-button (click)="selectGroup(grp)"><mat-icon>edit</mat-icon></button>
                     <button cdkDragHandle mat-icon-button><mat-icon>drag_handle</mat-icon></button>
+                    <div *cdkDragPreview class="p-3 mat-elevation-z4">{{ grp.title | cnLocalizedText }}</div>
                     <div class="cn-list-label">{{ grp.title | cnLocalizedText }}</div>
                     <div class="cn-list-content bg-primary-lighter">
-                      <div cdkDropList (cdkDropListDropped)="onSlideDrop($event)" class="cn-list">
+                      <div cdkDropList [cdkDropListData]="grp" (cdkDropListDropped)="onSlideDrop($event)" class="cn-list">
                         <div cdkDrag *ngFor="let slide of grp.slides" class="p-0"
                           [class.cn-selected]="editorMode.selectedSlide === slide">
-                          <button mat-icon-button><mat-icon>delete</mat-icon></button>
+                          <button mat-icon-button (click)="deleteSlide(grp,slide)"><mat-icon>delete</mat-icon></button>
                           <button mat-icon-button (click)="selectSlide(slide)"><mat-icon>edit</mat-icon></button>
                           <button cdkDragHandle mat-icon-button><mat-icon>drag_handle</mat-icon></button>
                           <div class="cn-list-label">{{ slide.title | cnLocalizedText }}</div>
+                          <div *cdkDragPreview class="p-3 mat-elevation-z4">{{ slide.title | cnLocalizedText }}</div>
                         </div>
+
+                        <div class="text-center" (click)="addSlide(grp)">
+                          <button mat-icon-button>
+                            <mat-icon>add</mat-icon>
+                          </button>
+                        </div>
+
                       </div>
                     </div>
                   </div>
@@ -191,6 +200,13 @@
               <mat-label>Video</mat-label>
               <app-file-input [item]="this.item" [(url)]="editorMode.selectedSlide.video"></app-file-input>
             </mat-form-field>
+
+
+            <mat-form-field class="d-block" *ngIf="editorMode.selectedSlide.type === 'item'">
+              <mat-label>Embedded Item</mat-label>
+              <app-item-input [(value)]="editorMode.selectedSlide.itemId"></app-item-input>
+            </mat-form-field>
+
 
           </ng-container>
         </div>

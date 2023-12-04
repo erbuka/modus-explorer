@@ -1,0 +1,12 @@
+:host {
+  display: flex;
+  width: 100%;
+
+  &>input {
+    width: auto;
+    border: 0;
+    outline: 0;
+    flex-grow: 1;
+  }
+
+}

@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Item } from './types/item';
+import { Item, LocalizedText } from './types/item';
 
 import { LocationRouterService } from './location-router.service';
 import { JsonValidator } from './json-validator.service';
 import { ContextService, ITEM_SCHEMA } from './context.service';
 import { ModusOperandiServerType } from './types/config';
 import { V1 } from './classes/modus-operandi-item-parser';
+import { LocalizedTextPipe } from './localized-text.pipe';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
@@ -16,11 +17,16 @@ type ModusOperandiLoginData = {
   userId: string
 }
 
+export type ItemRef = {
+  id: string,
+  title?: LocalizedText
+}
+
 export abstract class ContentProviderService {
 
   abstract storeFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }>
 
-  abstract listItems(): Promise<{ id: string }[]>;
+  abstract listItems(): Promise<ItemRef[]>;
   abstract storeItem(item: Item): Promise<{ id: string }>;
   abstract getItem(id: string): Promise<Item>;
 

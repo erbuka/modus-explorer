@@ -22,6 +22,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { AppComponent } from './app.component';
 import { BlockListComponent } from './ui/block-list/block-list.component';
@@ -56,6 +58,7 @@ import { AppRoutingModule } from './app-ruoting.module';
 import { NotFoundComponent } from './ui/not-found/not-found.component';
 import { FileInputComponent } from './ui/file-input/file-input.component';
 import { FileDropDirective } from './file-drop.directive';
+import { ItemInputComponent } from './ui/item-input/item-input.component';
 
 
 
@@ -85,6 +88,7 @@ import { FileDropDirective } from './file-drop.directive';
     EmbedComponent,
     NotFoundComponent,
     FileInputComponent,
+    ItemInputComponent,
   ],
   imports: [
     BrowserModule,
@@ -111,6 +115,8 @@ import { FileDropDirective } from './file-drop.directive';
     MatSelectModule,
     MatTabsModule,
     MatRadioModule,
+    MatAutocompleteModule,
+    MatChipsModule,
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "outline", floatLabel: "always" } },

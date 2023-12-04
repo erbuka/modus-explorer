@@ -9,6 +9,7 @@ import { ConfigLocale, Config } from './types/config';
 import { DOCUMENT } from '@angular/common';
 import { JsonValidator } from './json-validator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NavigationEnd, Router } from '@angular/router';
 
 export const ITEM_SCHEMA = require('./types/item-schema.json');
 
@@ -72,7 +73,15 @@ export class ContextService {
   onFileChoose: EventEmitter<FileChooserEvent> = new EventEmitter();
   onError: EventEmitter<ErrorEvent> = new EventEmitter();
 
-  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private router: LocationRouterService, private snackBar: MatSnackBar) { }
+  constructor(private router: Router, private snackBar: MatSnackBar) { 
+    this.router.events.subscribe({
+      next: evt => {
+        if(evt instanceof NavigationEnd) {
+          this.editorSaveClick.next(null);
+        }
+      }
+    });
+  }
 
   translate(text: LocalizedText) {
     let locale = this.getCurrentLocale();
