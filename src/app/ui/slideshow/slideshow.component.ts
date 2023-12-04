@@ -83,7 +83,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
   currentSlideIndex: number = null;
   allSlides: SlideShowItemSlide[] = [];
   slideCount: number = 0;
-  slideItemsCache: Item[] = null;
+  slideItemsCache: Map<string, Promise<Item>> = new Map();
   subscription: Subscription = null;
 
   get simpleMode(): boolean {
@@ -141,6 +141,16 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
 
   }
 
+  getCachedItem(slide: SlideShowItemSlide): Promise<Item> {
+    if (slide.type === "item") {
+      if (!this.slideItemsCache.has(slide.itemId)) {
+        this.slideItemsCache.set(slide.itemId, this.contentProvider.getItem(slide.itemId))
+      }
+      return this.slideItemsCache.get(slide.itemId);
+    }
+    return null;
+  }
+
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
@@ -152,8 +162,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
     // Reloads helper variables
     this.allSlides = this.item.groups.map(grp => grp.slides).reduce((p, c) => [...p, ...c], []);
     this.slideCount = this.allSlides.length;
-    this.slideItemsCache = new Array<Item>(this.slideCount);
-    this.slideItemsCache.fill(null);
+    this.slideItemsCache = new Map();
   }
 
   clearSlide(): void {
@@ -247,7 +256,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
     } else {
       throw "Fuck off";
     }
-    
+
   }
 
 }

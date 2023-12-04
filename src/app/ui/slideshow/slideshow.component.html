@@ -32,7 +32,7 @@
                 <div *ngIf="i === currentSlideIndex" class="cn-slideshow-slide">
 
                   <!-- Item link-->
-                  <app-embed *ngIf="it.type === 'item'" [item]="slideItemsCache[i]"></app-embed>
+                  <app-embed *ngIf="it.type === 'item'" [item]="getCachedItem(it) | async"></app-embed>
 
                   <!-- Video link-->
                   <div *ngIf="it.type === 'video'" class="w-100 h-100 cn-relative">
