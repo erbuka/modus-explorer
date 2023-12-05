@@ -118,6 +118,7 @@ export class MainComponent extends State implements OnInit {
 
         try {
           this.item = await this.contentProvider.getItem(itemId);
+          this.context.editorSaveClick.next(null); // Reset on item change
           this.resetContentScrollTop()
         }
         catch (e) {

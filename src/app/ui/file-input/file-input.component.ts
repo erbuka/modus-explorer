@@ -64,7 +64,8 @@ export class FileInputComponent implements OnInit, MatFormFieldControl<string> {
   }
 
   onFileDrop(df: DroppedFile) {
-    this.contentProvider.storeFile(df.file.name, df.data, this.item)
+    const extension = df.file.name.split(".")[1];
+    this.contentProvider.storeFile(df.data, extension, this.item)
       .then(({ fileUrl }) => {
         this.urlChange.emit(fileUrl)
         this.stateChanges.next()

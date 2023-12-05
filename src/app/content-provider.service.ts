@@ -8,6 +8,7 @@ import { JsonValidator } from './json-validator.service';
 import { ContextService, ITEM_SCHEMA } from './context.service';
 import { ModusOperandiServerType } from './types/config';
 import { V1 } from './classes/modus-operandi-item-parser';
+import { computeHash } from './classes/utility';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
@@ -23,7 +24,12 @@ export type ItemRef = {
 
 export abstract class ContentProviderService {
 
-  abstract storeFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }>
+  async storeFile(data: ArrayBuffer, extension:string, item?: Item) {
+    const hash = await computeHash(data);
+    return this.putFile(`${hash}.${extension}`, data, item);
+  }
+
+  abstract putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }>
 
   abstract listItems(): Promise<ItemRef[]>;
   abstract storeItem(item: Item): Promise<{ id: string }>;
@@ -50,7 +56,7 @@ export class LocalContentProviderService extends ContentProviderService {
     super();
   }
 
-  async storeFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
+  async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
 
     const formData = new FormData();
 
@@ -111,7 +117,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     this.server = context.config.serverType as ModusOperandiServerType;
   }
 
-  async storeFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
+  async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
     throw new Error('Method not implemented.');
   }
 

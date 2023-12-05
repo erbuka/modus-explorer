@@ -51,7 +51,7 @@ const argv = yargs(hideBin(process.argv)).parse();
 
             if (req.file) {
                 const dirPath = path.resolve(`./assets/files/${itemId}`);
-                const fileName = `${uuidv4()}${path.extname(req.file.originalname)}`;
+                const fileName = req.file.originalname;
                 const filePath = path.join(dirPath, fileName);
                 fs.mkdirSync(dirPath, { recursive: true });
                 fs.writeFileSync(filePath, req.file.buffer);
