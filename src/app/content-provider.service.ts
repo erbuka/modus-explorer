@@ -8,7 +8,6 @@ import { JsonValidator } from './json-validator.service';
 import { ContextService, ITEM_SCHEMA } from './context.service';
 import { ModusOperandiServerType } from './types/config';
 import { V1 } from './classes/modus-operandi-item-parser';
-import { LocalizedTextPipe } from './localized-text.pipe';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 

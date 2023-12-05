@@ -7,15 +7,11 @@ import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType, T
 import { LocalizedText } from 'src/app/types/item';
 import { ErrorEvent } from 'src/app/context.service';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
+import { computeHash } from 'src/app/classes/utility';
 
 // Utility functions
 
-const computeHash: (data: ArrayBuffer) => Promise<string> = async (data) => {
-	return Array.prototype.map.call(
-		new Uint8Array(await crypto.subtle.digest("SHA-256", data)),
-		(x: number) => x.toString(16).padStart(2, "0")
-	).reduce((prev, curr) => prev + curr, "");
-}
+
 
 export const exportPlyMesh: (meshOrGeometry: Mesh | BufferGeometry) => Promise<ArrayBuffer> = (meshOrGeometry) => {
 	let plyExporter = new PLYExporter();
