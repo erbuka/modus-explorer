@@ -11,6 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import { BlockListItem } from 'src/app/types/block-list-item';
+import { SlideshowItem } from 'src/app/types/slideshow-item';
 
 
 const DEFAULT_BLOCK_LIST: BlockListItem = {
@@ -22,10 +23,20 @@ const DEFAULT_BLOCK_LIST: BlockListItem = {
   }
 }
 
+const DEFAULT_SLIDESHOW: SlideshowItem  = {
+  groups: [],
+  options: {
+    itemAspectRatio: 1.5,
+    itemWidth: "20rem",
+    mode: "normal"
+  },
+  type: "slideshow"
+}
+
 
 const DEFAULT_ITEMS: { [type in Item['type']]?: Item } = {
   "block-list": DEFAULT_BLOCK_LIST,
-  "slideshow": null,
+  "slideshow": DEFAULT_SLIDESHOW,
   "deep-zoom": null,
   "3d": null,
   "page": null,
