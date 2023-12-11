@@ -18,6 +18,7 @@ import { ActivatedRoute, ActivationEnd, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { skip } from 'rxjs/operators';
+import { ItemSave } from '../item/item.component';
 
 type Styles = { [key: string]: string | number };
 
@@ -71,7 +72,7 @@ const createSlideAnimation = function (normal: Styles, next: Styles, previous: S
     ))
   ]
 })
-export class SlideshowComponent extends State implements OnInit, OnDestroy {
+export class SlideshowComponent extends State implements OnInit, OnDestroy, ItemSave {
 
   @Input() item: SlideshowItem = null;
 
@@ -106,14 +107,11 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy {
     return this.state.getState();
   }
 
-  saveItem() {
-    this.contentProvider.storeItem(this.item)
-      .then(() => this.snackBar.open("Item Saved!"))
-      .catch(error => this.context.raiseError(error));
+  save() {
+    return this.contentProvider.storeItem(this.item);
   }
 
   ngOnInit() {
-    this.context.editorSaveClick.next(this.saveItem.bind(this));
     this.reload();
 
     this.subscription = this.context.editorMode

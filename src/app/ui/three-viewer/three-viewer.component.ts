@@ -22,6 +22,7 @@ import { PageItem } from 'src/app/types/page-item';
 import { Item } from 'src/app/types/item';
 import { ContentProviderService } from 'src/app/content-provider.service';
 import { Subscription } from 'rxjs';
+import { ItemSave } from '../item/item.component';
 
 
 type EditorTab = "models" | "lights" | "pins" | "colliders";
@@ -78,7 +79,7 @@ class AnimationFrameHandler {
 	templateUrl: './three-viewer.component.html',
 	styleUrls: ['./three-viewer.component.scss'],
 })
-export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
+export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSave {
 
 	@ViewChild("containerRef", { read: ElementRef, static: true }) containterRef: ElementRef;
 	@Input() item: ThreeViewerItem;
@@ -212,7 +213,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 	ngOnInit() {
 		this.containterRef.nativeElement.appendChild(this.renderer.domElement);
-		this._subscription.add(this.context.editorSaveClick.next(() => this.export()));
 	}
 
 
@@ -830,7 +830,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 	}
 
-	async export(): Promise<void> {
+	async save() {
 
 		const itemId = this.item.id;
 

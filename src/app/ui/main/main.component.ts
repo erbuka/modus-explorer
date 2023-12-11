@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
 import { BlockListItem } from 'src/app/types/block-list-item';
 import { SlideshowItem } from 'src/app/types/slideshow-item';
+import { ItemComponent } from '../item/item.component';
 
 
 const DEFAULT_BLOCK_LIST: BlockListItem = {
@@ -23,7 +24,7 @@ const DEFAULT_BLOCK_LIST: BlockListItem = {
   }
 }
 
-const DEFAULT_SLIDESHOW: SlideshowItem  = {
+const DEFAULT_SLIDESHOW: SlideshowItem = {
   groups: [],
   options: {
     itemAspectRatio: 1.5,
@@ -52,6 +53,7 @@ const DEFAULT_ITEMS: { [type in Item['type']]?: Item } = {
 export class MainComponent extends State implements OnInit {
 
 
+  @ViewChild("currentItem", { static: false, read: ItemComponent }) currentItemComponent: ItemComponent;
   @ViewChild("newItemDialogTmpl", { read: TemplateRef, static: true }) newItemDialogTmpl;
   @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
@@ -116,7 +118,6 @@ export class MainComponent extends State implements OnInit {
 
         try {
           this.item = await this.contentProvider.getItem(itemId);
-          this.context.editorSaveClick.next(null); // Reset on item change
           this.resetContentScrollTop()
         }
         catch (e) {
@@ -148,16 +149,11 @@ export class MainComponent extends State implements OnInit {
   }
 
   async saveItem() {
-    const saveFn = this.context.editorSaveClick.value;
-    if (saveFn) {
-      try {
-        await saveFn();
-        this.snackBar.open("Item saved!");
-      }
-      catch (e) {
-        this.context.raiseError(e);
-      }
+    try {
+      await this.currentItemComponent.save()
+      this.snackBar.open("Item saved!")
     }
+    catch (e) { this.context.raiseError(e) }
   }
 
   toggleEditorMode(): void {

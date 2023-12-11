@@ -1,7 +1,7 @@
 <ng-container *ngIf="item">
-    <app-block-list *ngIf="item.type === 'block-list'" [item]="item"></app-block-list>
-    <app-page *ngIf="item.type === 'page'" [item]="item"></app-page>
-    <app-slideshow *ngIf="item.type === 'slideshow'" [item]="item"></app-slideshow>
-    <app-leaflet-deep-zoom *ngIf="item.type === 'deep-zoom'" [item]="item"></app-leaflet-deep-zoom>
-    <app-three-viewer *ngIf="item.type === '3d'" [item]="item"></app-three-viewer>
+    <app-block-list        #concreteItem *ngIf="item.type === 'block-list'" [item]="item"></app-block-list>
+    <app-page              #concreteItem *ngIf="item.type === 'page'" [item]="item"></app-page>
+    <app-slideshow         #concreteItem *ngIf="item.type === 'slideshow'" [item]="item"></app-slideshow>
+    <app-leaflet-deep-zoom #concreteItem *ngIf="item.type === 'deep-zoom'" [item]="item"></app-leaflet-deep-zoom>
+    <app-three-viewer      #concreteItem *ngIf="item.type === '3d'" [item]="item"></app-three-viewer>
 </ng-container>

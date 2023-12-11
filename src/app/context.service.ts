@@ -66,7 +66,6 @@ export class ContextService {
   templates: Map<string, TemplateRef<any>> = new Map();
 
   editorMode: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  editorSaveClick: BehaviorSubject<() => Promise<any>> = new BehaviorSubject(null);
 
   onModusOperandiLogin: EventEmitter<ModusOperandiLoginEvent> = new EventEmitter();
   onTextEdit: EventEmitter<TextEditEvent> = new EventEmitter();

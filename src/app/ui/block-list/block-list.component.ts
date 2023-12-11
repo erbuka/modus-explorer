@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ContentProviderService } from 'src/app/content-provider.service';
 import { ContextService } from 'src/app/context.service';
 import { BlockListItem, BlockListItemLink } from 'src/app/types/block-list-item';
+import { ItemSave } from '../item/item.component';
 
 
 type BlockListEditorMode = {
@@ -16,7 +17,7 @@ type BlockListEditorMode = {
   templateUrl: './block-list.component.html',
   styleUrls: ['./block-list.component.scss']
 })
-export class BlockListComponent implements OnInit {
+export class BlockListComponent implements OnInit, ItemSave {
 
   editorMode: BlockListEditorMode = {
     selectedLink: null,
@@ -30,11 +31,11 @@ export class BlockListComponent implements OnInit {
   constructor(public context: ContextService, private contentProvider: ContentProviderService) { }
 
   ngOnInit() {
-    this.context.editorSaveClick.next(() => this.saveItem())
+    //this.context.editorSaveClick.next(() => this.saveItem())
     this.editorMode.items = this.contentProvider.listItems();
   }
 
-  saveItem() {
+  save() {
     return this.contentProvider.storeItem(this.item);
   }
 
