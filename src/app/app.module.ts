@@ -59,6 +59,7 @@ import { NotFoundComponent } from './ui/not-found/not-found.component';
 import { FileInputComponent } from './ui/file-input/file-input.component';
 import { FileDropDirective } from './file-drop.directive';
 import { ItemInputComponent } from './ui/item-input/item-input.component';
+import { EditorModeGuard } from './editor-mode.guard';
 
 
 
@@ -119,6 +120,7 @@ import { ItemInputComponent } from './ui/item-input/item-input.component';
     MatChipsModule,
   ],
   providers: [
+    EditorModeGuard,
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "outline", floatLabel: "always" } },
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } },
     { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { color: "primary" } },

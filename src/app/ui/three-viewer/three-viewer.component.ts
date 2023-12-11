@@ -210,8 +210,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 		this.updateSelectedPinStyle();
 	}
 
-	async ngOnInit() {
+	ngOnInit() {
 		this.containterRef.nativeElement.appendChild(this.renderer.domElement);
+		this._subscription.add(this.context.editorSaveClick.next(() => this.export()));
 	}
 
 
@@ -289,15 +290,15 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 			for (let modelDef of this.item.models) {
 
 				for (let meshDef of modelDef.meshes)
-					resourcePromises[meshDef.file] = resources.loadPlyMesh(this.router.resolve(meshDef.file, this.item));
+					resourcePromises[meshDef.file] = resources.loadPlyMesh(meshDef.file);
 
 				for (let materialDef of modelDef.materials) {
 					for (let meshMaterialDef of materialDef.meshMaterials) {
 						if (meshMaterialDef.map)
-							resourcePromises[meshMaterialDef.map] = resources.loadTexture(this.router.resolve(meshMaterialDef.map, this.item));
+							resourcePromises[meshMaterialDef.map] = resources.loadTexture(meshMaterialDef.map);
 
 						if (meshMaterialDef.normalMap)
-							resourcePromises[meshMaterialDef.normalMap] = resources.loadTexture(this.router.resolve(meshMaterialDef.normalMap, this.item));
+							resourcePromises[meshMaterialDef.normalMap] = resources.loadTexture(meshMaterialDef.normalMap);
 					}
 				}
 
@@ -306,12 +307,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 		if (this.item.pinLayers)
 			for (let pinLayerDef of this.item.pinLayers)
-				resourcePromises[pinLayerDef.geometry] = resources.loadPlyMesh(this.router.resolve(pinLayerDef.geometry, this.item));
+				resourcePromises[pinLayerDef.geometry] = resources.loadPlyMesh(pinLayerDef.geometry);
 
 
 		if (this.item.colliders)
 			for (let colliderDef of this.item.colliders)
-				resourcePromises[colliderDef.geometry] = resources.loadPlyMesh(this.router.resolve(colliderDef.geometry, this.item));
+				resourcePromises[colliderDef.geometry] = resources.loadPlyMesh(colliderDef.geometry);
 
 		// Setup loading screen
 		this.loadingScreen.mode = "determinate";
@@ -333,7 +334,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 				model.title = modelDef.title;
 				model.visible = typeof modelDef.visible === "boolean" ? modelDef.visible : true;
 				model.description = modelDef.description || "";
-				model.previewImage = modelDef.previewImage ? this.router.resolve(modelDef.previewImage, this.item) : null;
+				model.previewImage = modelDef.previewImage ?? modelDef.previewImage;
 
 				if (pos)
 					model.position.fromArray(pos);
@@ -831,8 +832,10 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 
 	async export(): Promise<void> {
 
+		const itemId = this.item.id;
+
 		let lookAt = new Vector3();
-		let binFiles = new BinaryFiles();
+		let binFiles = new BinaryFiles(this.contentProvider, this.item);
 
 		this.loadingScreen.text = "Saving...";
 		this.loadingScreen.mode = "indeterminate";
@@ -842,6 +845,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 		lookAt.add(this.camera.position);
 
 		let exportItem: ThreeViewerItem = {
+			id: itemId,
 			type: "3d",
 			camera: {
 				position: [this.camera.position.x, this.camera.position.y, this.camera.position.z],
@@ -863,18 +867,21 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck {
 			colliders: await Promise.all(this.colliders.children.map(collider => collider.serialize(binFiles)))
 		};
 
-		await this.httpClient.delete(this.router.resolve("./", this.item), { responseType: "text" }).toPromise();
+		await this.contentProvider.storeItem(exportItem);
 
-		await this.httpClient.post(this.router.resolve("./item.json", this.item),
-			new Blob([JSON.stringify(exportItem)], { type: "text/html" }),
-			{ responseType: "text" }).toPromise();
-
-		for (let [name, data] of binFiles.files) {
-			await this.httpClient.post(this.router.resolve(name, this.item),
-				new Blob([data], { type: "application/octet-stream" }),
-				{ responseType: "text" }).toPromise()
-		}
-
+		/*
+				await this.httpClient.delete(this.router.resolve("./", this.item), { responseType: "text" }).toPromise();
+		
+				await this.httpClient.post(this.router.resolve("./item.json", this.item),
+					new Blob([JSON.stringify(exportItem)], { type: "text/html" }),
+					{ responseType: "text" }).toPromise();
+		
+				for (let [name, data] of binFiles.files) {
+					await this.httpClient.post(this.router.resolve(name, this.item),
+						new Blob([data], { type: "application/octet-stream" }),
+						{ responseType: "text" }).toPromise()
+				}
+		*/
 		this.loadingScreen.show = false;
 
 		this.snackBar.open("Scene saved!");

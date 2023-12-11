@@ -93,8 +93,6 @@ export class MainComponent extends State implements OnInit {
 
     this.locales = this.context.getLocales();
 
-
-
     this.route.queryParamMap.subscribe({
       next: params => {
         if (params.has("state")) {

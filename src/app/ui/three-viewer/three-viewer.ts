@@ -4,10 +4,11 @@ import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader';
 import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType, ThreeViewerItemPinLayer, ThreeViewerItemPin, ThreeViewerItemCollider } from 'src/app/types/three-viewer-item';
-import { LocalizedText } from 'src/app/types/item';
+import { Item, LocalizedText } from 'src/app/types/item';
 import { ErrorEvent } from 'src/app/context.service';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computeHash } from 'src/app/classes/utility';
+import { ContentProviderService } from 'src/app/content-provider.service';
 
 // Utility functions
 
@@ -86,7 +87,10 @@ interface Serializable<T> {
 
 export class BinaryFiles {
 
-	files: Map<string, ArrayBuffer> = new Map();
+	constructor(private contentProvider: ContentProviderService, private item: Item) { }
+
+	// -> <hash, Promise<url>>
+	files: Map<string, Promise<string>> = new Map();
 
 	async storeTexture(tex: Texture | CompressedTexture): Promise<string> {
 		if (tex && tex.sourceFile) {
@@ -98,13 +102,17 @@ export class BinaryFiles {
 
 	async store(data: ArrayBuffer, ext: string = "bin"): Promise<string> {
 
-		let name = `./${await computeHash(data)}.${ext}`;
+		let hash = await computeHash(data);
 
-		if (!this.files.has(name)) {
-			this.files.set(name, data);
+		if (!this.files.has(hash)) {
+			this.files.set(hash, new Promise<string>((res, rej) => {
+				this.contentProvider.storeFile(data, ext, this.item)
+					.then(v => res(v.fileUrl))
+					.catch(e => rej(e))
+			}));
 		}
 
-		return name;
+		return this.files.get(hash);
 	}
 
 }

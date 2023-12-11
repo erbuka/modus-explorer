@@ -22,18 +22,11 @@
         <mat-icon>place</mat-icon>
         <span>Pin Layers...</span>
     </button>
-    <mat-divider></mat-divider>
-    <button mat-menu-item (click)="export()">
-        <mat-icon>save</mat-icon>
-        <span>Save</span>
-    </button>
 </mat-menu>
 
 <div class="cn-three-viewer" [style.display]="loadingScreen.show ? 'none' : 'block'">
 
     <div class="cn-three-viewer-container" #containerRef (tap)="onCanvasClick($event.srcEvent)"></div>
-
-
 
     <div class="cn-three-viewer-pin-popup" *ngIf="selectedPinStyle" [ngStyle]="selectedPinStyle">
         <div class="float-right" (click)="selectedPin=null" style="cursor: pointer;">
