@@ -103,7 +103,7 @@ export interface ThreeViewerItem extends ItemBase {
         orbitMaxDistance?: number,
     },
     userPopup?: {
-        pageItemUri: string,
+        pageItemId: string,
     },
     layerControls?: boolean;
     loadingBackgroundImage?: string;

@@ -2,6 +2,7 @@ import { Directive, Input, HostListener, ElementRef, OnInit, Renderer2 } from '@
 import { LocationRouterService } from './location-router.service';
 import { ContextService } from './context.service';
 
+// TODO: I want to get rid of this directive, so remove all the uses everywhere
 @Directive({
   selector: '[cnLink]'
 })

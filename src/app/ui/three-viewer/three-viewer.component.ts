@@ -16,7 +16,6 @@ import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, T
 import { PinLayerEditorComponent, PinLayerEditorData } from './pin-layer-editor/pin-layer-editor.component';
 
 import { moveItemInArray } from '@angular/cdk/drag-drop'
-import { LocationRouterService } from 'src/app/location-router.service';
 import { State } from 'src/app/classes/state';
 import { PageItem } from 'src/app/types/page-item';
 import { Item } from 'src/app/types/item';
@@ -36,7 +35,7 @@ type LoadingScreenData = {
 }
 
 type UserPopup = {
-	itemUri: string;
+	pageItemId: string;
 	item: PageItem;
 	open: boolean;
 }
@@ -184,8 +183,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 	private _loadedItem: ThreeViewerItem = null;
 	private _subscription: Subscription = new Subscription();
 
-	constructor(private contentProvider: ContentProviderService, private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
-		public router: LocationRouterService, private dialog: MatDialog, private state: State, private locationRouter: LocationRouterService) {
+	constructor(private contentProvider: ContentProviderService, private zone: NgZone, public context: ContextService, private snackBar: MatSnackBar, private dialog: MatDialog, private state: State) {
 
 		// Create renderer
 		this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true, antialias: true });
@@ -223,9 +221,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 	async loadItem(): Promise<void> {
 
 		const resources = this.resources;
-
-		// Lock router navigation
-		this.router.locked = true;
 
 		this.unloadItem();
 		this._loadedItem = this.item;
@@ -506,13 +501,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		// TODO: temp
 		if (this.item.userPopup) {
 
-
 			try {
-				const itemUri = this.locationRouter.resolve(this.item.userPopup.pageItemUri, this.item);
-				const item: Item = await this.contentProvider.getItem(itemUri);
+				const pageItemId = this.item.userPopup.pageItemId;
+				const item: Item = await this.contentProvider.getItem(pageItemId);
 				if (item.type === "page") {
 					this.userPopup = {
-						itemUri: this.item.userPopup.pageItemUri,
+						pageItemId: pageItemId,
 						item: item,
 						open: true
 					}
@@ -565,9 +559,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 			this._animFrameHandler = new AnimationFrameHandler(this.render.bind(this));
 			this._animFrameHandler.start();
 
-			// Unlock router
-			this.router.locked = false;
-
 			// Switch editor mode off
 			// this.context.editorMode.next(false)
 			// setTimeout(() =>  = false, 0);
@@ -595,6 +586,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 			this.controls.addEventListener("change", (evt) => this.saveState());
 
 		} else { // orbit
+			// TODO: need to edit all paramters from the editor, so default values here should not be necessary anymore. Instead will make those fields mandatory in the schema, and then will be set to some default values when the user creates a new 3d item
 			this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 			this.controls.rotateSpeed = this.item.camera.rotationSpeed || 1.0;
 			this.controls.zoomSpeed = this.item.camera.zoomStep || 1.0;
@@ -860,7 +852,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 				orbitMaxDistance: this.item.camera.orbitMaxDistance
 			},
 			userPopup: this.userPopup ? {
-				pageItemUri: this.userPopup.itemUri
+				pageItemId: this.userPopup.pageItemId
 			} : undefined,
 			models: await Promise.all(this.models.children.map(model => model.serialize(binFiles))),
 			lights: await Promise.all(this.lights.children.map(light => light.serialize(binFiles))),
