@@ -12,7 +12,7 @@ export class LinkDirective implements OnInit {
 
   ngOnInit() {
     if (this.elementRef.nativeElement instanceof HTMLAnchorElement) {
-      this.renderer.setAttribute(this.elementRef.nativeElement, "href", this.link);
+      this.renderer.setAttribute(this.elementRef.nativeElement, "href", "javascript:0");
     }
   }
 
