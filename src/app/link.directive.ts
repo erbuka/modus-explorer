@@ -13,11 +13,9 @@ export class LinkDirective implements OnInit {
 
   ngOnInit() {
     // TODO: removing this for now, check if it still works fine
-    /*
     if (this.elementRef.nativeElement instanceof HTMLAnchorElement) {
-      this.renderer.setAttribute(this.elementRef.nativeElement, "href", this.link);
+      this.renderer.setAttribute(this.elementRef.nativeElement, "href", "javascript:0");
     }
-    */
   }
 
 
