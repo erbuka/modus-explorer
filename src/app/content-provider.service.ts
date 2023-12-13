@@ -24,7 +24,7 @@ export type ItemRef = {
 
 export abstract class ContentProviderService {
 
-  async storeFile(data: ArrayBuffer, extension:string, item?: Item) {
+  async storeFile(data: ArrayBuffer, extension: string, item?: Item) {
     const hash = await computeHash(data);
     return this.putFile(`${hash}.${extension}`, data, item);
   }

@@ -13,7 +13,16 @@ import { NgForm } from '@angular/forms';
 import { BlockListItem } from 'src/app/types/block-list-item';
 import { SlideshowItem } from 'src/app/types/slideshow-item';
 import { ItemComponent } from '../item/item.component';
+import { ThreeViewerItem } from 'src/app/types/three-viewer-item';
 
+
+const DEFAULT_3D: ThreeViewerItem = {
+  type: "3d",
+  camera: {
+    position: [0, 5, -10],
+    lookAt: [0, 0, 0]
+  }
+}
 
 const DEFAULT_BLOCK_LIST: BlockListItem = {
   type: "block-list",
@@ -39,7 +48,7 @@ const DEFAULT_ITEMS: { [type in Item['type']]?: Item } = {
   "block-list": DEFAULT_BLOCK_LIST,
   "slideshow": DEFAULT_SLIDESHOW,
   "deep-zoom": null,
-  "3d": null,
+  "3d": DEFAULT_3D,
   "page": null,
 }
 

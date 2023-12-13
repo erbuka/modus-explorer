@@ -783,6 +783,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 
 		this.renderer.renderLists.dispose();
 
+		this.userPopup = null;
+
 		this._loadedItem = null;
 	}
 
@@ -988,7 +990,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		this.height = this.renderer.domElement.height = this.containterRef.nativeElement.clientHeight || window.innerHeight;
 	}
 
-	@HostListener("keydown", ["$event"])
+	@HostListener("window:keydown", ["$event"])
 	onKeyDown(evt: KeyboardEvent) {
 		if (this.context.editorMode.value) {
 			switch (evt.code) {

@@ -59,13 +59,13 @@ export class FileInputComponent implements OnInit, MatFormFieldControl<string> {
   constructor(private httpClient: HttpClient, private contentProvider: ContentProviderService, private context: ContextService) { }
 
 
-
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   onFileDrop(df: DroppedFile) {
-    const extension = df.file.name.split(".")[1];
-    this.contentProvider.storeFile(df.data, extension, this.item)
+
+    const extension = df.file.name.match(/^.*\.(.+)$/)
+
+    this.contentProvider.storeFile(df.data, extension ? extension[1] : "bin", this.item)
       .then(({ fileUrl }) => {
         this.urlChange.emit(fileUrl)
         this.stateChanges.next()
