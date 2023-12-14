@@ -1,9 +1,9 @@
 <div class="cn-three-viewer-editor cn-materials">
-    <div class="cn-three-viewer-mat-list">
+    <div class="cn-three-viewer-mat-list pr-2">
 
         <button mat-raised-button color="primary" class="w-100" (click)="newMaterial()">
             <mat-icon>add</mat-icon>
-            <span>ADD</span>
+            <span>Add</span>
         </button>
 
         <div class="cn-three-viewer-editor-item-list mt-2" style="height: 20rem;" cdkDropList
@@ -20,7 +20,7 @@
         </div>
 
     </div>
-    <div class="flex-grow-1 p-2" *ngIf="selectedMaterial">
+    <div class="flex-grow-1 pl-2" *ngIf="selectedMaterial">
         <div class="d-flex flex-column w-100" style="height: 25rem;">
             <div>
                 <div class="cn-three-viewer-editor-property">
@@ -34,7 +34,7 @@
                         [(data)]="selectedMaterial.description" multiline="true"></app-editable-localized-text>
                 </div>
             </div>
-            <div class="flex-grow-1 mat-elevation-z1" style="overflow-x: hidden; overflow-y: auto;">
+            <div class="flex-grow-1 mat-elevation-z3 mt-3" style="overflow-x: hidden; overflow-y: auto;">
                 <table class="cn-materials-table">
                     <thead>
                         <tr>
@@ -71,6 +71,5 @@
             </div>
 
         </div>
-
     </div>
 </div>

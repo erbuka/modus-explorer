@@ -437,8 +437,8 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 	isThreeViewerPin: boolean = true;
 	title: LocalizedText = "";
 	description: LocalizedText = "";
-	href: string = "";
-	hrefText: LocalizedText = "";
+	itemId: string = "";
+	linkText: LocalizedText = "";
 
 	set layer(layer: ThreeViewerPinLayer) {
 		this.geometry = layer.geometry;
@@ -469,8 +469,8 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 		return {
 			title: this.title,
 			description: this.description,
-			href: this.href,
-			hrefText: this.hrefText,
+			itemId: this.itemId,
+			linkText: this.linkText,
 			position: [pos.x, pos.y, pos.z],
 			rotation: [rot.x, rot.y, rot.z],
 			scale: [scl.x, scl.y, scl.z],

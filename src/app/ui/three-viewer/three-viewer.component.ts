@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, DoCheck } from '@angular/core';
-import { ThreeViewerItem, ThreeViewerItemLightType, ThreeViewerItemCameraControls } from 'src/app/types/three-viewer-item';
+import { ThreeViewerItem, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
 import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper, BufferGeometry, Texture } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService, FileChooserResult } from 'src/app/context.service';
@@ -22,9 +22,11 @@ import { Item } from 'src/app/types/item';
 import { ContentProviderService } from 'src/app/content-provider.service';
 import { Subscription } from 'rxjs';
 import { ItemSave } from '../item/item.component';
+import { skip } from 'rxjs/operators';
 
 
-type EditorTab = "models" | "lights" | "pins" | "colliders";
+type EditorHierarchyTab = "models" | "lights" | "pins" | "colliders";
+type EditorTab = "scene" | "object-inspector";
 
 type LoadingScreenData = {
 	mode: "determinate" | "indeterminate";
@@ -130,8 +132,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 	};
 
 
-	set editorActiveTab(tab: EditorTab) {
-		this._editorActiveTab = tab;
+	set editorHierarchyActiveTab(tab: EditorHierarchyTab) {
+		this._editorHierarchyActiveTab = tab;
 		switch (tab) {
 			case "models":
 				this.activeEditorHierarchyGroup = this.models;
@@ -150,8 +152,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		}
 	}
 
-	get editorActiveTab(): EditorTab {
-		return this._editorActiveTab;
+	get editorHierarchyActiveTab(): EditorHierarchyTab {
+		return this._editorHierarchyActiveTab;
 	}
 
 	set selectedObject(obj: any) {
@@ -177,8 +179,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		return this._selectedObject;
 	}
 
+	editorActiveTab: EditorTab = "object-inspector";
+
 	private _selectedObject: any = null;
-	private _editorActiveTab: EditorTab = "models";
+	private _editorHierarchyActiveTab: EditorHierarchyTab = "models";
+
 	private _animFrameHandler: AnimationFrameHandler = null;
 	private _loadedItem: ThreeViewerItem = null;
 	private _subscription: Subscription = new Subscription();
@@ -211,6 +216,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 
 	ngOnInit() {
 		this.containterRef.nativeElement.appendChild(this.renderer.domElement);
+
 	}
 
 
@@ -222,7 +228,19 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 
 		const resources = this.resources;
 
+		// Unload the item first
 		this.unloadItem();
+
+		// Update the controls when exiting editor mode
+		this._subscription.add(this.context.editorMode.pipe(skip(1)).subscribe({
+			next: value => {
+				if (!value) {
+					this.loadControls()
+					this.updateCollisionBounds()
+				}
+			}
+		}))
+
 		this._loadedItem = this.item;
 
 		// Layer controls
@@ -253,7 +271,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		this.scene.add(this.pins);
 		this.scene.add(this.colliders);
 
-		this.editorActiveTab = "models";
+		this.editorHierarchyActiveTab = "models";
 
 		// Load saved state
 		let state = this.state.getState();
@@ -450,8 +468,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 
 				pin.title = pinDef.title;
 				pin.description = pinDef.description || "";
-				pin.href = pinDef.href || "";
-				pin.hrefText = pinDef.hrefText || "";
+				pin.itemId = pinDef.itemId || "";
+				pin.linkText = pinDef.linkText || "";
 
 				if (pos)
 					pin.position.fromArray(pos);
@@ -556,8 +574,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		this.zone.runOutsideAngular(() => {
 
 			// Setup animation frame
-			this._animFrameHandler = new AnimationFrameHandler(this.render.bind(this));
-			this._animFrameHandler.start();
+			this._animFrameHandler = new AnimationFrameHandler(this.render.bind(this))
+			this._animFrameHandler.start()
 
 			// Switch editor mode off
 			// this.context.editorMode.next(false)
@@ -574,34 +592,36 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 	}
 
 	loadControls(): void {
-		const controlsType: ThreeViewerItemCameraControls = this.item.camera.controls || "fly";
 
-		if (controlsType === "fly") {
+		this.controls?.dispose();
+
+		const controlsDef = this.item.camera.controls
+
+		if (controlsDef.type === "fly") {
 			this.controls = new TouchControls(this.camera, this.renderer.domElement, {
-				rotationSpeed: this.item.camera.rotationSpeed || 1.0,
-				zoomStep: this.item.camera.zoomStep || 1.0,
-				zoomDamping: this.item.camera.zoomDamping || Number.POSITIVE_INFINITY
-			});
+				rotationSpeed: controlsDef.rotationSpeed,
+				zoomStep: controlsDef.zoomStep,
+				zoomDamping: controlsDef.zoomDamping
+			})
 
-			this.controls.addEventListener("change", (evt) => this.saveState());
+			this.controls.addEventListener("change", (evt) => this.saveState())
 
 		} else { // orbit
-			// TODO: need to edit all paramters from the editor, so default values here should not be necessary anymore. Instead will make those fields mandatory in the schema, and then will be set to some default values when the user creates a new 3d item
-			this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-			this.controls.rotateSpeed = this.item.camera.rotationSpeed || 1.0;
-			this.controls.zoomSpeed = this.item.camera.zoomStep || 1.0;
-			this.controls.minDistance = this.item.camera.orbitMinDistance || 0;
-			this.controls.maxDistance = this.item.camera.orbitMaxDistance || Number.POSITIVE_INFINITY;
-			this.controls.enablePan = true;
+			this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+			this.controls.rotateSpeed = controlsDef.rotationSpeed
+			this.controls.zoomSpeed = controlsDef.zoomStep
+			this.controls.minDistance = controlsDef.minDistance
+			this.controls.maxDistance = controlsDef.maxDistance
+			this.controls.enablePan = true
 
-			this.controls.addEventListener("change", (evt) => this.saveState());
+			this.controls.addEventListener("change", (evt) => this.saveState())
 
 		}
 	}
 
 	async uploadModelPreviewImage(model: ThreeViewerModel) {
-		let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg" });
-		model.previewImage = await this.resources.loadArrayBuffer(file.data as ArrayBuffer);
+		let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg" })
+		model.previewImage = await this.resources.loadArrayBuffer(file.data as ArrayBuffer)
 	}
 
 	async addCollider() {
@@ -841,15 +861,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		let exportItem: ThreeViewerItem = {
 			id: itemId,
 			type: "3d",
+			title: this.item.title,
 			camera: {
 				position: [this.camera.position.x, this.camera.position.y, this.camera.position.z],
 				lookAt: [lookAt.x, lookAt.y, lookAt.z],
-				rotationSpeed: this.item.camera.rotationSpeed,
-				zoomStep: this.item.camera.zoomStep,
-				zoomDamping: this.item.camera.zoomDamping,
-				controls: this.item.camera.controls,
-				orbitMinDistance: this.item.camera.orbitMinDistance,
-				orbitMaxDistance: this.item.camera.orbitMaxDistance
+				controls: this.item.camera.controls
 			},
 			userPopup: this.userPopup ? {
 				pageItemId: this.userPopup.pageItemId
@@ -974,6 +990,27 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 
 		// Create new controls
 		this.loadControls();
+	}
+
+	onCameraControlsChange(value: ThreeViewerItem['camera']['controls']['type']) {
+
+		if (value === "fly") {
+			this.item.camera.controls = {
+				type: "fly",
+				rotationSpeed: 1,
+				zoomDamping: 100,
+				zoomStep: 5
+			}
+		} else {
+			this.item.camera.controls = {
+				type: "orbit",
+				minDistance: 1,
+				maxDistance: 100,
+				rotationSpeed: 1,
+				zoomStep: 1
+			}
+		}
+
 	}
 
 	@HostListener("window:resize")

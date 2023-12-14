@@ -20,7 +20,14 @@ const DEFAULT_3D: ThreeViewerItem = {
   type: "3d",
   camera: {
     position: [0, 5, -10],
-    lookAt: [0, 0, 0]
+    lookAt: [0, 0, 0],
+    controls: {
+      type: "orbit",
+      maxDistance: 100,
+      minDistance: 1,
+      rotationSpeed: 1,
+      zoomStep: 1,
+    }
   }
 }
 

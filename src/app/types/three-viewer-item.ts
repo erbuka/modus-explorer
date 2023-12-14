@@ -73,8 +73,8 @@ export type ThreeViewerItemLight = ThreeViewerItemAmbientLight | ThreeViewerItem
 
 export interface ThreeViewerItemPin extends ThreeViewerItemObject {
     layerIndex: number;
-    href?: string;
-    hrefText?: LocalizedText;
+    itemId?: string;
+    linkText?: LocalizedText;
 }
 
 export interface ThreeViewerItemPinLayer {
@@ -88,19 +88,27 @@ export interface ThreeViewerItemPinLayer {
 
 // Base Item
 
-export type ThreeViewerItemCameraControls = "orbit" | "fly";
+export type ThreeViewerOrbitControls = {
+    type: "orbit",
+    rotationSpeed: number,
+    zoomStep: number,
+    minDistance: number
+    maxDistance: number
+}
+
+export type ThreeViewerFlyControls = {
+    type: "fly",
+    rotationSpeed: number,
+    zoomStep: number,
+    zoomDamping: number,
+}
 
 export interface ThreeViewerItem extends ItemBase {
     type: "3d",
     camera: {
         position: ThreeViewerItemVector3,
         lookAt: ThreeViewerItemVector3,
-        rotationSpeed?: number,
-        zoomStep?: number,
-        zoomDamping?: number,
-        controls?: ThreeViewerItemCameraControls,
-        orbitMinDistance?: number,
-        orbitMaxDistance?: number,
+        controls: ThreeViewerFlyControls | ThreeViewerOrbitControls
     },
     userPopup?: {
         pageItemId: string,
