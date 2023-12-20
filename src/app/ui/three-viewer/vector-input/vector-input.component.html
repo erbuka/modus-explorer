@@ -1,5 +1,8 @@
-<div class="d-flex">
-    <input class="ml-1 cn-input" [ngModel]="data.x" (ngModelChange)="updateData({ x: $event })">
-    <input class="ml-1 cn-input" [ngModel]="data.y" (ngModelChange)="updateData({ y: $event })">
-    <input class="ml-1 cn-input" [ngModel]="data.z" (ngModelChange)="updateData({ z: $event })">
+<div class="d-flex align-items-center w-100">
+    <label style="color: red">X</label>
+    <input #x class="flex-grow-1" type="number" [ngModel]="data.x | number : '1.3-3'" (blur)="updateData({ x: x.value })">
+    <label style="color: green;">Y</label>
+    <input #y class="flex-grow-1" type="number" [ngModel]="data.y | number : '1.3-3'" (blur)="updateData({ y: y.value })">
+    <label style="color: blue;">Z</label>
+    <input #z class="flex-grow-1" type="number" [ngModel]="data.z | number : '1.3-3'" (blur)="updateData({ z: z.value })">
 </div>

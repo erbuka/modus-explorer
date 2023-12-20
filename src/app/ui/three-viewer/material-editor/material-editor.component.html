@@ -22,19 +22,17 @@
     </div>
     <div class="flex-grow-1 pl-2" *ngIf="selectedMaterial">
         <div class="d-flex flex-column w-100" style="height: 25rem;">
-            <div>
-                <div class="cn-three-viewer-editor-property">
-                    <span>Title</span>
-                    <app-editable-localized-text style="width: 20rem;" class="ml-auto cn-input"
-                        [(data)]="selectedMaterial.title"></app-editable-localized-text>
-                </div>
-                <div class="cn-three-viewer-editor-property">
-                    <span>Description</span>
-                    <app-editable-localized-text style="width: 20rem;" class="ml-auto cn-input"
-                        [(data)]="selectedMaterial.description" multiline="true"></app-editable-localized-text>
-                </div>
+            <div class="row">
+                <mat-form-field class="col-6">
+                    <mat-label>Title</mat-label>
+                    <app-editable-localized-text [(data)]="selectedMaterial.title"></app-editable-localized-text>
+                </mat-form-field>
+                <mat-form-field class="col-6">
+                    <mat-label>Description</mat-label>
+                    <app-editable-localized-text [(data)]="selectedMaterial.description" multiline="true"></app-editable-localized-text>
+                </mat-form-field>
             </div>
-            <div class="flex-grow-1 mat-elevation-z3 mt-3" style="overflow-x: hidden; overflow-y: auto;">
+            <div class="flex-grow-1" style="overflow-x: hidden; overflow-y: auto;">
                 <table class="cn-materials-table">
                     <thead>
                         <tr>

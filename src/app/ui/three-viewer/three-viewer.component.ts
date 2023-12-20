@@ -619,11 +619,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		}
 	}
 
-	async uploadModelPreviewImage(model: ThreeViewerModel) {
-		let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg" })
-		model.previewImage = await this.resources.loadArrayBuffer(file.data as ArrayBuffer)
-	}
-
 	async addCollider() {
 
 		let fileChooserResult: FileChooserResult = await this.context.fileChooser({ type: "arraybuffer", accept: ".obj" });

@@ -4,7 +4,7 @@
 
         <button mat-raised-button color="primary" class="w-100" (click)="newPinLayer()">
             <mat-icon>add</mat-icon>
-            <span>ADD</span>
+            <span>Add</span>
         </button>
 
         <div class="cn-three-viewer-editor-item-list mt-2" style="height: 20rem;" cdkDropList
@@ -23,25 +23,25 @@
 
     <div class="flex-grow-1 px-2 pt-2">
         <div class="d-flex flex-column w-100 h-100">
-            <div *ngIf="selectedLayer">
-                <div class="cn-three-viewer-editor-property">
-                    <span>Title</span>
-                    <app-editable-localized-text style="width: 20rem;" class="ml-auto cn-input"
-                        [(data)]="selectedLayer.title"></app-editable-localized-text>
-                </div>
-                <div class="cn-three-viewer-editor-property">
-                    <span>Description</span>
-                    <app-editable-localized-text style="width: 20rem;" class="ml-auto cn-input"
-                        [(data)]="selectedLayer.description" multiline="true"></app-editable-localized-text>
-                </div>
-                <div class="cn-three-viewer-editor-property">
-                    <span>Color</span>
-                    <input class="cn-input ml-auto" type="color" style="width: 20rem;"
-                        [ngModel]="'#' + selectedLayer.color.getHexString()"
-                        (ngModelChange)="selectedLayer.color.set($event)">
-                </div>
+            <div *ngIf="selectedLayer" class="row">
 
-                <div class="cn-three-viewer-editor-property">
+                <mat-form-field class="col-6">
+                    <mat-label>Title</mat-label>
+                    <app-editable-localized-text [(data)]="selectedLayer.title"></app-editable-localized-text>
+                </mat-form-field>
+
+                <mat-form-field class="col-6">
+                    <mat-label>Description</mat-label>
+                    <app-editable-localized-text [(data)]="selectedLayer.description" multiline="true"></app-editable-localized-text>
+                </mat-form-field>
+
+                <mat-form-field class="col-6">
+                    <mat-label>Color</mat-label>
+                    <input matInput type="color" [ngModel]="'#' + selectedLayer.color.getHexString()"
+                        (ngModelChange)="selectedLayer.color.set($event)">
+                </mat-form-field>   
+
+                <div class="col-6">
                     <mat-checkbox [checked]="selectedLayer.transparent" (change)="selectedLayer.transparent = $event.checked">
                         Transparent
                     </mat-checkbox>

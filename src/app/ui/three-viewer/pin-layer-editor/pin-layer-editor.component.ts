@@ -133,6 +133,9 @@ export class PinLayerEditorComponent implements OnInit, OnDestroy {
 
 		requestAnimationFrame(this.render.bind(this));
 
+		this.renderer.domElement.width = w;
+		this.renderer.domElement.height = h;
+
 		this.light.position.copy(this.camera.position);
 
 		this.camera.aspect = w / h;

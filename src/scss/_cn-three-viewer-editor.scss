@@ -17,7 +17,7 @@
     left: 0;
     width: 20rem;
     height: 100%;
-    
+
     &.cn-hidden {
       left: -20rem;
     }
@@ -30,7 +30,7 @@
     right: 0;
     width: 20rem;
     height: 100%;
-    
+
     &.cn-hidden {
       right: -20rem;
     }
@@ -55,19 +55,14 @@
 
     .cn-materials-table {
       border-collapse: collapse;
-      
+
       @extend .w-100;
 
       th,
       td {
         @extend .p-2;
-        @extend .border-bottom;
+        border: 1px solid $border-color;
         white-space: nowrap;
-      }
-
-      th:not(:last-child),
-      td:not(:last-child) {
-        @extend .border-right;
       }
 
     }
@@ -91,6 +86,7 @@
   ul.cn-three-viewer-editor-nav {
     margin: 0;
     padding: 0;
+
     li {
 
       &:first-child {
@@ -116,8 +112,21 @@
   }
 
   .cn-three-viewer-editor-properties {
-    @extend .p-2;
-    @extend .mat-elevation-z3;
+
+    .row {
+      margin: 0 $spacer * -0.25;
+
+      &>* {
+        padding: 0 0.25 * $spacer;
+      }
+    }
+
+    .mat-form-field-wrapper {
+      padding-bottom: $spacer * 0.25;
+    }
+
+    padding: $spacer * 0.5;
+    border-bottom: 1px solid $border-color;
 
     .cn-caption {
       @extend .mb-2;
@@ -133,7 +142,6 @@
   }
 
   .cn-three-viewer-editor-item-list {
-    @extend .mat-elevation-z3;
     cursor: pointer;
     overflow-x: hidden;
     overflow-y: auto;
@@ -147,5 +155,12 @@
         background-color: gray("300");
       }
     }
+  }
+}
+
+
+mat-form-field {
+  input[type=color] {
+    height: 1rem;
   }
 }
