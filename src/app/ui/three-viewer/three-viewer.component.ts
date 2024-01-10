@@ -516,7 +516,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		}
 
 		// User popup 
-		// TODO: temp
 		if (this.item.userPopup) {
 
 			try {

@@ -1,8 +1,10 @@
 import { ItemBase, LocalizedText } from './item';
 
+export type DeepZoomItemLayerType = 'deep-image' | 'vector'
+
 // Definizione di una figura geometrica generica
 export interface DeepZoomItemShape {
-  type: string;               // Tipo, per adesso solo "circle" o "polygon"
+  type: string;               // Tipo, "polygon"
   title?: LocalizedText;      // Titolo
   description?: LocalizedText; // Descrizione
   itemId?: string;              // Link al click
@@ -20,17 +22,10 @@ export interface DeepZoomItemPolygon extends DeepZoomItemShape {
   points: [number, number][]; // Lista delle coordinate [x, y] che definiscono il poligono. 
 }
 
-// Definizione di un cerchio
-export interface DeepZoomItemCircle extends DeepZoomItemShape {
-  type: "circle";
-  center: [number, number];   // Coordinate centro
-  radius: number;             // Raggio
-}
-
 // Layer generico deepzoom
 export interface DeepZoomItemLayer {
   type: string;               // Tipo, "deep-image" o "vector"
-  name: string;               // Nome univoco              
+  id: string;                 // Id univoco              
   minZoom?: number;           // Zoom minimo
   maxZoom?: number;           // Zoom massimo
   title?: LocalizedText;      // Titolo
@@ -55,9 +50,15 @@ export interface DeepZoomItemDeepImageLayer extends DeepZoomItemLayer {
 // Layer di vettoriale
 export interface DeepZoomItemVectorLayer extends DeepZoomItemLayer {
   type: "vector";
-  shapes: (DeepZoomItemPolygon | DeepZoomItemCircle)[]; // Lista delle figure geometriche
+  shapes: DeepZoomItemPolygon[]; // Lista delle figure geometriche
 }
 
+export type DeepZoomItemLayerGroup = {             // Raggruppamenti di layer
+  id: string;               // Nome univoco del gruppo
+  exclusive: boolean;       // Questo layer è esclusivo?
+  title?: LocalizedText;    // Titolo del gruppo
+  layers: string[]          // Lista dei nomi univoci dei layer         
+}
 
 // Elemento deepzoom
 export interface DeepZoomItem extends ItemBase {
@@ -71,14 +72,9 @@ export interface DeepZoomItem extends ItemBase {
     disableMinimap?: boolean,   // Disabilita navigazione
     disableLayers?: boolean,    // Disabilita menu layout
     showLayers?: boolean,       // Menu layer aperto
-    minimapImage: string        // Miniatura per radar
+    minimapImage?: string        // Miniatura per radar
   },
   layers: (DeepZoomItemDeepImageLayer | DeepZoomItemVectorLayer)[],   // Lista dei layer
-  layerGroups?: {             // Raggruppamenti di layer
-    name: string;           // Nome univoco del gruppo
-    exclusive: boolean;     // Questo layer è esclusivo?
-    title?: LocalizedText;  // Titolo del gruppo
-    layers: string[]        // Lista dei nomi univoci dei layer         
-  }[]
+  layerGroups?: DeepZoomItemLayerGroup[]
 }
 

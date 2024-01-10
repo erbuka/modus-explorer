@@ -3,4 +3,7 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    display: inline-block;
+    max-width: 100%;
+    //margin-top: -0.625em;
 }

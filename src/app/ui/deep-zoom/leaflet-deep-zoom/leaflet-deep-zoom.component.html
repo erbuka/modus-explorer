@@ -1,4 +1,4 @@
-<div class="h-100 cn-relative" style="user-select: none;">
+<div [class.d-none]="context.editorMode.value" class="h-100 cn-relative" style="user-select: none;">
 
   <!-- Map container-->
   <div class="cn-deep-zoom-container h-100" style="z-index: 0;" #mapContainer>
@@ -6,6 +6,7 @@
 
   <!-- Controls -->
   <div style="z-index: 2;">
+
     <div *ngIf="!item.options.disableLayers" class="cn-dz-show-layers" (click)="showLayers=true">
       <button mat-mini-fab color="primary">
         <mat-icon>layers</mat-icon>
@@ -82,13 +83,6 @@
           <span class="text-capitalize" *ngIf="measureUnit==='centimeters'">{{ "centimeters" | cnLocalizedText }}</span>
         </div>
 
-        <!--
-                <button mat-button [matMenuTriggerFor]="unitsMenu" [class.cn-opacity-50]="tool !== 'measure'">
-                    <span *ngIf="measureUnit==='pixels'">Pixels</span>
-                    <span *ngIf="measureUnit==='inches'">Inches</span>
-                    <span *ngIf="measureUnit==='centimeters'">Centimeters</span>
-                </button>
-                -->
         <div class="ml-auto"></div>
         <span style="width: 2.5rem">
           {{formattedZoom}}
@@ -122,3 +116,304 @@
     </p>
   </ng-container>
 </div>
+
+<!-- Editor -->
+
+<ng-template #polygonEditorTmpl let-data>
+  <div class="cn-editor-mode-context">
+    <div class="cn-editor">
+      <mat-tab-group class="h-100" (selectedTabChange)="onPolygonEditorTabChange($event, data.points)">
+        <mat-tab label="General">
+          <div class="p-3">
+            <div class="row">
+              <mat-form-field class="col-6">
+                <mat-label>Title</mat-label>
+                <app-editable-localized-text [(data)]="data.title"></app-editable-localized-text>
+              </mat-form-field>
+              <mat-form-field class="col-6">
+                <mat-label>Description</mat-label>
+                <app-editable-localized-text multiline="true" [(data)]="data.description"></app-editable-localized-text>
+              </mat-form-field>
+              <mat-form-field class="col-12">
+                <mat-label>Linked Item</mat-label>
+                <app-item-input [(value)]="data.itemId"></app-item-input>
+              </mat-form-field>
+              <mat-form-field class="col-6">
+                <mat-label>Fill Color</mat-label>
+                <app-color-picker [(value)]="data.drawAttributes.fillColor"></app-color-picker>
+              </mat-form-field>
+              <mat-form-field class="col-6">
+                <mat-label>Stroke Color</mat-label>
+                <app-color-picker [(value)]="data.drawAttributes.strokeColor"></app-color-picker>
+              </mat-form-field>
+              <div class="col-12 mb-4">
+                <mat-checkbox [checked]="data.drawAttributes.fill"
+                  (change)="data.drawAttributes.fill=$event.checked">Fill</mat-checkbox>
+                <mat-checkbox class="ml-3" [checked]="data.drawAttributes.stroke"
+                  (change)="data.drawAttributes.stroke=$event.checked">Stroke</mat-checkbox>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Points">
+          <div #polygonEditorMap class="w-100 h-100 cn-polygon-editor-map"></div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+</ng-template>
+
+<ng-container *ngIf="context.editorMode.value">
+
+  <div class="cn-editor-mode-context">
+    <div class="cn-editor cn-deepzoom-editor">
+      <mat-tab-group class="h-100">
+        <mat-tab label="Options">
+          <div class="p-3">
+            <div class="row">
+              <mat-form-field class="col-12">
+                <mat-label>Title</mat-label>
+                <app-editable-localized-text [(data)]="item.title"></app-editable-localized-text>
+              </mat-form-field>
+              <mat-form-field class="col-4">
+                <mat-label>DPI</mat-label>
+                <input type="number" matInput [(ngModel)]="item.options.viewport.dpi">
+              </mat-form-field>
+              <mat-form-field class="col-4">
+                <mat-label>Viewport Width</mat-label>
+                <input type="number" matInput [(ngModel)]="item.options.viewport.width">
+              </mat-form-field>
+              <mat-form-field class="col-4">
+                <mat-label>Viewport Height</mat-label>
+                <input type="number" matInput [(ngModel)]="item.options.viewport.height">
+              </mat-form-field>
+              <mat-form-field class="col-12">
+                <mat-label>Navigator Image</mat-label>
+                <app-file-input [(url)]="item.options.minimapImage"></app-file-input>
+              </mat-form-field>
+
+              <div class="col-12 mb-4">
+                <mat-checkbox [checked]="item.options.disableMinimap"
+                  (change)="item.options.disableMinimap=$event.checked">
+                  Disable Navigator
+                </mat-checkbox>
+                <mat-checkbox class="ml-3" [checked]="item.options.disableLayers"
+                  (change)="item.options.disableLayers=$event.checked">
+                  Disable Layers
+                </mat-checkbox>
+                <mat-checkbox class="ml-3" [checked]="item.options.showLayers"
+                  (change)="item.options.showLayers=$event.checked">
+                  Show Layers
+                </mat-checkbox>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Layers">
+
+          <mat-menu #addLayerMenu="matMenu">
+            <button mat-menu-item (click)="addLayer('deep-image')">Deep Image</button>
+            <button mat-menu-item (click)="addLayer('vector')">Vector</button>
+          </mat-menu>
+
+          <!-- TODO: Don't like -->
+          <div class="d-flex" style="height: calc(768px - 49px);">
+            <div class="cn-sidebar h-100">
+
+              <div cdkDropList class="cn-list" (cdkDropListDropped)="onLayerDrop($event)">
+                <div cdkDrag *ngFor="let layer of item.layers; index as idx"
+                  [class.cn-selected]="editorMode.selectedLayer === layer">
+                  <button mat-icon-button (click)="deleteLayer(idx)"><mat-icon>delete</mat-icon></button>
+                  <button mat-icon-button (click)="editorMode.selectedLayer=layer"><mat-icon>edit</mat-icon></button>
+                  <button cdkDragHandle mat-icon-button><mat-icon>drag_handle</mat-icon></button>
+                  <div *cdkDragPreview class="p-3 mat-elevation-z4">{{ layer.title | cnLocalizedText }}</div>
+                  <div class="cn-list-label">{{ layer.title | cnLocalizedText }}</div>
+                </div>
+
+                <div>
+                  <button mat-icon-button [matMenuTriggerFor]="addLayerMenu">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+            <div class="cn-content">
+              <ng-container *ngIf="editorMode.selectedLayer">
+                <div class="row">
+
+                  <mat-form-field class="col-6">
+                    <mat-label>Type</mat-label>
+                    <input type="text" matInput readonly [ngModel]="editorMode.selectedLayer.type">
+                  </mat-form-field>
+
+                  <mat-form-field class="col-6">
+                    <mat-label>ID</mat-label>
+                    <input type="text" matInput readonly [ngModel]="editorMode.selectedLayer.id">
+                  </mat-form-field>
+
+                  <mat-form-field class="col-12">
+                    <mat-label>Preview Image</mat-label>
+                    <app-file-input [(url)]="editorMode.selectedLayer.previewImage"></app-file-input>
+                  </mat-form-field>
+
+                  <mat-form-field class="col-12">
+                    <mat-label>Title</mat-label>
+                    <app-editable-localized-text
+                      [(data)]="editorMode.selectedLayer.title"></app-editable-localized-text>
+                  </mat-form-field>
+
+
+                  <mat-form-field class="col-4">
+                    <mat-label>Color</mat-label>
+                    <input type="color" matInput [(ngModel)]="editorMode.selectedLayer.color">
+                  </mat-form-field>
+
+                  <mat-form-field class="col-4">
+                    <mat-label>Min Zoom</mat-label>
+                    <input type="number" matInput [ngModel]="editorMode.selectedLayer.minZoom">
+                  </mat-form-field>
+
+                  <mat-form-field class="col-4">
+                    <mat-label>Max Zoom</mat-label>
+                    <input type="number" matInput [ngModel]="editorMode.selectedLayer.maxZoom">
+                  </mat-form-field>
+
+                  <div class="col-12 mb-4">
+                    <mat-checkbox [checked]="editorMode.selectedLayer.opacityControl"
+                      (change)="editorMode.selectedLayer.opacityControl=$event.checked">
+                      Opacity Control
+                    </mat-checkbox>
+
+                    <mat-checkbox class="ml-3" [checked]="editorMode.selectedLayer.visible"
+                      (change)="editorMode.selectedLayer.visible=$event.checked">
+                      Visible
+                    </mat-checkbox>
+                  </div>
+
+                  <ng-container *ngIf="editorMode.selectedLayer.type === 'vector'">
+                    <mat-form-field class="col-12">
+                      <mat-label>Shapes</mat-label>
+                      <mat-chip-list>
+                        <mat-chip (click)="editPolygon(s)" *ngFor="let s of editorMode.selectedLayer.shapes; index as i"
+                          (removed)="editorMode.selectedLayer.shapes.splice(i, 1)">
+                          {{s.title | cnLocalizedText}}
+                          <button matChipRemove>
+                            <mat-icon>cancel</mat-icon>
+                          </button>
+                        </mat-chip>
+                        <mat-chip (click)="addShapeToVectorLayer(editorMode.selectedLayer)">
+                          <mat-icon>add</mat-icon>
+                        </mat-chip>
+                      </mat-chip-list>
+                    </mat-form-field>
+
+
+                  </ng-container>
+
+
+                  <ng-container *ngIf="editorMode.selectedLayer.type === 'deep-image'">
+                    <mat-form-field class="col-4">
+                      <mat-label>Format</mat-label>
+                      <mat-select [(ngModel)]="editorMode.selectedLayer.imageFormat">
+                        <mat-option value="jpg">JPG</mat-option>
+                        <mat-option value="jpeg">JPEG</mat-option>
+                        <mat-option value="png">PNG</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="col-4">
+                      <mat-label>Width</mat-label>
+                      <input matInput type="number" [(ngModel)]="editorMode.selectedLayer.width">
+                    </mat-form-field>
+                    <mat-form-field class="col-4">
+                      <mat-label>Height</mat-label>
+                      <input matInput type="number" [(ngModel)]="editorMode.selectedLayer.height">
+                    </mat-form-field>
+                    <mat-form-field class="col-6">
+                      <mat-label>Tile Size</mat-label>
+                      <input matInput type="number" [(ngModel)]="editorMode.selectedLayer.tileSize">
+                    </mat-form-field>
+                    <mat-form-field class="col-6">
+                      <mat-label>Tile Overlap</mat-label>
+                      <input matInput type="number" [(ngModel)]="editorMode.selectedLayer.tileOverlap">
+                    </mat-form-field>
+
+                    <mat-form-field class="col-12">
+                      <mat-label>Image Source</mat-label>
+                      <input matInput type="text" [(ngModel)]="editorMode.selectedLayer.imageSrc">
+                    </mat-form-field>
+                  </ng-container>
+
+
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Groups">
+          <div class="d-flex" style="height: calc(768px - 49px);">
+
+            <div class="cn-sidebar h-100">
+              <div class="cn-list">
+                <div *ngFor="let grp of item.layerGroups; index as idx"
+                  [class.cn-selected]="editorMode.selectedGroup === grp">
+                  <button mat-icon-button (click)="deleteLayer(idx)"><mat-icon>delete</mat-icon></button>
+                  <button mat-icon-button (click)="editorMode.selectedGroup=grp"><mat-icon>edit</mat-icon></button>
+                  <div class="cn-list-label">{{ (grp.title | cnLocalizedText) || grp.id }}</div>
+                </div>
+
+                <div>
+                  <button mat-icon-button (click)="addLayerGroup()">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+            <div class="cn-content">
+              <div class="row" *ngIf="editorMode.selectedGroup">
+                <mat-form-field class="col-12">
+                  <mat-label>ID</mat-label>
+                  <input type="text" matInput readonly [ngModel]="editorMode.selectedGroup.id">
+                </mat-form-field>
+                <mat-form-field class="col-12">
+                  <mat-label>Title</mat-label>
+                  <app-editable-localized-text [(data)]="editorMode.selectedGroup.title"></app-editable-localized-text>
+                </mat-form-field>
+                <div class="col-12 mb-4">
+                  <mat-checkbox [checked]="editorMode.selectedGroup.exclusive"
+                    (change)="editorMode.selectedGroup.exclusive=$event.checked">Exclusive</mat-checkbox>
+                </div>
+
+                <mat-form-field class="col-12">
+                  <mat-label>Add Layer</mat-label>
+                  <mat-select #addLayerSelect="matSelect" (selectionChange)="addLayerToGroup(editorMode.selectedGroup, $event.value); addLayerSelect.value = null">
+                    <mat-option *ngFor="let layer of item.layers" [value]="layer.id">
+                      {{ (layer.title | cnLocalizedText) || layer.id }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="col-12">
+                  <mat-label>Layers</mat-label>
+                  <mat-chip-list #groupLayers aria-label="Layers">
+                    <mat-chip *ngFor="let l of editorMode.selectedGroup.layers"
+                      (removed)="removeLayerFromGroup(editorMode.selectedGroup, l)">
+                      {{l}}
+                      <button matChipRemove>
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    </mat-chip>
+                  </mat-chip-list>
+                </mat-form-field>
+
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+</ng-container>

@@ -122,7 +122,7 @@
                   </button>
                 </div>
 
-                <div cdkDropList (cdkDropListDropped)="onGroupDrop($event)" class="cn-list">
+                <div cdkDropList (cdkDropListDropped)="onGroupDrop($event)" class="cn-list cn-wrap">
                   <div cdkDrag *ngFor="let grp of item.groups" [class.cn-selected]="editorMode.selectedGroup === grp">
                     <button mat-icon-button (click)="deleteGroup(grp)"><mat-icon>delete</mat-icon></button>
                     <button mat-icon-button (click)="selectGroup(grp)"><mat-icon>edit</mat-icon></button>

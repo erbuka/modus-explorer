@@ -14,6 +14,7 @@ import { BlockListItem } from 'src/app/types/block-list-item';
 import { SlideshowItem } from 'src/app/types/slideshow-item';
 import { ItemComponent } from '../item/item.component';
 import { ThreeViewerItem } from 'src/app/types/three-viewer-item';
+import { DeepZoomItem } from 'src/app/types/deep-zoom-item';
 
 
 const DEFAULT_3D: ThreeViewerItem = {
@@ -50,11 +51,25 @@ const DEFAULT_SLIDESHOW: SlideshowItem = {
   type: "slideshow"
 }
 
+const DEFAULT_DEEPZOOM: DeepZoomItem = {
+  type: "deep-zoom",
+  layers: [],
+  layerGroups: [],
+  options: {
+    viewport: {
+      dpi: 300,
+      width: 4096,
+      height: 4096
+    },
+    minimapImage: null
+  }
+}
+
 
 const DEFAULT_ITEMS: { [type in Item['type']]?: Item } = {
   "block-list": DEFAULT_BLOCK_LIST,
   "slideshow": DEFAULT_SLIDESHOW,
-  "deep-zoom": null,
+  "deep-zoom": DEFAULT_DEEPZOOM,
   "3d": DEFAULT_3D,
   "page": null,
 }

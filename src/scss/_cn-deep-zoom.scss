@@ -150,23 +150,26 @@ $cn-dz-layer-count: 6;
   width: 10rem;
   top: 16px;
   right: 16px;
+  overflow: hidden;
 
   @include media-breakpoint-down(md) {
     display: none;
   }
 
   .cn-dz-minimap-image {
+    display: block;
     overflow: hidden;
-    position: relative;
     width: 100%;
     background-size: 100% 100%;
-
-    .cn-dz-minimap-track {
-      position: absolute;
-      border: 2px solid theme-color("primary");
-      background-color: transparentize($color: theme-color("primary"), $amount: 0.9);
-    }
   }
+
+  .cn-dz-minimap-track {
+    pointer-events: none;
+    position: absolute;
+    border: 2px solid theme-color("primary");
+    background-color: transparentize($color: theme-color("primary"), $amount: 0.9);
+  }
+
 }
 
 .cn-dz-tools {

@@ -20,7 +20,7 @@ import { MatCheckboxModule, MAT_CHECKBOX_DEFAULT_OPTIONS } from '@angular/materi
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MAT_TABS_CONFIG, MatTabsModule } from '@angular/material/tabs';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
@@ -60,6 +60,7 @@ import { FileInputComponent } from './ui/file-input/file-input.component';
 import { FileDropDirective } from './file-drop.directive';
 import { ItemInputComponent } from './ui/item-input/item-input.component';
 import { EditorModeGuard } from './editor-mode.guard';
+import { ColorPickerComponent } from './ui/color-picker/color-picker.component';
 
 
 
@@ -90,6 +91,7 @@ import { EditorModeGuard } from './editor-mode.guard';
     NotFoundComponent,
     FileInputComponent,
     ItemInputComponent,
+    ColorPickerComponent,
   ],
   imports: [
     BrowserModule,
@@ -124,6 +126,7 @@ import { EditorModeGuard } from './editor-mode.guard';
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "outline", floatLabel: "always" } },
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } },
     { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { color: "primary" } },
+    { provide: MAT_TABS_CONFIG, useValue: { animationDuration: "0" } },
     { provide: APP_BASE_HREF, useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(), deps: [PlatformLocation] },
     { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] },
     { provide: ContentProviderService, useFactory: ContentProviderService.factory, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] }

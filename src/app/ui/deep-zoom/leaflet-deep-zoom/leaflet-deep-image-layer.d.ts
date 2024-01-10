@@ -1,6 +1,7 @@
 import * as L from 'leaflet';
 
 export type LeafletDeepImageLayerOptions = L.GridLayerOptions | {
+    cnDebug: boolean,
     cnTileSize: number,
     cnViewportWidth: number,
     cnViewportHeight: number,

@@ -68,7 +68,12 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
       let sh = coords.y === level.tilesY - 1 ? img.height - sy : img.height - sy - overlap;
 
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw / this.options.cnTileSize * canvas.width, sh / this.options.cnTileSize * canvas.height);
-     
+
+      if (this.options.cnDebug) {
+        ctx.strokeStyle = "red"
+        ctx.strokeRect(0, 0, canvas.width, canvas.height)
+      }
+
     }
 
     let cachedImage = this.imagesCache[key];
