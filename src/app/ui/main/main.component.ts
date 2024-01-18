@@ -88,6 +88,7 @@ export class MainComponent extends State implements OnInit {
   @ViewChild("newItemDialogTmpl", { read: TemplateRef, static: true }) newItemDialogTmpl;
   @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
+  notFound: boolean = false;
   savedState: StateData = null;
   locales: ConfigLocale[] = null;
   item: Item = null;
@@ -148,11 +149,13 @@ export class MainComponent extends State implements OnInit {
         }
 
         try {
-          this.item = await this.contentProvider.getItem(itemId);
+          this.item = await this.contentProvider.getItem(itemId)
+          this.notFound = false
           this.resetContentScrollTop()
         }
         catch (e) {
-          this.router.navigate(['/not-found'], { replaceUrl: true });
+          console.log("Ciao")
+          this.notFound = true
         }
       }
     })

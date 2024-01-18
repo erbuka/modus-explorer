@@ -30,7 +30,7 @@
     </form>
 </ng-template>
 
-<ng-container *ngIf="item">
+<ng-container *ngIf="item || notFound">
 
     <div class="cn-app-mobile-menu" [class.cn-show]="showMobileMenu">
         <div class="d-flex w-100 p-2 align-items-center cn-app-mobile-menu-header">
@@ -173,7 +173,8 @@
             </div>
         </div>
         <div class="cn-app-content" #appContent>
-            <app-item #currentItem [item]="item"></app-item>
+            <app-item *ngIf="item" #currentItem [item]="item"></app-item>
+            <app-not-found *ngIf="notFound"></app-not-found>
         </div>
     </div>
 
