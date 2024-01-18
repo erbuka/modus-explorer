@@ -5,7 +5,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 
 import { Item, LocalizedText } from './types/item';
 import { LocationRouterService } from './location-router.service';
-import { ConfigLocale, Config } from './types/config';
+import { ConfigLocale, Config, ServerType } from './types/config';
 import { DOCUMENT } from '@angular/common';
 import { JsonValidator } from './json-validator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -61,6 +61,7 @@ export class ContextService {
 
   _currentLocale: ConfigLocale;
 
+  server: ServerType = null;
   config: Config = null;
 
   templates: Map<string, TemplateRef<any>> = new Map();

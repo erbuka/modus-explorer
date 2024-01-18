@@ -37,7 +37,7 @@ export abstract class ContentProviderService {
 
   static factory(context: ContextService, router: LocationRouterService, httpClient: HttpClient, jsonValidator: JsonValidator): ContentProviderService {
 
-    const type = context.config.serverType.type;
+    const type = context.server.type;
 
     switch (type) {
       case 'local': return new LocalContentProviderService(router, jsonValidator, httpClient, context);
@@ -114,7 +114,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
   constructor(private context: ContextService, private httpClient: HttpClient) {
     super();
-    this.server = context.config.serverType as ModusOperandiServerType;
+    this.server = context.server as ModusOperandiServerType;
   }
 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {

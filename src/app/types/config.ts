@@ -14,10 +14,9 @@ export type ModusOperandiServerType = {
 	baseUrl: string,
 }
 
-export type ConfigServerType = LocalServerType | ModusOperandiServerType;
+export type ServerType = LocalServerType | ModusOperandiServerType;
 
 export interface Config {
-	serverType: ConfigServerType;
 	title: LocalizedText;           // Titolo applicazione
 	backgroundImage: string;        // Immagine di sfondo
 	entry: string;                  // Link alla homepage

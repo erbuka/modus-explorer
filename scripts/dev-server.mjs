@@ -164,6 +164,11 @@ const argv = yargs(hideBin(process.argv)).parse();
                 dest: "./src/app/types/config-schema.json",
                 files: ["./src/app/types/config.ts"]
             },
+            {
+                name: "ServerType",
+                dest: "./src/app/types/server-schema.json",
+                files: ["./src/app/types/config.ts"]
+            }
         ];
 
         for (let type of types) {
