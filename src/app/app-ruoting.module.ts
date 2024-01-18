@@ -7,11 +7,6 @@ import { EditorModeGuard } from './editor-mode.guard';
 
 const routes: Routes = [
   {
-    path: "not-found",
-    pathMatch: "full",
-    component: NotFoundComponent,
-  },
-  {
     path: "",
     pathMatch: "full",
     component: MainComponent,

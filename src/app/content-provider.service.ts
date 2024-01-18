@@ -171,6 +171,8 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
       userId: ""
     };
 
+    throw new Error("Not implemented")
+
     try {
       const itemData = await this.httpClient.get<any>(this.getUrl(`/api/dataaccess-service/records/record/${uri}`), {
         headers: {
