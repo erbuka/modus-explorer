@@ -35,6 +35,7 @@ export abstract class ContentProviderService {
   abstract storeItem(item: Item): Promise<{ id: string }>;
   abstract getItem(id: string): Promise<Item>;
 
+  /* TODO: remove router */
   static factory(context: ContextService, router: LocationRouterService, httpClient: HttpClient, jsonValidator: JsonValidator): ContentProviderService {
 
     const type = context.server.type;
@@ -131,6 +132,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   }
 
   private getUrl(uri: string) {
+    // TODO: join with slashes
     return `${this.server.baseUrl}${uri}`
   }
 
@@ -171,7 +173,10 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
       userId: ""
     };
 
+    throw new Error("Not implemented")
+
     try {
+      /*
       const itemData = await this.httpClient.get<any>(this.getUrl(`/api/dataaccess-service/records/record/${uri}`), {
         headers: {
           "Authorization": loginData.token
@@ -179,6 +184,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
       }).toPromise();
 
       return new V1.Parser(this.server).parse(itemData);
+      */
     }
     catch (e) {
       if (e.status === 401) {
