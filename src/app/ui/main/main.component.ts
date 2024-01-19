@@ -168,9 +168,9 @@ export class MainComponent extends State implements OnInit {
       data: {
         submit: (form: NgForm) => {
           if (form.valid) {
-            const { id, title, type }: { id: string, title: string, type: Item['type'] } = form.value;
+            const { title, type }: { title: string, type: Item['type'] } = form.value;
             const defaultValue = DEFAULT_ITEMS[type];
-            this.contentProvider.storeItem(Object.assign({ id, title }, defaultValue))
+            this.contentProvider.storeItem(Object.assign({ title }, defaultValue))
               .then(({ id }) => {
                 ref.close()
                 this.router.navigate(['/', id])
