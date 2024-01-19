@@ -12,6 +12,7 @@ export type LocalServerType = { type: "local" }
 export type ModusOperandiServerType = {
 	type: "modus-operandi",
 	baseUrl: string,
+	baseFolderId: string
 }
 
 export type ServerType = LocalServerType | ModusOperandiServerType;

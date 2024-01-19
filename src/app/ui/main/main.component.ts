@@ -154,7 +154,6 @@ export class MainComponent extends State implements OnInit {
           this.resetContentScrollTop()
         }
         catch (e) {
-          console.log("Ciao")
           this.notFound = true
         }
       }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Item, LocalizedText } from './types/item';
 
@@ -107,9 +107,18 @@ export class LocalContentProviderService extends ContentProviderService {
 }
 
 
+type ModusOperandiFileProps = {
+  id: string,
+  type: "folder" | "file",
+  extension: "string"
+  deepZoom: any,
+  thumbnail: string,
+  view: string
+}
 
 @Injectable()
 export class ModusOperandiContentProviderService extends ContentProviderService {
+
 
   private server: ModusOperandiServerType;
 
@@ -123,22 +132,128 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   }
 
 
-  listItems(): Promise<{ id: string; }[]> {
-    throw new Error('Method not implemented.');
+  async listItems(): Promise<{ id: string; }[]> {
+    const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
+    const items = await this.listFiles(itemsFolder.id)
+    console.log(items)
+    return []
   }
 
-  storeItem(item: Item): Promise<{ id: string; }> {
-    throw new Error('Method not implemented.');
+  async storeItem(item: Item): Promise<{ id: string; }> {
+    const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
+    const targetFolder = await this.createOrGetFolder(itemsFolder.id, item.id)
+    const fileResponse = await this.uploadFile(targetFolder.id, "item.json", new TextEncoder().encode(JSON.stringify(item)))
+    return { id: item.id }
   }
 
   private getUrl(uri: string) {
     // TODO: join with slashes
     return `${this.server.baseUrl}${uri}`
   }
+  
 
-  async doLogin(): Promise<void> {
+  private async listFiles(parentId: string, name?: string): Promise<ModusOperandiFileProps[]> {
+    /*
+    https://modus.culturanuova.com/api/file-service/files?lang=it&folder={{baseFolder}}&name=items
+    Authorization: {{token}}
+    */
+    const params = new URLSearchParams({
+      folder: parentId,
+    })
+
+    const loginData = await this.getLoginData()
+    const url = this.getUrl(`api/file-service/files?${params.toString()}`)
+
+    const response = await this.httpClient.get<any>(url, {
+      headers: { Authorization: loginData.token }
+    }).toPromise()
+
+    return name ? response.data.files.filter(f => f.name === name) : response.data.files
+
+    /*
+    https://modus.culturanuova.com/api/file-service/files?lang=it&folder={{baseFolder}}&name=items
+  */
+  }
+
+  private async createOrGetFolder(parentId: string, name: string): Promise<ModusOperandiFileProps> {
+    // POST https://modus.culturanuova.com/api/file-service/files/createFolder
+    // Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+    // Authorization: {{token}}
+    // 
+    // parent={{baseFolder}}&name=test
+
+    const loginData = await this.getLoginData()
+
+
+    // Check if the folder exists first
+    const files = await this.listFiles(parentId, name)
+
+    if (files.length > 0)
+      return files[0]
+
+
+    // Create the folder if it doesn't exist
+    const url = this.getUrl(`api/file-service/files/createFolder`)
+
+
+    // TODO: Angular HttpParams() does not work for some reason
+    const data = new FormData()
+    data.append("parent", parentId)
+    data.append("name", name)
+
+    const response = await this.httpClient.post<any>(url, data, {
+      headers: {
+        Authorization: loginData.token
+      }
+    }).toPromise()
+
+
+    return response.data.files[0]
+
+
+  }
+
+  private async uploadFile(parentId: string, name: string, contents: ArrayBuffer): Promise<ModusOperandiFileProps> {
+    const loginData = await this.getLoginData()
+    const url = this.getUrl(`api/file-service/files/uploads`)
+
+    const data = new FormData()
+
+    data.append("parent", parentId)
+    data.append("file[]", new Blob([contents]), name)
+
+    const response = await this.httpClient.post<any>(url, data, {
+      headers: {
+        Authorization: loginData.token,
+        "enc-type": "multipart/form-data"
+      }
+    }).toPromise()
+
+    return response.data.files[0]
+
+  }
+
+  private async downloadFile(fileId: string) {
+    const loginData = await this.getLoginData()
+    const url = this.getUrl(`api/file-service/files/download/d/${fileId}`)
+    return this.httpClient.get(url, {
+      responseType: "arraybuffer",
+      headers: {
+        Authorization: loginData.token,
+
+      }
+    }).toPromise()
+  }
+
+  async getLoginData(): Promise<ModusOperandiLoginData> {
+
+    let data = JSON.parse(localStorage.getItem(SS_LOGIN_DATA_ID))
+    if (data)
+      return data;
 
     let done = false;
+
+
 
     while (!done) {
       const loginForm = await this.context.modusOperandiLogin();
@@ -156,7 +271,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
         localStorage.setItem(SS_LOGIN_DATA_ID, JSON.stringify(loginData));
 
-        done = true;
+        return loginData
       }
       catch (e) {
         console.error(e.error)
@@ -166,33 +281,13 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   }
 
 
-  async getItem(uri: string): Promise<Item> {
-
-    const loginData: ModusOperandiLoginData = JSON.parse(localStorage.getItem(SS_LOGIN_DATA_ID)) || {
-      token: "",
-      userId: ""
-    };
-
-    throw new Error("Not implemented")
-
-    try {
-      /*
-      const itemData = await this.httpClient.get<any>(this.getUrl(`/api/dataaccess-service/records/record/${uri}`), {
-        headers: {
-          "Authorization": loginData.token
-        }
-      }).toPromise();
-
-      return new V1.Parser(this.server).parse(itemData);
-      */
-    }
-    catch (e) {
-      if (e.status === 401) {
-        await this.doLogin();
-        return this.getItem(uri);
-      }
-      else throw e;
-    }
+  async getItem(id: string): Promise<Item> {
+    const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
+    const targetFolder = await this.createOrGetFolder(itemsFolder.id, id)
+    const file = await this.listFiles(targetFolder.id, "item")
+    const data = await this.downloadFile(file[0].id)
+    const itemData: Item = JSON.parse(new TextDecoder("utf-8").decode(data))
+    return itemData
   }
 }
 
