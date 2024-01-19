@@ -7,10 +7,6 @@
     <form #self="ngForm" (ngSubmit)="data.submit(self)">
         <div class="row">
             <mat-form-field class="col-12">
-                <mat-label>ID</mat-label>
-                <input type="text" matInput name="id" [(ngModel)]="data.name">
-            </mat-form-field>
-            <mat-form-field class="col-12">
                 <mat-label>Title</mat-label>
                 <input type="text" matInput name="title" [(ngModel)]="data.title" required>
             </mat-form-field>

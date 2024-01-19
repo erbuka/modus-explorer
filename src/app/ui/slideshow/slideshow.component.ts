@@ -198,7 +198,7 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy, Item
     const slide: SlideShowItemSlide = {
       type: "image",
       title: "New Slide",
-      previewImage: null
+      previewImage: ""
     }
     grp.slides = [...grp.slides, slide];
     this.selectSlide(slide);
