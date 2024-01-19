@@ -13,8 +13,6 @@ export function initialize( context: ContextService, router: LocationRouterServi
 
     const server = await httpClient.get<ServerType>("assets/server.json").toPromise()
 
-    console.log(server)
-
     if (!jsonValidator.validate(SERVER_SCHEMA, server)) {
       throw new Error(`Server file doesn't validate against the schema: ${JSON.stringify(jsonValidator.getErrors())}`);
     }

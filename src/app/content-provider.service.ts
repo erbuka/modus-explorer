@@ -9,6 +9,8 @@ import { ContextService, ITEM_SCHEMA } from './context.service';
 import { ModusOperandiServerType } from './types/config';
 import { V1 } from './classes/modus-operandi-item-parser';
 import { computeHash } from './classes/utility';
+import { v4 as uuidv4 } from 'uuid';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
@@ -119,8 +121,9 @@ type ModusOperandiFileProps = {
 @Injectable()
 export class ModusOperandiContentProviderService extends ContentProviderService {
 
-
-  private server: ModusOperandiServerType;
+  private itemListNeedsUpdate: boolean = true
+  private itemsList: { id: string; }[]
+  private server: ModusOperandiServerType
 
   constructor(private context: ContextService, private httpClient: HttpClient) {
     super();
@@ -128,29 +131,53 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   }
 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
-    throw new Error('Method not implemented.');
+    const folder = await this.createOrGetFolder(this.server.baseFolderId, "files")
+    const result = await this.uploadFile(folder.id, fileName, data)
+    return { fileUrl: result.view }
   }
 
-
   async listItems(): Promise<{ id: string; }[]> {
-    const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
-    const items = await this.listFiles(itemsFolder.id)
-    console.log(items)
-    return []
+
+    if (this.itemListNeedsUpdate) {
+      const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
+      this.itemsList = await this.listFiles(itemsFolder.id)
+      this.itemListNeedsUpdate = false
+    }
+    return [...this.itemsList]
   }
 
   async storeItem(item: Item): Promise<{ id: string; }> {
-    const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
-    const targetFolder = await this.createOrGetFolder(itemsFolder.id, item.id)
-    const fileResponse = await this.uploadFile(targetFolder.id, "item.json", new TextEncoder().encode(JSON.stringify(item)))
-    return { id: item.id }
+
+    if (item.id) {
+      // TODO: Update file
+      const result = await this.updateFile(item.id, new TextEncoder().encode(JSON.stringify(item)))
+      console.log(`Update file with id ${result.id}`)
+    } else {
+      const fileName = `${uuidv4()}.json`
+      const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
+      const fileResponse = await this.uploadFile(itemsFolder.id, fileName, new TextEncoder().encode(JSON.stringify(item)))
+
+      this.itemListNeedsUpdate = true
+
+      console.log(`Stored new item with id ${fileResponse.id}`)
+
+      return { id: fileResponse.id }
+    }
+
+
+  }
+
+  async getItem(id: string): Promise<Item> {
+    const data = await this.downloadFile(id)
+    const itemData: Item = JSON.parse(new TextDecoder("utf-8").decode(data))
+    itemData.id = id
+    return itemData
   }
 
   private getUrl(uri: string) {
     // TODO: join with slashes
     return `${this.server.baseUrl}${uri}`
   }
-  
 
   private async listFiles(parentId: string, name?: string): Promise<ModusOperandiFileProps[]> {
     /*
@@ -188,15 +215,14 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     // Check if the folder exists first
     const files = await this.listFiles(parentId, name)
 
-    if (files.length > 0)
+    if (files.length > 0) {
+      console.log(`Folder ${name} already exists under ${parentId}`)
       return files[0]
-
+    }
 
     // Create the folder if it doesn't exist
     const url = this.getUrl(`api/file-service/files/createFolder`)
 
-
-    // TODO: Angular HttpParams() does not work for some reason
     const data = new FormData()
     data.append("parent", parentId)
     data.append("name", name)
@@ -207,10 +233,27 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
       }
     }).toPromise()
 
+    console.log(`Created folder ${name} under ${parentId}`)
 
     return response.data.files[0]
 
+  }
 
+  private async updateFile(fileId: string, contents: ArrayBuffer): Promise<ModusOperandiFileProps> {
+    const loginData = await this.getLoginData()
+    const url = this.getUrl(`api/file-service/files/upload/${fileId}`)
+
+    const data = new FormData()
+    data.append("file", new Blob([contents]))
+
+    const response = await this.httpClient.post<any>(url, data, {
+      headers: {
+        Authorization: loginData.token,
+        "enc-type": "multipart/form-data"
+      }
+    }).toPromise()
+
+    return response.data.files[0]
   }
 
   private async uploadFile(parentId: string, name: string, contents: ArrayBuffer): Promise<ModusOperandiFileProps> {
@@ -245,7 +288,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     }).toPromise()
   }
 
-  async getLoginData(): Promise<ModusOperandiLoginData> {
+  private async getLoginData(): Promise<ModusOperandiLoginData> {
 
     let data = JSON.parse(localStorage.getItem(SS_LOGIN_DATA_ID))
     if (data)
@@ -280,15 +323,6 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
   }
 
-
-  async getItem(id: string): Promise<Item> {
-    const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
-    const targetFolder = await this.createOrGetFolder(itemsFolder.id, id)
-    const file = await this.listFiles(targetFolder.id, "item")
-    const data = await this.downloadFile(file[0].id)
-    const itemData: Item = JSON.parse(new TextDecoder("utf-8").decode(data))
-    return itemData
-  }
 }
 
 
