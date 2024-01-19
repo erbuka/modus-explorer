@@ -128,7 +128,7 @@ import { ColorPickerComponent } from './ui/color-picker/color-picker.component';
     { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { color: "primary" } },
     { provide: MAT_TABS_CONFIG, useValue: { animationDuration: "0" } },
     { provide: APP_BASE_HREF, useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(), deps: [PlatformLocation] },
-    { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] },
+    { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContextService, HttpClient, JsonValidator] },
     { provide: ContentProviderService, useFactory: ContentProviderService.factory, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] }
   ],
   bootstrap: [AppComponent]
