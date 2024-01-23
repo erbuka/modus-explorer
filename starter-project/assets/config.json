@@ -1,23 +1,8 @@
 {
     "title": "Modus Explorer - Starter Project",
     "backgroundImage": "assets/images/background.jpg",
-    "entry": "assets/home",
-		"serverType" : {
-			"type" : "local"
-		},
-		"headerLinks" : [
-			{
-				"title" : {
-					"it" : "Crediti",
-					"en" : "Credits"
-				},
-				"href" : "assets/credits"
-			},
-			{
-				"title" : "Link 2",
-				"href" : "assets/home/templates-samples"
-			}
-		],
+    "entry": "main",
+		"headerLinks" : [],
 		"internationalization" : {
 			"defaultLocale" : "it",
 			"locales" : [
