@@ -32,7 +32,7 @@ const argv = yargs(hideBin(process.argv)).parse();
         console.log(`${colors.green("[Dev-Server]")} - Creating starter project`);
         try {
             await ncpWithPromise("./starter-project/assets", "./assets");
-            await ncpWithPromise("./starter-project/templates", "./templates");
+            //await ncpWithPromise("./starter-project/templates", "./templates");
         }
         catch (e) {
             console.log(`${colors.red("[Dev-Server]")} - ${e}`);
