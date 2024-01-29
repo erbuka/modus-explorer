@@ -9,6 +9,7 @@
 /assets
 /assets2
 /templates/*.html
+/server.json
 
 # compiled output
 /build-dev
