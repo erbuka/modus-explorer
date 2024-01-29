@@ -3,13 +3,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Item, LocalizedText } from './types/item';
 
-import { LocationRouterService } from './location-router.service';
 import { JsonValidator } from './json-validator.service';
 import { ContextService, ITEM_SCHEMA } from './context.service';
-import { ModusOperandiServerType } from './types/config';
+import { Config, ModusOperandiServerType } from './types/config';
 import { computeHash } from './classes/utility';
 import { v4 as uuidv4 } from 'uuid';
-import { BehaviorSubject, Subject } from 'rxjs';
+import getServer from 'src/server';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
@@ -30,6 +29,8 @@ export abstract class ContentProviderService {
     return this.putFile(`${hash}.${extension}`, data, item);
   }
 
+  abstract getConfig(): Promise<Config>;
+
   abstract putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }>
 
   abstract listItems(): Promise<ItemRef[]>;
@@ -37,12 +38,12 @@ export abstract class ContentProviderService {
   abstract getItem(id: string): Promise<Item>;
 
   /* TODO: remove router */
-  static factory(context: ContextService, router: LocationRouterService, httpClient: HttpClient, jsonValidator: JsonValidator): ContentProviderService {
+  static factory(context: ContextService, httpClient: HttpClient, jsonValidator: JsonValidator): ContentProviderService {
 
-    const type = context.server.type;
+    const type = getServer().type
 
     switch (type) {
-      case 'local': return new LocalContentProviderService(router, jsonValidator, httpClient, context);
+      case 'local': return new LocalContentProviderService(jsonValidator, httpClient, context);
       case 'modus-operandi': return new ModusOperandiContentProviderService(context, httpClient);
       default: throw new Error(`Unsupported server type: ${type}`)
     }
@@ -54,8 +55,12 @@ export abstract class ContentProviderService {
 export class LocalContentProviderService extends ContentProviderService {
 
 
-  constructor(private router: LocationRouterService, private jsonValidator: JsonValidator, private httpClient: HttpClient, private context: ContextService) {
+  constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private context: ContextService) {
     super();
+  }
+
+  async getConfig(): Promise<Config> {
+    return await this.httpClient.get<Config>("assets/config.json").toPromise();
   }
 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
@@ -126,7 +131,11 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
   constructor(private context: ContextService, private httpClient: HttpClient) {
     super();
-    this.server = context.server as ModusOperandiServerType;
+    this.server = getServer() as ModusOperandiServerType;
+  }
+
+  async getConfig(): Promise<Config> {
+    throw new Error('Method not implemented.');
   }
 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {

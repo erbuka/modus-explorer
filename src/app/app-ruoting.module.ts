@@ -1,11 +1,16 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router'; // CLI imports router
 import { MainComponent } from './ui/main/main.component';
-import { NotFoundComponent } from './ui/not-found/not-found.component';
 
 import { EditorModeGuard } from './editor-mode.guard';
+import { ConfigEditorComponent } from './ui/config-editor/config-editor.component';
 
 const routes: Routes = [
+  {
+    path: "config",
+    pathMatch: "full",
+    component: ConfigEditorComponent
+  },
   {
     path: "",
     pathMatch: "full",

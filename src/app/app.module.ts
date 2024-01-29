@@ -61,6 +61,7 @@ import { FileDropDirective } from './file-drop.directive';
 import { ItemInputComponent } from './ui/item-input/item-input.component';
 import { EditorModeGuard } from './editor-mode.guard';
 import { ColorPickerComponent } from './ui/color-picker/color-picker.component';
+import { ConfigEditorComponent } from './ui/config-editor/config-editor.component';
 
 
 
@@ -92,6 +93,7 @@ import { ColorPickerComponent } from './ui/color-picker/color-picker.component';
     FileInputComponent,
     ItemInputComponent,
     ColorPickerComponent,
+    ConfigEditorComponent,
   ],
   imports: [
     BrowserModule,
@@ -128,8 +130,8 @@ import { ColorPickerComponent } from './ui/color-picker/color-picker.component';
     { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { color: "primary" } },
     { provide: MAT_TABS_CONFIG, useValue: { animationDuration: "0" } },
     { provide: APP_BASE_HREF, useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(), deps: [PlatformLocation] },
-    { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContextService, HttpClient, JsonValidator] },
-    { provide: ContentProviderService, useFactory: ContentProviderService.factory, deps: [ContextService, LocationRouterService, HttpClient, JsonValidator] }
+    { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContentProviderService, ContextService, JsonValidator] },
+    { provide: ContentProviderService, useFactory: ContentProviderService.factory, deps: [ContextService, HttpClient, JsonValidator] }
   ],
   bootstrap: [AppComponent]
 })

@@ -1,15 +1,11 @@
-import { Injectable, TemplateRef, EventEmitter, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map, tap } from 'rxjs/operators';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Injectable, TemplateRef, EventEmitter } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
-import { Item, LocalizedText } from './types/item';
-import { LocationRouterService } from './location-router.service';
-import { ConfigLocale, Config, ServerType } from './types/config';
-import { DOCUMENT } from '@angular/common';
-import { JsonValidator } from './json-validator.service';
+import { LocalizedText } from './types/item';
+import { ConfigLocale, Config, ServerType, ConfigLocaleId } from './types/config';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { getLocale } from './types/locales';
 
 export const ITEM_SCHEMA = require('./types/item-schema.json');
 
@@ -60,8 +56,8 @@ export class ContextService {
   private _editorMode: boolean = false;
 
   _currentLocale: ConfigLocale;
+  _locales: ConfigLocale[];
 
-  server: ServerType = null;
   config: Config = null;
 
   templates: Map<string, TemplateRef<any>> = new Map();
@@ -89,6 +85,17 @@ export class ContextService {
     */
   }
 
+  async initialize(config: Config) {
+    this.config = config;
+    this._locales = this.config.internationalization.locales.map(id => getLocale(id))
+    try {
+      this.setCurrentLocale(sessionStorage.getItem(SS_LOCALE_ID_KEY) as ConfigLocaleId);
+    }
+    catch (e) {
+      this.setCurrentLocale(config.internationalization.defaultLocale);
+    }
+  }
+
   translate(text: LocalizedText) {
     let locale = this.getCurrentLocale();
     if (typeof text === "object" && locale) {
@@ -103,27 +110,13 @@ export class ContextService {
     }
   }
 
-  getLocales(): ConfigLocale[] {
-    if (!this.config.internationalization)
-      return [];
+  getLocales(): ConfigLocale[] { return this._locales }
 
-    return this.config.internationalization.locales;
-  }
-
-  setCurrentLocale(localeId: string, reload: boolean = false) {
+  setCurrentLocale(localeId: ConfigLocaleId, reload: boolean = false) {
 
     this._currentLocale = null;
-
-    if (!this.config.internationalization)
-      throw new Error("No locales have been configured");
-
-    let loc = this.config.internationalization.locales.find(loc => loc.id === localeId);
-
-    if (!loc)
-      throw new Error(`Locale not found: ${localeId}`);
-
+    let loc = getLocale(localeId)
     sessionStorage.setItem(SS_LOCALE_ID_KEY, loc.id);
-
     this._currentLocale = loc;
 
     if (reload)
