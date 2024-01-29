@@ -7,7 +7,6 @@ import { LocationRouterService } from './location-router.service';
 import { JsonValidator } from './json-validator.service';
 import { ContextService, ITEM_SCHEMA } from './context.service';
 import { ModusOperandiServerType } from './types/config';
-import { V1 } from './classes/modus-operandi-item-parser';
 import { computeHash } from './classes/utility';
 import { v4 as uuidv4 } from 'uuid';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -150,7 +149,10 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
     if (item.id) {
       // TODO: Update file
-      const result = await this.updateFile(item.id, new TextEncoder().encode(JSON.stringify(item)))
+
+      const fileContents = JSON.stringify(item);
+      console.log(fileContents);
+      const result = await this.updateFile(item.id, new TextEncoder().encode(fileContents))
       console.log(`Update file with id ${result.id}`)
     } else {
       const fileName = `${uuidv4()}.json`
@@ -240,6 +242,12 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   }
 
   private async updateFile(fileId: string, contents: ArrayBuffer): Promise<ModusOperandiFileProps> {
+
+    /*
+      POST https://modus.culturanuova.com/api/file-service/files/upload/{{id}}
+      Authorization: {{token}}
+    */
+
     const loginData = await this.getLoginData()
     const url = this.getUrl(`api/file-service/files/upload/${fileId}`)
 
