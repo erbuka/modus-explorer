@@ -10,6 +10,8 @@
 /assets2
 /templates/*.html
 /server.json
+/server-local.json
+/server-mo.json
 
 # compiled output
 /build-dev
