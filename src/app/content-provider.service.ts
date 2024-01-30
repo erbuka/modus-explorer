@@ -29,7 +29,7 @@ export abstract class ContentProviderService {
     return this.putFile(`${hash}.${extension}`, data, item);
   }
 
-  abstract saveConfig(config:Config):Promise<void>
+  abstract saveConfig(config: Config): Promise<void>
 
   abstract getConfig(): Promise<Config>;
 
@@ -133,7 +133,7 @@ type ModusOperandiFileProps = {
 export class ModusOperandiContentProviderService extends ContentProviderService {
 
   private itemListNeedsUpdate: boolean = true
-  private itemsList: { id: string; }[]
+  private itemsList: ItemRef[]
   private server: ModusOperandiServerType
 
   constructor(private context: ContextService, private httpClient: HttpClient) {
@@ -160,7 +160,21 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     if (this.itemListNeedsUpdate) {
       const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
       this.itemsList = await this.listFiles(itemsFolder.id)
+
+      const decoder = new TextDecoder("utf-8")
+      const promises = this.itemsList.map(item => {
+        const promise = this.downloadFile(item.id)
+        promise.then(data => {
+          const itemData: Item = JSON.parse(decoder.decode(data))
+          item.title = itemData.title
+        })
+        return promise
+      })
+
+      await Promise.all(promises)
+
       this.itemListNeedsUpdate = false
+
     }
     return [...this.itemsList]
   }
