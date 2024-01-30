@@ -129,6 +129,9 @@
                             <button (click)="newItem()" [disabled]="context.editorMode.value" mat-menu-item>
                                 <mat-icon>add</mat-icon> Create New Item
                             </button>
+                            <button routerLink="/config" [disabled]="context.editorMode.value" mat-menu-item>
+                                <mat-icon>settings</mat-icon> Configuration
+                            </button>
                         </mat-menu>
                         <button mat-button [matMenuTriggerFor]="editorModeMenu" [class.text-accent]="context.editorMode.value">
                             Editor Mode
