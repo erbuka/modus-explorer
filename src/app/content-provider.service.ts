@@ -185,7 +185,6 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
       // TODO: Update file
 
       const fileContents = JSON.stringify(item);
-      console.log(fileContents);
       const result = await this.updateFile(item.id, new TextEncoder().encode(fileContents))
       console.log(`Update file with id ${result.id}`)
     } else {
