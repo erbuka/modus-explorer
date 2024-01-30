@@ -3,7 +3,7 @@ import { ConfigLocale, ConfigLocaleId } from "./config";
 const IT: ConfigLocale = {
   id: "it",
   description: "Italiano",
-  flagIcon: "assets/images/it.png",
+  flagIcon: "core-assets/flags/it.png",
   translations: {
     inches: "pollici",
     centimeters: "centimetri",
@@ -16,7 +16,7 @@ const IT: ConfigLocale = {
 
 const EN: ConfigLocale = {
   "id": "en",
-  "flagIcon": "assets/images/en.png",
+  "flagIcon": "core-assets/flags/en.png",
   "description": "English"
 }
 
