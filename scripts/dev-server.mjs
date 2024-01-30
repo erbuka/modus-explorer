@@ -44,6 +44,12 @@ const argv = yargs(hideBin(process.argv)).parse();
 
         const upload = multer({ storage: memoryStorage() })
 
+        app.post("/config", express.json(), (req, res) => {
+            const data = JSON.stringify(req.body)
+            fs.writeFileSync("./assets/config.json", data, { encoding: "utf-8" })
+            res.send()
+        })
+
         app.post("/files", upload.single("file"), (req, res) => {
 
             const itemId = req.body.itemId || "__global";

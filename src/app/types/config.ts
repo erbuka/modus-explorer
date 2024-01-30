@@ -23,7 +23,7 @@ export interface Config {
 	backgroundImage?: string;        // Immagine di sfondo
 	entry: string;                  // Link alla homepage
 	headerTemplate?: string;        // Template grafico per testata
-	headerLinks?: {
+	headerLinks: {
 		title: LocalizedText,
 		itemId: string
 	}[]

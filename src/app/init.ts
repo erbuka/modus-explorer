@@ -9,6 +9,7 @@ const CONFIG_SCHEMA = require('./types/config-schema.json')
 const DEFAULT_CONFIG: Config = {
   title: "Modus Explorer",
   entry: "home",
+  headerLinks: [],
   internationalization: {
     defaultLocale: "it",
     locales: ["it", "en"]

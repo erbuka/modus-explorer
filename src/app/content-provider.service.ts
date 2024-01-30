@@ -29,6 +29,8 @@ export abstract class ContentProviderService {
     return this.putFile(`${hash}.${extension}`, data, item);
   }
 
+  abstract saveConfig(config:Config):Promise<void>
+
   abstract getConfig(): Promise<Config>;
 
   abstract putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }>
@@ -54,8 +56,13 @@ export abstract class ContentProviderService {
 export class LocalContentProviderService extends ContentProviderService {
 
 
+
   constructor(private jsonValidator: JsonValidator, private httpClient: HttpClient, private context: ContextService) {
     super();
+  }
+
+  async saveConfig(config: Config): Promise<void> {
+    await this.httpClient.post<void>("/config", config).toPromise()
   }
 
   async getConfig(): Promise<Config> {
@@ -116,11 +123,16 @@ export class LocalContentProviderService extends ContentProviderService {
 @Injectable()
 export class ModusOperandiContentProviderService extends ContentProviderService {
 
+
   private server: ModusOperandiServerType;
 
   constructor(private context: ContextService, private httpClient: HttpClient) {
     super();
     this.server = getServer() as ModusOperandiServerType;
+  }
+
+  async saveConfig(config: Config): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 
   async getConfig(): Promise<Config> {

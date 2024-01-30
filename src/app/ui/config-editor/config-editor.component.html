@@ -1,1 +1,83 @@
-<p>config-editor works!</p>
+<div class="container py-5">
+  <h1>Modus Explorer - Configuration Editor</h1>
+
+  <h2>General</h2>
+
+  <div class="row">
+
+
+    <mat-form-field class="col-12">
+      <mat-label>Title</mat-label>
+      <app-editable-localized-text [(data)]="config.title"></app-editable-localized-text>
+    </mat-form-field>
+    <mat-form-field class="col-12">
+      <mat-label>Background Image</mat-label>
+      <app-file-input [(url)]="config.backgroundImage"></app-file-input>
+    </mat-form-field>
+    <mat-form-field class="col-12">
+      <mat-label>Entry</mat-label>
+      <app-item-input [(value)]="config.entry"></app-item-input>
+    </mat-form-field>
+
+    <mat-form-field class="col-12">
+      <mat-label>Locales</mat-label>
+      <mat-chip-list #localesChipList>
+        <ng-container *ngFor="let loc of config.internationalization.locales; first as f">
+          <mat-chip [selected]="f" (removed)="removeLocale(loc)" selectable="false">
+            {{ loc }}
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+        </ng-container>
+        <input placeholder="Add locale..." #localeInput [matChipInputFor]="localesChipList"
+          [matAutocomplete]="localeAuto" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          (matChipInputTokenEnd)="addLocale($event)">
+      </mat-chip-list>
+      <mat-autocomplete #localeAuto="matAutocomplete">
+        <mat-option *ngFor="let loc of allLocales">
+          {{loc}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+  </div>
+
+
+
+
+
+  <h2>Header Links</h2>
+  <div class="row">
+    <div class="col-12" *ngFor="let link of config.headerLinks; index as idx">
+      <div class="w-100 border p-3 mb-4 bg-white">
+        <mat-form-field class="w-100">
+          <mat-label>Title</mat-label>
+          <app-editable-localized-text [(data)]="link.title"></app-editable-localized-text>
+        </mat-form-field>
+        <mat-form-field class="w-100">
+          <mat-label>Item</mat-label>
+          <app-item-input [(value)]="link.itemId"></app-item-input>
+        </mat-form-field>
+        <div class="text-right">
+          <button mat-icon-button (click)="config.headerLinks.splice(idx, 1)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-right mb-4">
+    <button mat-mini-fab (click)="addHeaderLink()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div class="text-center">
+    <button color="primary" mat-raised-button (click)="save()">
+      <mat-icon>save</mat-icon>
+      <span class="ml-2">Save &amp; Reload</span>
+    </button>
+  </div>
+
+</div>

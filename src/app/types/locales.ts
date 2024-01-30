@@ -28,3 +28,7 @@ export function getLocale(id: ConfigLocaleId) {
       throw new Error(`Locale not found: ${id}`)
   }
 }
+
+export function getAllLocales() : ConfigLocaleId[] {
+  return ["it", "en"]
+}
