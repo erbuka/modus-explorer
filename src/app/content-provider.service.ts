@@ -123,6 +123,7 @@ export class LocalContentProviderService extends ContentProviderService {
 type ModusOperandiFileProps = {
   id: string,
   type: "folder" | "file",
+  name: string,
   extension: "string"
   deepZoom: any,
   thumbnail: string,
@@ -142,17 +143,27 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   }
 
   async saveConfig(config: Config): Promise<void> {
-    throw new Error('Method not implemented.');
+    const data = new TextEncoder().encode(JSON.stringify(config))
+    const result = await this.uploadFile(this.server.baseFolderId, "config.json", data)
   }
 
   async getConfig(): Promise<Config> {
-    throw new Error('Method not implemented.');
+    const files = await this.listFiles(this.server.baseFolderId, "config")
+
+    if (files.length === 1) {
+      const contents = new TextDecoder().decode(await this.downloadFile(files[0].id))
+      return JSON.parse(contents)
+    }
+
+    throw new Error('Config not found')
   }
 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
     const folder = await this.createOrGetFolder(this.server.baseFolderId, "files")
     const result = await this.uploadFile(folder.id, fileName, data)
-    return { fileUrl: result.view }
+    const fileInfo = await this.listFiles(folder.id, result.name)
+    console.log(fileInfo)
+    return { fileUrl: fileInfo[0].view }
   }
 
   async listItems(): Promise<{ id: string; }[]> {
