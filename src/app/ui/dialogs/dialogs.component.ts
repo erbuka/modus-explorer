@@ -23,7 +23,7 @@ export class DialogsComponent implements OnInit {
     this.initErrorDialog();
     this.initFileChooser();
     this.initTextEditor();
-    this.initMOLogin();
+    // this.initMOLogin();
   }
 
   isMultilanguage(txt: LocalizedText): boolean {
@@ -67,31 +67,6 @@ export class DialogsComponent implements OnInit {
 
   }
 
-  private initMOLogin() {
-    this.context.onModusOperandiLogin.subscribe(evt => {
-
-      const result: ModusOperandiLoginForm = {
-        username: "",
-        password: ""
-      }
-
-      let ref = this.dialog.open(this.moLoginDialogTmpl, {
-        maxWidth: "800px",
-        width: "80%",
-        data: {
-          formData: result,
-          confirmClick: () => {
-            result.username = result.username.trim();
-            result.password = result.password.trim();
-            if (result.username && result.password) {
-              evt.confirm(result)
-              ref.close()
-            }
-          }
-        }
-      })
-    })
-  }
 
   private initTextEditor(): void {
     this.context.onTextEdit.subscribe(evt => {

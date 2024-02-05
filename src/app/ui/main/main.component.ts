@@ -4,7 +4,7 @@ import { Location } from '@angular/common';
 
 import { ContextService } from 'src/app/context.service';
 import { Item } from 'src/app/types/item';
-import { ConfigLocale } from 'src/app/types/config';
+import { Config, ConfigLocale } from 'src/app/types/config';
 import { State, StateData } from 'src/app/classes/state';
 import { ContentProviderService } from 'src/app/content-provider.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,7 +15,19 @@ import { SlideshowItem } from 'src/app/types/slideshow-item';
 import { ItemComponent } from '../item/item.component';
 import { ThreeViewerItem } from 'src/app/types/three-viewer-item';
 import { DeepZoomItem } from 'src/app/types/deep-zoom-item';
+import { BehaviorSubject } from 'rxjs';
+import getServer from 'src/server';
 
+
+const DEFAULT_CONFIG: Config = {
+  title: "Modus Explorer",
+  entry: "home",
+  headerLinks: [],
+  internationalization: {
+    defaultLocale: "it",
+    locales: ["it", "en"]
+  }
+}
 
 const DEFAULT_3D: ThreeViewerItem = {
   type: "3d",
@@ -88,6 +100,8 @@ export class MainComponent extends State implements OnInit {
   @ViewChild("newItemDialogTmpl", { read: TemplateRef, static: true }) newItemDialogTmpl;
   @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
+
+  initialized: BehaviorSubject<boolean> = new BehaviorSubject(false)
   notFound: boolean = false;
   savedState: StateData = null;
   locales: ConfigLocale[] = null;
@@ -123,7 +137,15 @@ export class MainComponent extends State implements OnInit {
     this.context.setCurrentLocale(this.locales[nextIndex].id, true);
   }
 
-  ngOnInit(): void {
+  async initialize() {
+    console.log("Initializing...")
+    const config = await this.contentProvider.getConfig()
+    await this.context.initialize(config)
+  }
+
+  async ngOnInit() {
+
+    await this.initialize()
 
     this.locales = this.context.getLocales();
 
@@ -154,7 +176,9 @@ export class MainComponent extends State implements OnInit {
           this.resetContentScrollTop()
         }
         catch (e) {
-          this.notFound = true
+          if (e.status === 404)
+            this.notFound = true
+          else throw e
         }
       }
     })
@@ -167,14 +191,18 @@ export class MainComponent extends State implements OnInit {
       data: {
         submit: (form: NgForm) => {
           if (form.valid) {
-            const { title, type }: { title: string, type: Item['type'] } = form.value;
-            const defaultValue = DEFAULT_ITEMS[type];
+            const { title, type }: { title: string, type: Item['type'] } = form.value
+            const defaultValue = DEFAULT_ITEMS[type]
+
+            this.context.startLoading()
+
             this.contentProvider.storeItem(Object.assign({ title }, defaultValue))
               .then(({ id }) => {
                 ref.close()
                 this.router.navigate(['/', id])
               })
               .catch(e => this.context.raiseError(e))
+              .finally(() => this.context.stopLoading())
           }
         }
       }

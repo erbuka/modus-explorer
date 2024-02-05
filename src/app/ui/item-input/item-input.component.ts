@@ -65,7 +65,6 @@ export class ItemInputComponent implements OnInit, OnDestroy, MatFormFieldContro
     this.contentProvider.listItems()
       .then(items => {
         this.items = items;
-        console.log(items)
         this.filterItems();
       })
       .catch(e => this.context.raiseError(e));

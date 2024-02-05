@@ -4,8 +4,14 @@ import { MainComponent } from './ui/main/main.component';
 
 import { EditorModeGuard } from './editor-mode.guard';
 import { ConfigEditorComponent } from './ui/config-editor/config-editor.component';
+import { LoginComponent } from './ui/login/login.component';
 
 const routes: Routes = [
+  {
+    path: "login",
+    pathMatch: "full",
+    component: LoginComponent
+  },
   {
     path: "config",
     pathMatch: "full",

@@ -92,20 +92,6 @@
                                     [(data)]="editorMode.selectedLink.title"></app-editable-localized-text>
                             </mat-form-field>
 
-                            <!--
-                            <mat-form-field class="col-12">
-                                <mat-label>Destination Item</mat-label>
-                                <mat-select [(ngModel)]="editorMode.selectedLink.itemId">
-                                    <mat-option *ngFor="let item of editorMode.items | async" [value]="item.id">
-                                        <span>{{ item.id }}</span>
-                                        <span *ngIf="item.title">
-                                            ({{ item?.title | cnLocalizedText }})
-                                        </span>
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        -->
-
                             <mat-form-field class="col-12">
                                 <mat-label>Destination Item</mat-label>
                                 <app-item-input [(value)]="editorMode.selectedLink.itemId"></app-item-input>

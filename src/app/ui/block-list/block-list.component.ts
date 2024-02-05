@@ -5,6 +5,8 @@ import { ContentProviderService } from 'src/app/content-provider.service';
 import { ContextService } from 'src/app/context.service';
 import { BlockListItem, BlockListItemLink } from 'src/app/types/block-list-item';
 import { ItemSave } from '../item/item.component';
+import { skip } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 
 type BlockListEditorMode = {
@@ -17,12 +19,14 @@ type BlockListEditorMode = {
   templateUrl: './block-list.component.html',
   styleUrls: ['./block-list.component.scss']
 })
-export class BlockListComponent implements OnInit, ItemSave {
+export class BlockListComponent implements OnInit, OnDestroy, ItemSave {
 
   editorMode: BlockListEditorMode = {
     selectedLink: null,
     items: null
   }
+
+  private _subscription: Subscription;
 
   @ViewChild("editBlockDialogTmpl", { static: true, read: TemplateRef }) editBlockDialogTmpl: TemplateRef<any>;
 
@@ -30,9 +34,21 @@ export class BlockListComponent implements OnInit, ItemSave {
 
   constructor(public context: ContextService, private contentProvider: ContentProviderService) { }
 
+
   ngOnInit() {
     //this.context.editorSaveClick.next(() => this.saveItem())
-    this.editorMode.items = this.contentProvider.listItems();
+
+    this._subscription = this.context.editorMode.pipe(skip(1)).subscribe({
+      next: value => {
+        if (value === false)
+          this.editorMode.selectedLink = null
+      }
+    })
+
+  }
+
+  ngOnDestroy(): void {
+    this._subscription.unsubscribe()
   }
 
   save() {

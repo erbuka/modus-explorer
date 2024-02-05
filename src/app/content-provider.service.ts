@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 
 import { Item, LocalizedText } from './types/item';
 
@@ -9,10 +9,11 @@ import { Config, ModusOperandiServerType } from './types/config';
 import { computeHash } from './classes/utility';
 import { v4 as uuidv4 } from 'uuid';
 import getServer from 'src/server';
+import { Router } from '@angular/router';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
-type ModusOperandiLoginData = {
+export type ModusOperandiLoginData = {
   token: string,
   userId: string
 }
@@ -39,14 +40,13 @@ export abstract class ContentProviderService {
   abstract storeItem(item: Item): Promise<{ id: string }>;
   abstract getItem(id: string): Promise<Item>;
 
-  /* TODO: remove router */
-  static factory(context: ContextService, httpClient: HttpClient, jsonValidator: JsonValidator): ContentProviderService {
+  static factory(context: ContextService, httpClient: HttpClient, jsonValidator: JsonValidator, router: Router): ContentProviderService {
 
     const type = getServer().type
 
     switch (type) {
       case 'local': return new LocalContentProviderService(jsonValidator, httpClient, context);
-      case 'modus-operandi': return new ModusOperandiContentProviderService(context, httpClient);
+      case 'modus-operandi': return new ModusOperandiContentProviderService(context, httpClient, router);
       default: throw new Error(`Unsupported server type: ${type}`)
     }
 
@@ -137,9 +137,24 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   private itemsList: ItemRef[]
   private server: ModusOperandiServerType
 
-  constructor(private context: ContextService, private httpClient: HttpClient) {
+  constructor(private context: ContextService, private httpClient: HttpClient, private router: Router) {
     super();
     this.server = getServer() as ModusOperandiServerType;
+  }
+
+  async login(username: string, password: string) {
+    const data = new FormData();
+    data.append("username", username.trim());
+    data.append("password", password.trim());
+
+    const loginData = await this.httpClient.post<ModusOperandiLoginData>(this.getUrl(`/api/auth-service/auth`), data, {
+      headers: {
+        'enctype': 'multipart/form-data'
+      },
+    }).toPromise();
+
+    localStorage.setItem(SS_LOGIN_DATA_ID, JSON.stringify(loginData));
+
   }
 
   async saveConfig(config: Config): Promise<void> {
@@ -162,7 +177,6 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     const folder = await this.createOrGetFolder(this.server.baseFolderId, "files")
     const result = await this.uploadFile(folder.id, fileName, data)
     const fileInfo = await this.listFiles(folder.id, result.name)
-    console.log(fileInfo)
     return { fileUrl: fileInfo[0].view }
   }
 
@@ -193,23 +207,24 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   async storeItem(item: Item): Promise<{ id: string; }> {
 
     if (item.id) {
-      // TODO: Update file
-
       const fileContents = JSON.stringify(item);
       const result = await this.updateFile(item.id, new TextEncoder().encode(fileContents))
+
       console.log(`Update file with id ${result.id}`)
+      this.itemListNeedsUpdate = true
+
+      return { id: result.id }
+
     } else {
       const fileName = `${uuidv4()}.json`
       const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
       const fileResponse = await this.uploadFile(itemsFolder.id, fileName, new TextEncoder().encode(JSON.stringify(item)))
 
       this.itemListNeedsUpdate = true
-
       console.log(`Stored new item with id ${fileResponse.id}`)
 
       return { id: fileResponse.id }
     }
-
 
   }
 
@@ -230,18 +245,21 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     https://modus.culturanuova.com/api/file-service/files?lang=it&folder={{baseFolder}}&name=items
     Authorization: {{token}}
     */
+
     const params = new URLSearchParams({
       folder: parentId,
     })
-
     const loginData = await this.getLoginData()
     const url = this.getUrl(`api/file-service/files?${params.toString()}`)
 
-    const response = await this.httpClient.get<any>(url, {
-      headers: { Authorization: loginData.token }
-    }).toPromise()
+    this.context.startLoading()
 
-    return name ? response.data.files.filter(f => f.name === name) : response.data.files
+    return new Promise<ModusOperandiFileProps[]>((resolve, reject) => {
+      this.httpClient.get<any>(url, { headers: { Authorization: loginData.token } }).subscribe({
+        next: value => resolve(name ? value.data.files.filter(f => f.name === name) : value.data.files),
+        error: e => reject(e)
+      })
+    }).finally(() => this.context.stopLoading())
 
     /*
     https://modus.culturanuova.com/api/file-service/files?lang=it&folder={{baseFolder}}&name=items
@@ -298,14 +316,20 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     const data = new FormData()
     data.append("file", new Blob([contents]))
 
-    const response = await this.httpClient.post<any>(url, data, {
-      headers: {
-        Authorization: loginData.token,
-        "enc-type": "multipart/form-data"
-      }
-    }).toPromise()
+    this.context.startLoading()
 
-    return response.data.files[0]
+    return new Promise<ModusOperandiFileProps>((resolve, reject) => {
+      this.httpClient.post<any>(url, data, {
+        headers: {
+          Authorization: loginData.token,
+          "enc-type": "multipart/form-data"
+        }
+      }).subscribe({
+        next: response => resolve(response.data.files[0]),
+        error: e => reject(e)
+      })
+    }).finally(() => this.context.stopLoading())
+
   }
 
   private async uploadFile(parentId: string, name: string, contents: ArrayBuffer): Promise<ModusOperandiFileProps> {
@@ -317,14 +341,19 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     data.append("parent", parentId)
     data.append("file[]", new Blob([contents]), name)
 
-    const response = await this.httpClient.post<any>(url, data, {
-      headers: {
-        Authorization: loginData.token,
-        "enc-type": "multipart/form-data"
-      }
-    }).toPromise()
+    this.context.startLoading()
 
-    return response.data.files[0]
+    return new Promise<ModusOperandiFileProps>((resolve, reject) => {
+      this.httpClient.post<any>(url, data, {
+        headers: {
+          Authorization: loginData.token,
+          "enc-type": "multipart/form-data"
+        }
+      }).subscribe({
+        next: response => resolve(response.data.files[0]),
+        error: e => reject(e)
+      })
+    }).finally(() => this.context.stopLoading())
 
   }
 
@@ -341,38 +370,9 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   }
 
   private async getLoginData(): Promise<ModusOperandiLoginData> {
-
     let data = JSON.parse(localStorage.getItem(SS_LOGIN_DATA_ID))
-    if (data)
-      return data;
-
-    let done = false;
-
-
-
-    while (!done) {
-      const loginForm = await this.context.modusOperandiLogin();
-
-      const data = new FormData();
-      data.append("username", loginForm.username);
-      data.append("password", loginForm.password);
-
-      try {
-        const loginData = await this.httpClient.post<ModusOperandiLoginData>(this.getUrl(`/api/auth-service/auth`), data, {
-          headers: {
-            'enctype': 'multipart/form-data'
-          },
-        }).toPromise();
-
-        localStorage.setItem(SS_LOGIN_DATA_ID, JSON.stringify(loginData));
-
-        return loginData
-      }
-      catch (e) {
-        console.error(e.error)
-      }
-    }
-
+    if (data) return data;
+    else return { userId: "USER", token: "NOT_LOGGED" }
   }
 
 }

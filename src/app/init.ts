@@ -5,19 +5,12 @@ import { Config } from './types/config';
 
 const CONFIG_SCHEMA = require('./types/config-schema.json')
 
-const DEFAULT_CONFIG: Config = {
-  title: "Modus Explorer",
-  entry: "home",
-  headerLinks: [],
-  internationalization: {
-    defaultLocale: "it",
-    locales: ["it", "en"]
-  }
-}
 
 export function initialize(contentProvider: ContentProviderService, context: ContextService, jsonValidator: JsonValidator): () => Promise<any> {
 
   return async () => {
+/*
+    console.log("Initializing...")
 
     try {
       const config = await contentProvider.getConfig()
@@ -29,6 +22,6 @@ export function initialize(contentProvider: ContentProviderService, context: Con
     catch (e) {
       await context.initialize(Object.assign({}, DEFAULT_CONFIG))
     }
-
+*/
   }
 }

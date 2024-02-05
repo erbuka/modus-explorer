@@ -1,5 +1,5 @@
 import { BrowserModule, HammerModule } from '@angular/platform-browser';
-import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { NgModule, APP_INITIALIZER, ErrorHandler } from '@angular/core';
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -24,6 +24,7 @@ import { MAT_TABS_CONFIG, MatTabsModule } from '@angular/material/tabs';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AppComponent } from './app.component';
 import { BlockListComponent } from './ui/block-list/block-list.component';
@@ -62,6 +63,10 @@ import { ItemInputComponent } from './ui/item-input/item-input.component';
 import { EditorModeGuard } from './editor-mode.guard';
 import { ColorPickerComponent } from './ui/color-picker/color-picker.component';
 import { ConfigEditorComponent } from './ui/config-editor/config-editor.component';
+import { LoginComponent } from './ui/login/login.component';
+import { Router } from '@angular/router';
+import { GlobalErrorHandler } from './classes/global-error-handler';
+import { GlobalLoadingComponent } from './ui/global-loading/global-loading.component';
 
 
 
@@ -94,6 +99,8 @@ import { ConfigEditorComponent } from './ui/config-editor/config-editor.componen
     ItemInputComponent,
     ColorPickerComponent,
     ConfigEditorComponent,
+    LoginComponent,
+    GlobalLoadingComponent,
   ],
   imports: [
     BrowserModule,
@@ -122,6 +129,7 @@ import { ConfigEditorComponent } from './ui/config-editor/config-editor.componen
     MatRadioModule,
     MatAutocompleteModule,
     MatChipsModule,
+    MatProgressSpinnerModule,
   ],
   providers: [
     EditorModeGuard,
@@ -130,8 +138,10 @@ import { ConfigEditorComponent } from './ui/config-editor/config-editor.componen
     { provide: MAT_CHECKBOX_DEFAULT_OPTIONS, useValue: { color: "primary" } },
     { provide: MAT_TABS_CONFIG, useValue: { animationDuration: "0" } },
     { provide: APP_BASE_HREF, useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(), deps: [PlatformLocation] },
-    { provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContentProviderService, ContextService, JsonValidator] },
-    { provide: ContentProviderService, useFactory: ContentProviderService.factory, deps: [ContextService, HttpClient, JsonValidator] }
+    // FIXME: commentato, per adesso non sembra servire
+    //{ provide: APP_INITIALIZER, useFactory: initialize, multi: true, deps: [ContentProviderService, ContextService, JsonValidator] },
+    { provide: ContentProviderService, useFactory: ContentProviderService.factory, deps: [ContextService, HttpClient, JsonValidator, Router] },
+    { provide: ErrorHandler, useClass: GlobalErrorHandler }
   ],
   bootstrap: [AppComponent]
 })

@@ -55,6 +55,7 @@ export class ContextService {
 
   private _editorMode: boolean = false;
 
+  _loading = 0;
   _currentLocale: ConfigLocale;
   _locales: ConfigLocale[];
 
@@ -64,7 +65,6 @@ export class ContextService {
 
   editorMode: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  onModusOperandiLogin: EventEmitter<ModusOperandiLoginEvent> = new EventEmitter();
   onTextEdit: EventEmitter<TextEditEvent> = new EventEmitter();
   onFileChoose: EventEmitter<FileChooserEvent> = new EventEmitter();
   onError: EventEmitter<ErrorEvent> = new EventEmitter();
@@ -84,6 +84,12 @@ export class ContextService {
     });
     */
   }
+
+
+  startLoading(): void { this._loading++ }
+  stopLoading(): void { this._loading = Math.max(0, this._loading - 1) }
+
+  get loading(): boolean { return this._loading > 0 }
 
   async initialize(config: Config) {
     this.config = config;
@@ -136,13 +142,6 @@ export class ContextService {
     this.templates.set(name, ref);
   }
 
-  modusOperandiLogin(): Promise<ModusOperandiLoginForm> {
-    return new Promise<ModusOperandiLoginForm>((resolve, reject) => {
-      this.onModusOperandiLogin.emit({
-        confirm: (data: ModusOperandiLoginForm) => resolve(data)
-      })
-    })
-  }
 
   editText(text: LocalizedText, multiline: boolean = false): Promise<LocalizedText> {
     let textCopy = typeof text === "string" ? text : Object.assign({}, text);
