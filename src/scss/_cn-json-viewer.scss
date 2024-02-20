@@ -1,0 +1,11 @@
+app-json-viewer {
+  .cn-json-key {
+    padding: $spacer*0.125 $spacer*0.25;
+    cursor: pointer;
+    display: inline-block;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  }
+}

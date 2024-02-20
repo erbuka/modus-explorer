@@ -1,0 +1,28 @@
+<button *ngIf="isExpandable" (click)="expanded=!expanded" class="mx-2">
+  <span *ngIf="expanded">+</span>
+  <span *ngIf="!expanded">-</span>
+</button>
+<ng-container *ngIf="isObject">
+  <span>{{ '{' }}</span>
+  <span class="px-2" [class.d-none]="expanded">...</span>
+  <div [class.d-none]="!expanded">
+    <div class="ml-4" *ngFor="let item of data | keyvalue">
+      <span class="cn-json-key" (click)="copyPath(item.key)"><strong>{{ item.key }}</strong></span>: <app-json-viewer [path]="path + '[\'' + item.key + '\']'"
+        [data]="item.value"></app-json-viewer>
+    </div>
+  </div>
+  <span>{{ '}' }}</span>
+</ng-container>
+<ng-container *ngIf="isArray">
+  <span>[</span>
+  <span class="px-2" [class.d-none]="expanded">...</span>
+  <div [class.d-none]="!expanded">
+    <div class="ml-4" *ngFor="let item of data; index as idx">
+      <span class="cn-json-key" (click)="copyPath(idx)"><strong>[{{ idx }}]</strong></span>: <app-json-viewer [path]="path + '[' + idx + ']'" [data]="item"></app-json-viewer>
+    </div>
+  </div>
+  <span>]</span>
+</ng-container>
+<ng-container *ngIf="isOther">
+  <span>{{ data | json }}</span>
+</ng-container>

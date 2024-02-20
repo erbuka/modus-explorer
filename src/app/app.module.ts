@@ -68,6 +68,7 @@ import { Router } from '@angular/router';
 import { GlobalErrorHandler } from './classes/global-error-handler';
 import { GlobalLoadingComponent } from './ui/global-loading/global-loading.component';
 import { ModusOperandiFilePickerComponent } from './ui/file-input/modus-operandi-file-picker/modus-operandi-file-picker.component';
+import { JsonViewerComponent } from './ui/json-viewer/json-viewer.component';
 
 
 
@@ -103,6 +104,7 @@ import { ModusOperandiFilePickerComponent } from './ui/file-input/modus-operandi
     LoginComponent,
     GlobalLoadingComponent,
     ModusOperandiFilePickerComponent,
+    JsonViewerComponent,
   ],
   imports: [
     BrowserModule,
