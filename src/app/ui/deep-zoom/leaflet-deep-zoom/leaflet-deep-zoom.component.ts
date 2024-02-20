@@ -317,7 +317,22 @@ export class LeafletDeepZoomComponent implements OnInit, OnDestroy, OnChanges, I
 			}
 			this.item.layers.push(layerDef)
 		} else if (type === 'deep-image') {
-			throw new Error("Not implemented")
+
+			const layerDef: DeepZoomItemDeepImageLayer = {
+				type: "deep-image",
+				id: uuidv4(),
+				width: this.item.options.viewport.width,
+				height: this.item.options.viewport.height,
+				imageFormat: "jpg",
+				imageSrc: "",
+				tileOverlap: 1,
+				tileSize: 256,
+				title: "Deep Image Layer",
+				color: "#ffffff",
+			}
+
+			this.item.layers.push(layerDef)
+
 		}
 	}
 
