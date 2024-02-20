@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, TemplateRef, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, TemplateRef, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import { PageItem } from 'src/app/types/page-item';
 
@@ -9,6 +9,8 @@ import { PageItem } from 'src/app/types/page-item';
 })
 export class PageComponent implements OnChanges {
 
+  @ViewChild("defaultTmpl", { static:true, read: TemplateRef }) defaultTmpl: TemplateRef<any>
+
   @Input() item: PageItem = null;
 
   template: TemplateRef<any> = null;
@@ -17,7 +19,7 @@ export class PageComponent implements OnChanges {
   constructor(private context: ContextService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.template = this.context.getTemplate(this.item.template);
+    this.template = this.context.getTemplate(this.item.template) || this.defaultTmpl;
     this.templateContext = { $implicit: this.item.data, item: this.item };
   }
 
