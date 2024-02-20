@@ -13,12 +13,7 @@ import { Router } from '@angular/router';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
-export type ModusOperandiImageSource = "thumbnail" | "gallery" | "source"
 
-export type ModusOperandiLoginData = {
-  token: string,
-  userId: string
-}
 
 export type ItemRef = {
   id: string,
@@ -121,9 +116,40 @@ export class LocalContentProviderService extends ContentProviderService {
   }
 }
 
+export type ModusOperandiImageSource = "thumbnail" | "gallery" | "source"
+
+export type ModusOperandiLoginData = {
+  token: string,
+  userId: string
+}
+
 export type ModusOperandiUserGroup = {
   id: string,
   name: string
+}
+
+export type ModusOperandiInfoFile = {
+  mimeType: string,
+  deepZoom?: {
+    name: string,
+    description: string,
+    width: number,
+    height: number,
+    dpi: number,
+    layers: {
+      id: string,
+      name: string,
+      description: string,
+      path: string,                         // ex "/root.{f}/{f}....", manca "https://{dominio}/content"
+      width: number,
+      height: number,
+      dpi: number,
+      overlap: number,
+      tileSize: number,
+      extension: "jpg" | "jpeg" | "png",
+      index: number
+    }[]
+  }
 }
 
 export type ModusOperandiFileProps = {
@@ -185,7 +211,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   }
 
   async getFileUrl(fileProps: ModusOperandiFileProps) {
-    return this.getUrl(new URL(fileProps.view).pathname)  
+    return this.getUrl(new URL(fileProps.view).pathname)
   }
 
   async getImageUrl(fileProps: ModusOperandiFileProps, sourceType: ModusOperandiImageSource) {
@@ -216,7 +242,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     const folder = await this.createOrGetFolder(this.server.baseFolderId, "files")
     const result = await this.uploadFile(folder.id, fileName, data)
     const fileInfo = await this.listFiles(folder.id, { name: result.name })
-    return { fileUrl: this.getUrl(new URL(fileInfo[0].view).pathname)  }
+    return { fileUrl: this.getUrl(new URL(fileInfo[0].view).pathname) }
   }
 
   async listItems(): Promise<{ id: string; }[]> {
@@ -274,7 +300,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     return itemData
   }
 
-  private getUrl(path: string) {
+  getUrl(path: string) {
 
     // Check the uri for common mistakes
     // 1. double slashes
@@ -283,6 +309,20 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     // Join the url with the server base
     let url = new URL(path, this.server.baseUrl)
     return url.href
+  }
+
+  async infoFile({ id }: { id: string }): Promise<ModusOperandiInfoFile> {
+    const loginData = await this.getLoginData()
+    const url = this.getUrl(`api/file-service/files/${id}`)
+
+    const result = await this.httpClient.get<any>(url, {
+      headers: {
+        Authorization: loginData.token
+      }
+    }).toPromise()
+
+    return result.data
+
   }
 
   async listFiles(parentId: string, options: { name?: string, group?: string } = {}): Promise<ModusOperandiFileProps[]> {

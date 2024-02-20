@@ -16,18 +16,7 @@ import { ItemComponent } from '../item/item.component';
 import { ThreeViewerItem } from 'src/app/types/three-viewer-item';
 import { DeepZoomItem } from 'src/app/types/deep-zoom-item';
 import { BehaviorSubject } from 'rxjs';
-import getServer from 'src/server';
 
-
-const DEFAULT_CONFIG: Config = {
-  title: "Modus Explorer",
-  entry: "home",
-  headerLinks: [],
-  internationalization: {
-    defaultLocale: "it",
-    locales: ["it", "en"]
-  }
-}
 
 const DEFAULT_3D: ThreeViewerItem = {
   type: "3d",
@@ -73,7 +62,8 @@ const DEFAULT_DEEPZOOM: DeepZoomItem = {
       width: 4096,
       height: 4096
     },
-    minimapImage: null
+    minimapImage: null,
+    showLayers: true
   }
 }
 

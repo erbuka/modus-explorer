@@ -234,6 +234,9 @@
                   <button mat-icon-button [matMenuTriggerFor]="addLayerMenu">
                     <mat-icon>add</mat-icon>
                   </button>
+                  <button *ngIf="isModusOperandiServer"  mat-icon-button (click)="importDeepZoomFromModusOperandi()">
+                    <mat-icon>cloud_download</mat-icon>
+                  </button>
                 </div>
 
               </div>

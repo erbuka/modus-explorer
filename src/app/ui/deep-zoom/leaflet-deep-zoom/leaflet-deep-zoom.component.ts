@@ -10,14 +10,16 @@ import { LocationRouterService } from 'src/app/location-router.service';
 import { State } from 'src/app/classes/state';
 import { LocalizedText } from 'src/app/types/item';
 import { ItemSave } from '../../item/item.component';
-import { ContentProviderService } from 'src/app/content-provider.service';
+import { ContentProviderService, ModusOperandiContentProviderService, ModusOperandiFileProps, ModusOperandiInfoFile } from 'src/app/content-provider.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { skip } from 'rxjs/operators';
+import { filter, skip } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { LeafletPolygonEditLayer } from './leaflet-polygon-edit-layer';
 import { v4 as uuidv4 } from 'uuid';
+import getServer from 'src/server';
+import { ModusOperandiFileFilter, ModusOperandiFilePickerComponent } from '../../file-input/modus-operandi-file-picker/modus-operandi-file-picker.component';
 
 
 
@@ -56,6 +58,7 @@ export class LeafletDeepZoomComponent implements OnInit, OnDestroy, OnChanges, I
 	measureLayer: LeafletMeasureLayer = null;
 	navigatorBounds: NavigatorTrackBounds = null;
 	showLayers: boolean = true;
+	isModusOperandiServer = getServer().type === "modus-operandi"
 
 	_tool: DeepZoomTools = "pan";
 	_measureUnit: DeepZoomMeasureUnit = "centimeters";
@@ -273,6 +276,54 @@ export class LeafletDeepZoomComponent implements OnInit, OnDestroy, OnChanges, I
 		map.setView(this.pointToLatLng(viewport.width / 2, viewport.height / 2, 0), map.getMinZoom());
 	}
 
+	async selectDeepZoomFromModusOperandi(): Promise<ModusOperandiInfoFile> {
+		const moContentProvider = this.contentProvider as ModusOperandiContentProviderService
+
+		const fileFilter: ModusOperandiFileFilter = (f: ModusOperandiFileProps) => {
+			return f.type === "DeepZoomLink" || f.deepZoom?.deepZoom === true
+		}
+
+		const ref = this.dialog.open(ModusOperandiFilePickerComponent, {
+			position: {
+				top: "100px"
+			},
+			width: "90%",
+			maxWidth: "1280px"
+		})
+		ref.componentInstance.fileFilter = fileFilter
+
+		const result = await ref.afterClosed().toPromise()
+		if (result) {
+			const info = await moContentProvider.infoFile(result[0])
+			return info
+		}
+		return null
+	}
+
+	async importDeepZoomFromModusOperandi() {
+		const deepZoomInfo = await this.selectDeepZoomFromModusOperandi()
+		const moContentProvider = this.contentProvider as ModusOperandiContentProviderService
+		if (deepZoomInfo) {
+			for (let layer of deepZoomInfo.deepZoom.layers) {
+				const layerDef: DeepZoomItemDeepImageLayer = {
+					type: "deep-image",
+					id: uuidv4(),
+					title: layer.name,
+					height: layer.height,
+					width: layer.width,
+					imageFormat: layer.extension,
+					// The 8th level is always 256px, good for the preview. Adding "content" in front because path starts with "/root.{f}/...."
+					previewImage: moContentProvider.getUrl(`content${layer.path}/8/0_0.${layer.extension}`),
+					imageSrc: moContentProvider.getUrl(`content${layer.path}`),
+					tileOverlap: layer.overlap,
+					tileSize: layer.tileSize,
+					minZoom: -Math.ceil(Math.log2(Math.max(layer.width, layer.height))),
+					maxZoom: 0,
+				}
+				this.item.layers.push(layerDef)
+			}
+		}
+	}
 
 	addLayerToGroup(group: DeepZoomItemLayerGroup, layerId: string) {
 		const idx = group.layers.findIndex(l => l === layerId)

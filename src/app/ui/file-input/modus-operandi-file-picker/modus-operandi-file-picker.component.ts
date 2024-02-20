@@ -45,7 +45,6 @@ export class ModusOperandiFilePickerComponent implements OnInit {
   async reloadFilesList() {
     const folderId = this.currentPath.length === 0 ? null : this.currentPath[this.currentPath.length - 1].id
     const files = await this.moContentProvider.listFiles(folderId, { group: this.currentGroup.value.id })
-    console.log(files)
     this.files = files.filter(f => f.type === "folder" || this.fileFilter(f))
   }
 
