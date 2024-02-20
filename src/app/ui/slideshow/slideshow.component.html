@@ -177,7 +177,7 @@
             <h2>Edit Slide</h2>
             <mat-form-field class="d-block">
               <mat-label>Preview Image</mat-label>
-              <app-file-input [item]="this.item" [(url)]="editorMode.selectedSlide.previewImage"></app-file-input>
+              <app-file-input [item]="this.item" contentTypeFilter="image" [(url)]="editorMode.selectedSlide.previewImage"></app-file-input>
             </mat-form-field>
             <mat-form-field class="d-block">
               <mat-label>Title</mat-label>
@@ -193,12 +193,12 @@
 
             <mat-form-field class="d-block" *ngIf="editorMode.selectedSlide.type === 'image'">
               <mat-label>Image</mat-label>
-              <app-file-input [item]="this.item" [(url)]="editorMode.selectedSlide.image"></app-file-input>
+              <app-file-input [item]="this.item" contentTypeFilter="image" [(url)]="editorMode.selectedSlide.image"></app-file-input>
             </mat-form-field>
 
             <mat-form-field class="d-block" *ngIf="editorMode.selectedSlide.type === 'video'">
               <mat-label>Video</mat-label>
-              <app-file-input [item]="this.item" [(url)]="editorMode.selectedSlide.video"></app-file-input>
+              <app-file-input [item]="this.item" contentTypeFilter="video" [(url)]="editorMode.selectedSlide.video"></app-file-input>
             </mat-form-field>
 
 

@@ -1,4 +1,17 @@
+<ng-template #imageSourceDialogTmpl let-data>
+  <mat-radio-group aria-label="Select an option" #imageSource [(ngModel)]="data.value">
+    <mat-radio-button class="d-block mb-3" value="thumbnail">Thumbnail</mat-radio-button>
+    <mat-radio-button class="d-block mb-3" value="gallery">Gallery</mat-radio-button>
+    <mat-radio-button class="d-block mb-3" value="source">Source</mat-radio-button>
+  </mat-radio-group>
+  <button mat-raised-button [mat-dialog-close]="data.value">Confirm</button>
+</ng-template>
+
 <div class="cn-file-input" (appFileDrop)="onFileDrop($event)">
+
+  <button *ngIf="isModusOperandi" mat-icon-button (click)="modusOperandiFilePicker()" class="cn-mo-file-picker">
+    <mat-icon>more_horiz</mat-icon>
+  </button>
 
   <ng-container *ngIf="url">
     <img class="cn-file-input-preview" *ngIf="contentType === 'image'" [src]="url">

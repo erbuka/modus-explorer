@@ -67,6 +67,7 @@ import { LoginComponent } from './ui/login/login.component';
 import { Router } from '@angular/router';
 import { GlobalErrorHandler } from './classes/global-error-handler';
 import { GlobalLoadingComponent } from './ui/global-loading/global-loading.component';
+import { ModusOperandiFilePickerComponent } from './ui/file-input/modus-operandi-file-picker/modus-operandi-file-picker.component';
 
 
 
@@ -101,6 +102,7 @@ import { GlobalLoadingComponent } from './ui/global-loading/global-loading.compo
     ConfigEditorComponent,
     LoginComponent,
     GlobalLoadingComponent,
+    ModusOperandiFilePickerComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,34 @@
+<div class="container fluid">
+  <div class="row">
+    <mat-form-field class="col-auto">
+      <mat-label>Group</mat-label>
+      <mat-select [ngModel]="(currentGroup | async)" (ngModelChange)="currentGroup.next($event)">
+        <mat-option *ngFor="let g of groups" [value]="g">{{ g.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col">
+      <mat-label>Path</mat-label>
+      <input type="text" matInput readonly="" [ngModel]="path">
+    </mat-form-field>
+    <div class="col-auto">
+      <button mat-fab (click)="goUp()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="cn-mo-file-picker-list">
+    <div class="row">
+      <div *ngFor="let f of files" class="cn-file col-3" (dblclick)="onFileDoubleClick(f)">
+        <div class="cn-icon">
+          <img *ngIf="f.thumbnail" [src]="f.thumbnail" class="cn-thumbnail">
+          <mat-icon *ngIf="f.type === 'folder'">folder</mat-icon>
+          <mat-icon *ngIf="f.type !== 'folder' && !f.thumbnail">file</mat-icon>
+        </div>
+        <div class="cn-info">
+          <div class="cn-name">{{ f.name }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -13,6 +13,8 @@ import { Router } from '@angular/router';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
+export type ModusOperandiImageSource = "thumbnail" | "gallery" | "source"
+
 export type ModusOperandiLoginData = {
   token: string,
   userId: string
@@ -119,10 +121,14 @@ export class LocalContentProviderService extends ContentProviderService {
   }
 }
 
-
-type ModusOperandiFileProps = {
+export type ModusOperandiUserGroup = {
   id: string,
-  type: "folder" | "file",
+  name: string
+}
+
+export type ModusOperandiFileProps = {
+  id: string,
+  type: "folder" | "file" | "DeepZoomLink",
   name: string,
   extension: "string"
   deepZoom: any,
@@ -142,6 +148,27 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     this.server = getServer() as ModusOperandiServerType;
   }
 
+
+  async listGroups(): Promise<ModusOperandiUserGroup[]> {
+    const loginData = await this.getLoginData()
+
+    const url = this.getUrl(`/api/auth-service/users/profile/${loginData.userId}`)
+
+    const userData = await this.httpClient.get<any>(url, {
+      headers: {
+        Authorization: loginData.token
+      }
+    }).toPromise()
+
+    return Object.entries(userData.data.groups).map(([_, gdata]: [string, any]) => {
+      return {
+        id: gdata.id,
+        name: gdata.name,
+      }
+    })
+
+  }
+
   async login(username: string, password: string) {
     const data = new FormData();
     data.append("username", username.trim());
@@ -157,13 +184,25 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
   }
 
+  async getFileUrl(fileProps: ModusOperandiFileProps) {
+    return this.getUrl(new URL(fileProps.view).pathname)  
+  }
+
+  async getImageUrl(fileProps: ModusOperandiFileProps, sourceType: ModusOperandiImageSource) {
+    switch (sourceType) {
+      case "thumbnail": return this.getUrl(`/api/file-service/files/thumb/${fileProps.id}`)
+      case "gallery": return this.getUrl(`/api/file-service/files/gallery/${fileProps.id}`)
+      case "source": return this.getFileUrl(fileProps)
+    }
+  }
+
   async saveConfig(config: Config): Promise<void> {
     const data = new TextEncoder().encode(JSON.stringify(config))
     const result = await this.uploadFile(this.server.baseFolderId, "config.json", data)
   }
 
   async getConfig(): Promise<Config> {
-    const files = await this.listFiles(this.server.baseFolderId, "config")
+    const files = await this.listFiles(this.server.baseFolderId, { name: "config" })
 
     if (files.length === 1) {
       const contents = new TextDecoder().decode(await this.downloadFile(files[0].id))
@@ -176,8 +215,8 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
     const folder = await this.createOrGetFolder(this.server.baseFolderId, "files")
     const result = await this.uploadFile(folder.id, fileName, data)
-    const fileInfo = await this.listFiles(folder.id, result.name)
-    return { fileUrl: fileInfo[0].view }
+    const fileInfo = await this.listFiles(folder.id, { name: result.name })
+    return { fileUrl: this.getUrl(new URL(fileInfo[0].view).pathname)  }
   }
 
   async listItems(): Promise<{ id: string; }[]> {
@@ -235,12 +274,18 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     return itemData
   }
 
-  private getUrl(uri: string) {
-    // TODO: join with slashes
-    return `${this.server.baseUrl}${uri}`
+  private getUrl(path: string) {
+
+    // Check the uri for common mistakes
+    // 1. double slashes
+    path = path.replace("//", "/")
+
+    // Join the url with the server base
+    let url = new URL(path, this.server.baseUrl)
+    return url.href
   }
 
-  private async listFiles(parentId: string, name?: string): Promise<ModusOperandiFileProps[]> {
+  async listFiles(parentId: string, options: { name?: string, group?: string } = {}): Promise<ModusOperandiFileProps[]> {
     /*
     https://modus.culturanuova.com/api/file-service/files?lang=it&folder={{baseFolder}}&name=items
     Authorization: {{token}}
@@ -249,6 +294,10 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     const params = new URLSearchParams({
       folder: parentId,
     })
+
+    if (options.group)
+      params.append("group", options.group)
+
     const loginData = await this.getLoginData()
     const url = this.getUrl(`api/file-service/files?${params.toString()}`)
 
@@ -256,7 +305,16 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
     return new Promise<ModusOperandiFileProps[]>((resolve, reject) => {
       this.httpClient.get<any>(url, { headers: { Authorization: loginData.token } }).subscribe({
-        next: value => resolve(name ? value.data.files.filter(f => f.name === name) : value.data.files),
+        next: value => {
+          const result: ModusOperandiFileProps[] = options.name ? value.data.files.filter(f => f.name === options.name) : value.data.files
+
+          result.forEach(file => {
+            if (file.thumbnail)
+              file.thumbnail = this.getUrl(file.thumbnail)
+          })
+
+          resolve(result)
+        },
         error: e => reject(e)
       })
     }).finally(() => this.context.stopLoading())
@@ -277,7 +335,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
 
     // Check if the folder exists first
-    const files = await this.listFiles(parentId, name)
+    const files = await this.listFiles(parentId, { name })
 
     if (files.length > 0) {
       console.log(`Folder ${name} already exists under ${parentId}`)

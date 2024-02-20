@@ -189,7 +189,7 @@
               </mat-form-field>
               <mat-form-field class="col-12">
                 <mat-label>Navigator Image</mat-label>
-                <app-file-input [(url)]="item.options.minimapImage"></app-file-input>
+                <app-file-input contentTypeFilter="image" [(url)]="item.options.minimapImage"></app-file-input>
               </mat-form-field>
 
               <div class="col-12 mb-4">
@@ -255,7 +255,7 @@
 
                   <mat-form-field class="col-12">
                     <mat-label>Preview Image</mat-label>
-                    <app-file-input [(url)]="editorMode.selectedLayer.previewImage"></app-file-input>
+                    <app-file-input contentTypeFilter="image" [(url)]="editorMode.selectedLayer.previewImage"></app-file-input>
                   </mat-form-field>
 
                   <mat-form-field class="col-12">

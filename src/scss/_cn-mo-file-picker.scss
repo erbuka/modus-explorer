@@ -1,0 +1,55 @@
+.cn-mo-file-picker-list {
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  min-height: 10rem;
+  max-height: 512px;
+
+  .cn-file {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: $spacer * 0.5;
+    padding-top: $spacer *0.25;
+    padding-bottom: $spacer *0.25;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, .5);
+    }
+
+    .cn-info {
+      flex-grow: 1;
+      padding: $spacer * 0.25;
+      overflow: hidden;
+
+      .cn-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+    }
+
+    .cn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 2.5rem;
+      aspect-ratio: 1/1;
+      flex-grow: 0;
+      flex-shrink: 0;
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+      }
+    }
+
+
+  }
+}
