@@ -62,6 +62,7 @@ import { ItemInputComponent } from './ui/item-input/item-input.component';
 import { EditorModeGuard } from './editor-mode.guard';
 import { ColorPickerComponent } from './ui/color-picker/color-picker.component';
 import { ConfigEditorComponent } from './ui/config-editor/config-editor.component';
+import { JsonViewerComponent } from './ui/json-viewer/json-viewer.component';
 
 
 
@@ -94,6 +95,7 @@ import { ConfigEditorComponent } from './ui/config-editor/config-editor.componen
     ItemInputComponent,
     ColorPickerComponent,
     ConfigEditorComponent,
+    JsonViewerComponent,
   ],
   imports: [
     BrowserModule,

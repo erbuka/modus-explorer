@@ -1,7 +1,7 @@
 <ng-template #defaultTmpl let-data>
     <div class="container bg-white py-4">
         <h1>Default template</h1>
-        <pre>{{ data | json }}</pre>
+        <app-json-viewer [data]="data"></app-json-viewer>
     </div>
 </ng-template>
 <ng-container *ngIf="item && template">
