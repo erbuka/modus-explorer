@@ -69,6 +69,7 @@ import { GlobalErrorHandler } from './classes/global-error-handler';
 import { GlobalLoadingComponent } from './ui/global-loading/global-loading.component';
 import { ModusOperandiFilePickerComponent } from './ui/file-input/modus-operandi-file-picker/modus-operandi-file-picker.component';
 import { JsonViewerComponent } from './ui/json-viewer/json-viewer.component';
+import { IotaPipe } from './iota.pipe';
 
 
 
@@ -105,6 +106,7 @@ import { JsonViewerComponent } from './ui/json-viewer/json-viewer.component';
     GlobalLoadingComponent,
     ModusOperandiFilePickerComponent,
     JsonViewerComponent,
+    IotaPipe,
   ],
   imports: [
     BrowserModule,

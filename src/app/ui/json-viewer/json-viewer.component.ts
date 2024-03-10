@@ -15,7 +15,7 @@ export class JsonViewerComponent implements OnInit {
   isOther: boolean;
   isExpandable: boolean
 
-  expanded: boolean = true
+  expanded: boolean = false
 
 
   @Input() path: string = ""

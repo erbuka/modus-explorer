@@ -13,8 +13,6 @@ import { Router } from '@angular/router';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
-
-
 export type ItemRef = {
   id: string,
   title?: LocalizedText
@@ -50,6 +48,7 @@ export abstract class ContentProviderService {
   }
 }
 
+/* LOCAL */
 @Injectable()
 export class LocalContentProviderService extends ContentProviderService {
 
@@ -111,10 +110,14 @@ export class LocalContentProviderService extends ContentProviderService {
     }
 
     item.id = id;
+
     return item;
 
   }
 }
+
+/* MODUS OPERANDI */
+
 
 export type ModusOperandiImageSource = "thumbnail" | "gallery" | "source"
 
@@ -161,6 +164,43 @@ export type ModusOperandiFileProps = {
   thumbnail: string,
   view: string
 }
+
+export namespace MORecord {
+
+  export type CommonFieldProps = {
+    id: string,
+    title: string,
+    type: "text" | "file" | "group"
+  }
+
+  export type TextField = CommonFieldProps & {
+    type: "text"
+    values: LocalizedText[]
+  }
+
+  export type FileField = CommonFieldProps & {
+    type: "file",
+    values: {
+      id: string,
+      name: string,
+      thumbnail: string,
+      type: string,
+      view: string,
+      deepZoom?: any
+    }[]
+  }
+
+  export type GroupField = CommonFieldProps & {
+    type: "group",
+    fields: RecordValue | RecordValue[]
+  }
+
+  export type FieldValue = FileField | TextField | GroupField;
+
+  export type RecordValue = { [id: string]: FieldValue }
+
+}
+
 
 @Injectable()
 export class ModusOperandiContentProviderService extends ContentProviderService {
@@ -359,9 +399,86 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
       })
     }).finally(() => this.context.stopLoading())
 
-    /*
-    https://modus.culturanuova.com/api/file-service/files?lang=it&folder={{baseFolder}}&name=items
-  */
+  }
+
+  async getRecord(id: string) {
+    const loginData = await this.getLoginData()
+    const url = this.getUrl(`/api/dataaccess-service/records/record/${id}`)
+    const record = await this.httpClient.get<any>(url, {
+      headers: { Authorization: loginData.token }
+    }).toPromise()
+    return record.data
+  }
+
+  /**
+   * This function is used to parse the record data received from the server.
+   * It recursively traverses the record data and performs the following operations:
+   * - If the record data contains fields, it creates an object with field IDs as keys and recursively calls the function to parse the field data.
+   * - If the record data is of type "group", it calculates the size of the group by finding the maximum size of its nested groups and creates an object with the group ID, type, size, and recursively parsed field data.
+   * - If the record data is neither a field nor a group, it iterates over the values and performs the following operations:
+   *   - If a value is of type "file", it updates the thumbnail and view URLs by calling the getUrl() function.
+   *   - It returns the parsed record data.
+   * 
+   * @param recordData The record data to be parsed.
+   * @returns The parsed record data.
+   */
+  parseRecordData(recordData: any): any {
+
+    // The group size is hard to find. We must traverse all the fields and find the maximum size. If the sub field is a group it self, we must traverse it recursively. 
+
+    const getGroupSize = (groupFields: any[]) => Math.max(...groupFields.map(g => g.type === "group" ? getGroupSize(g.data[0]) : g.values.length))
+
+    const arrayWalkRecursive = (array: any[], callback: (value: any, key: number) => any) => {
+      for (let i = 0; i < array.length; i++) {
+        if (array[i] instanceof Array) {
+          arrayWalkRecursive(array[i], callback)
+        } else {
+          array[i] = callback(array[i], i)
+        }
+      }
+    }
+
+    if (recordData.fields) {
+      const result = {}
+
+      for (let field of recordData.fields) {
+        result[field.id] = this.parseRecordData(field)
+      }
+
+      return result
+
+    } else if (recordData.type === "group") {
+
+      const fields = recordData.data[0];
+      const size = getGroupSize(fields)
+
+      return {
+        id: recordData.id,
+        type: "group",
+        title: recordData.title,
+        size,
+        fields: this.parseRecordData({ fields })
+      };
+    } else {
+
+      arrayWalkRecursive(recordData.values, (value: any) => {
+        if (value) {
+          if (value.thumbnail)
+            value.thumbnail = this.getUrl(value.thumbnail)
+          if (value.view)
+            value.view = this.getUrl(value.view)
+        }
+        return value
+      });
+
+      return {
+        id: recordData.id,
+        type: recordData.type,
+        title: recordData.title,
+        values: recordData.values,
+      }
+
+    }
   }
 
   private async createOrGetFolder(parentId: string, name: string): Promise<ModusOperandiFileProps> {

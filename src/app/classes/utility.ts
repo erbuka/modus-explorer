@@ -4,3 +4,6 @@ export const computeHash: (data: ArrayBuffer) => Promise<string> = async (data) 
 		(x: number) => x.toString(16).padStart(2, "0")
 	).reduce((prev, curr) => prev + curr, "");
 }
+
+
+export const structuredClone = (obj: any) => JSON.parse(JSON.stringify(obj))

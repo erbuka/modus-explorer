@@ -361,7 +361,7 @@
               <div class="cn-list">
                 <div *ngFor="let grp of item.layerGroups; index as idx"
                   [class.cn-selected]="editorMode.selectedGroup === grp">
-                  <button mat-icon-button (click)="deleteLayer(idx)"><mat-icon>delete</mat-icon></button>
+                  <button mat-icon-button (click)="deleteGroup(grp)"><mat-icon>delete</mat-icon></button>
                   <button mat-icon-button (click)="editorMode.selectedGroup=grp"><mat-icon>edit</mat-icon></button>
                   <div class="cn-list-label">{{ (grp.title | cnLocalizedText) || grp.id }}</div>
                 </div>

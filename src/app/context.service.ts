@@ -134,6 +134,10 @@ export class ContextService {
     return this._currentLocale;
   }
 
+  getTemplateNames(): string[] {
+    return [...this.templates.keys()]
+  }
+
   getTemplate(name: string): TemplateRef<any> {
     return this.templates.get(name);
   }

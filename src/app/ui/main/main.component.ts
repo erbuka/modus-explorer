@@ -16,6 +16,7 @@ import { ItemComponent } from '../item/item.component';
 import { ThreeViewerItem } from 'src/app/types/three-viewer-item';
 import { DeepZoomItem } from 'src/app/types/deep-zoom-item';
 import { BehaviorSubject } from 'rxjs';
+import { PageItem } from 'src/app/types/page-item';
 
 
 const DEFAULT_3D: ThreeViewerItem = {
@@ -67,13 +68,20 @@ const DEFAULT_DEEPZOOM: DeepZoomItem = {
   }
 }
 
+const DEFAULT_PAGE: PageItem = {
+  type: "page",
+  template: null,
+  internalData: {},
+  modusOperandiRecordId: "65d87d2be59c94347ca06093"
+}
+
 
 const DEFAULT_ITEMS: { [type in Item['type']]?: Item } = {
   "block-list": DEFAULT_BLOCK_LIST,
   "slideshow": DEFAULT_SLIDESHOW,
   "deep-zoom": DEFAULT_DEEPZOOM,
   "3d": DEFAULT_3D,
-  "page": null,
+  "page": DEFAULT_PAGE,
 }
 
 

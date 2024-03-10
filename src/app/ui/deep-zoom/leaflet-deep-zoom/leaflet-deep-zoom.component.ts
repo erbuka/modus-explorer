@@ -317,6 +317,9 @@ export class LeafletDeepZoomComponent implements OnInit, OnDestroy, OnChanges, I
 					imageSrc: moContentProvider.getUrl(`content${layer.path}`),
 					tileOverlap: layer.overlap,
 					tileSize: layer.tileSize,
+					visible: true,
+					opacityControl: true,
+					opacity: 1,
 					minZoom: -Math.ceil(Math.log2(Math.max(layer.width, layer.height))),
 					maxZoom: 0,
 				}
@@ -347,6 +350,11 @@ export class LeafletDeepZoomComponent implements OnInit, OnDestroy, OnChanges, I
 		this.item.layerGroups.push(grp)
 	}
 
+	deleteGroup(grp: DeepZoomItemLayerGroup) {
+		this.item.layerGroups = this.item.layerGroups.filter(g => g !== grp)
+	}
+
+	// TODO: pass layer directly maybe?
 	deleteLayer(idx: number) {
 		const layerId = this.item.layers[idx].id
 		this.item.layers.splice(idx, 1)
