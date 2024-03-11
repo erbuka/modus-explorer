@@ -6,12 +6,23 @@ import { Item, LocalizedText } from './types/item';
 import { JsonValidator } from './json-validator.service';
 import { ContextService, ITEM_SCHEMA } from './context.service';
 import { Config, ModusOperandiServerType } from './types/config';
-import { computeHash } from './classes/utility';
+import { computeHash, structuredClone } from './classes/utility';
 import { v4 as uuidv4 } from 'uuid';
 import getServer from 'src/server';
 import { Router } from '@angular/router';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
+
+const DEFAULT_CONFIG: Config = {
+  entry: "home",
+  headerLinks: [],
+  internationalization: {
+    defaultLocale: "it",
+    locales: ["it", "en"]
+  },
+  title: "Modus Explorer",
+}
+
 
 export type ItemRef = {
   id: string,
@@ -283,7 +294,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
       return JSON.parse(contents)
     }
 
-    throw new Error('Config not found')
+    return structuredClone(DEFAULT_CONFIG);
   }
 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {

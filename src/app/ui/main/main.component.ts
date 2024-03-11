@@ -173,9 +173,14 @@ export class MainComponent extends State implements OnInit {
           this.resetContentScrollTop()
         }
         catch (e) {
-          if (e.status === 404)
-            this.notFound = true
-          else throw e
+          // TODO: before I was handling 404, but and trowing on other error code, but apparently the API throws 500 if the item is not found
+          // The rethrown error was handled by GlobalErrorHandler
+          /*
+            if(e.status === 404)
+              this.notFound = true
+            else throw e
+          */
+          this.notFound = true
         }
       }
     })
@@ -229,15 +234,6 @@ export class MainComponent extends State implements OnInit {
   resetContentScrollTop(): void {
     if (this.appContentElmt != null) {
       this.appContentElmt.nativeElement.scrollTop = 0;
-    }
-  }
-
-  private parseLocation(url: string) {
-    let [path, queryString] = url.split("?");
-    return {
-      url: url,
-      path: path,
-      queryString: queryString ? queryString : ""
     }
   }
 
