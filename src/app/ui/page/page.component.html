@@ -27,17 +27,24 @@
                     <mat-form-field class="col-6">
                         <mat-label>Template</mat-label>
                         <mat-select [(ngModel)]="item.template">
+                            <mat-option value="">
+                                <em>-- Default --</em>
+                            </mat-option>
                             <mat-option *ngFor="let name of templateNames" [value]="name">{{ name }}</mat-option>
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field class="col-12">
                         <mat-label>Data</mat-label>
-                        <textarea matInput [ngModel]="item.internalData | json" (input)="onInternalDataInput($event)" rows="10"></textarea>
+                        <textarea matInput [ngModel]="item.internalData | json" (input)="onInternalDataInput($event)"
+                            rows="10"></textarea>
                     </mat-form-field>
                     <ng-container *ngIf="isModusOperandi">
                         <mat-form-field class="col-12">
                             <mat-label>Modus Operandi Record</mat-label>
-                            <input type="text" matInput [(ngModel)]="item.modusOperandiRecordId">
+                            <input readonly type="text" matInput [ngModel]="recordName">
+                            <button mat-icon-button matSuffix (click)="pickRecord()">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
                         </mat-form-field>
                         <div class="col-12">
                             <button mat-raised-button (click)="viewData()">View Data</button>

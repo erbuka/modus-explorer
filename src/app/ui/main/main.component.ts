@@ -70,9 +70,8 @@ const DEFAULT_DEEPZOOM: DeepZoomItem = {
 
 const DEFAULT_PAGE: PageItem = {
   type: "page",
-  template: null,
+  template: "",
   internalData: {},
-  modusOperandiRecordId: "65d87d2be59c94347ca06093"
 }
 
 

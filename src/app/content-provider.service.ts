@@ -165,6 +165,14 @@ export type ModusOperandiFileProps = {
   view: string
 }
 
+export type ModusOperandiRecordProps = {
+  id: string,
+  type: string,
+  thumbnail: string,
+  modelName: string,
+  name: string,
+}
+
 export namespace MORecord {
 
   export type CommonFieldProps = {
@@ -400,6 +408,35 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     }).finally(() => this.context.stopLoading())
 
   }
+
+  async listRecords(options: { groupId?: string, catalogId?: string }): Promise<ModusOperandiRecordProps[]> {
+    /* GET https://modus.culturanuova.com/api/dataaccess-service/records?group=5b55ccbee59c945cdab9b9c1 */
+
+    const params = new URLSearchParams()
+
+    if (options.groupId)
+      params.append("group", options.groupId)
+
+    if (options.catalogId)
+      params.append("catalog", options.catalogId)
+
+    const loginData = await this.getLoginData()
+    const url = this.getUrl(`api/dataaccess-service/records/?${params.toString()}`)
+
+    const recordsData = await this.httpClient.get<any>(url, {
+      headers: { Authorization: loginData.token }
+    }).toPromise()
+
+    return recordsData.data.elements.map((record: any) => ({  
+      id: record.id,
+      type: record.type,
+      thumbnail: typeof record.thumbnail === "string" ? this.getUrl(record.thumbnail) : null,
+      modelName: record.modelName,
+      name: record.name
+    }))
+
+
+  };
 
   async getRecord(id: string) {
     const loginData = await this.getLoginData()

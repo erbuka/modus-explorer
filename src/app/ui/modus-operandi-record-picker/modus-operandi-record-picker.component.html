@@ -1,0 +1,31 @@
+<div class="container-fluid">
+  <div class="row">
+    <mat-form-field class="col-auto">
+      <mat-label>Group</mat-label>
+      <mat-select [ngModel]="(currentGroup | async)" (ngModelChange)="currentGroup.next($event)">
+        <mat-option *ngFor="let g of groups" [value]="g">{{ g.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="col">
+      <mat-label>Path</mat-label>
+      <input type="text" matInput readonly="" [ngModel]="path">
+    </mat-form-field>
+    <div class="col-auto">
+      <button mat-fab (click)="goUp()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="cn-mo-record-picker-list-wrapper">
+    <div class="cn-mo-record-picker-list">
+      <div *ngFor="let r of records" class="cn-record bg-primary" (dblclick)="onFileDoubleClick(r)">
+        <img *ngIf="r.thumbnail" [src]="r.thumbnail" class="cn-thumbnail">
+        <div class="cn-info">
+          <div class="cn-name">{{ r.name }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

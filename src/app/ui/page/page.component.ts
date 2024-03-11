@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, TemplateRef, OnChanges, SimpleChanges, ViewChild, OnDestroy } from '@angular/core';
-import { ContentProviderService, ModusOperandiContentProviderService } from 'src/app/content-provider.service';
+import { ContentProviderService, ModusOperandiContentProviderService, ModusOperandiRecordProps } from 'src/app/content-provider.service';
 import { ContextService } from 'src/app/context.service';
 import { PageItem } from 'src/app/types/page-item';
 import getServer from 'src/server';
@@ -8,6 +8,7 @@ import { structuredClone } from 'src/app/classes/utility';
 import { Subscription } from 'rxjs';
 import { skip } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
+import { ModusOperandiRecordPickerComponent } from '../modus-operandi-record-picker/modus-operandi-record-picker.component';
 
 @Component({
   selector: 'app-page',
@@ -23,6 +24,7 @@ export class PageComponent implements OnInit, OnDestroy, OnChanges, ItemSave {
 
 
   data: any;
+  recordName: string;
 
   isModusOperandi = getServer().type === "modus-operandi"
 
@@ -77,6 +79,7 @@ export class PageComponent implements OnInit, OnDestroy, OnChanges, ItemSave {
       const moContentProvider = this.contentProvider as ModusOperandiContentProviderService
       const moData = await moContentProvider.getRecord(this.item.modusOperandiRecordId)
       const parsedData = moContentProvider.parseRecordData(moData)
+      this.recordName = this.context.translate(parsedData["object-title"].values[0])
       Object.assign(this.data, parsedData)
     }
 
@@ -88,20 +91,39 @@ export class PageComponent implements OnInit, OnDestroy, OnChanges, ItemSave {
     const target = evt.target as HTMLTextAreaElement
     try {
       const data = JSON.parse(target.value)
-      if(typeof data === "object")
+      if (typeof data === "object")
         this.item.internalData = data
     }
-    catch (e) {}
+    catch (e) { }
   }
 
   viewData() {
-    this.dialog.open(this.dataViewTmpl, { 
+    this.dialog.open(this.dataViewTmpl, {
       data: this.data,
       width: "80%",
       height: "80%",
       minWidth: "1024px",
       minHeight: "768px"
     })
+  }
+
+  pickRecord() {
+    const ref = this.dialog.open(ModusOperandiRecordPickerComponent, {
+      width: "80%",
+      minWidth: "1024px",
+    })
+
+    ref.componentInstance.multiple = false
+
+    ref.afterClosed().subscribe({
+      next: (records: ModusOperandiRecordProps[]) => {
+        if (records && records.length > 0) {
+          this.item.modusOperandiRecordId = records[0].id
+          this.reload()
+        }
+      }
+    })
+
   }
 
 }

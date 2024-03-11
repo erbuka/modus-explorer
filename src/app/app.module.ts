@@ -70,6 +70,7 @@ import { GlobalLoadingComponent } from './ui/global-loading/global-loading.compo
 import { ModusOperandiFilePickerComponent } from './ui/file-input/modus-operandi-file-picker/modus-operandi-file-picker.component';
 import { JsonViewerComponent } from './ui/json-viewer/json-viewer.component';
 import { IotaPipe } from './iota.pipe';
+import { ModusOperandiRecordPickerComponent } from './ui/modus-operandi-record-picker/modus-operandi-record-picker.component';
 
 
 
@@ -107,6 +108,7 @@ import { IotaPipe } from './iota.pipe';
     ModusOperandiFilePickerComponent,
     JsonViewerComponent,
     IotaPipe,
+    ModusOperandiRecordPickerComponent,
   ],
   imports: [
     BrowserModule,
