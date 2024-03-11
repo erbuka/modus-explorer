@@ -56,7 +56,7 @@ import { LocationRouterService } from './location-router.service';
 import { ContextService } from './context.service';
 import { ContentProviderService, LocalContentProviderService } from './content-provider.service';
 import { AppRoutingModule } from './app-ruoting.module';
-import { NotFoundComponent } from './ui/not-found/not-found.component';
+import { ErrorPageComponent } from './ui/error-page/error-page.component';
 import { FileInputComponent } from './ui/file-input/file-input.component';
 import { FileDropDirective } from './file-drop.directive';
 import { ItemInputComponent } from './ui/item-input/item-input.component';
@@ -98,7 +98,7 @@ import { ModusOperandiRecordPickerComponent } from './ui/modus-operandi-record-p
     PinLayerEditorComponent,
     LinkDirective,
     EmbedComponent,
-    NotFoundComponent,
+    ErrorPageComponent,
     FileInputComponent,
     ItemInputComponent,
     ColorPickerComponent,

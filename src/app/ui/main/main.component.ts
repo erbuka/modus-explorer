@@ -99,11 +99,15 @@ export class MainComponent extends State implements OnInit {
 
 
   initialized: BehaviorSubject<boolean> = new BehaviorSubject(false)
-  notFound: boolean = false;
   savedState: StateData = null;
   locales: ConfigLocale[] = null;
   item: Item = null;
   showMobileMenu: boolean = false;
+
+  error: {
+    code: string,
+    object: any
+  } = null
 
   constructor(private route: ActivatedRoute, private router: Router, private location: Location, private contentProvider: ContentProviderService, public context: ContextService, private snackBar: MatSnackBar, private dialog: MatDialog) {
     super();
@@ -169,18 +173,16 @@ export class MainComponent extends State implements OnInit {
 
         try {
           this.item = await this.contentProvider.getItem(itemId)
-          this.notFound = false
+          this.error = null
           this.resetContentScrollTop()
         }
         catch (e) {
-          // TODO: before I was handling 404, but and trowing on other error code, but apparently the API throws 500 if the item is not found
-          // The rethrown error was handled by GlobalErrorHandler
-          /*
-            if(e.status === 404)
-              this.notFound = true
-            else throw e
-          */
-          this.notFound = true
+          if ([404, 500].includes(e.status)) { // Have to handle both not found and internal server error
+            this.error = {
+              code: e.status,
+              object: e.message
+            }
+          } else throw e // Rethrow if unauthorized or other error
         }
       }
     })

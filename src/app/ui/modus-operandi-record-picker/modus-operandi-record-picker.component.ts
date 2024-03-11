@@ -44,7 +44,6 @@ export class ModusOperandiRecordPickerComponent implements OnInit {
     const catalogId = this.currentPath.length === 0 ? null : this.currentPath[this.currentPath.length - 1].id
     const records = await this.moContentProvider.listRecords({ groupId: this.currentGroup.value.id, catalogId: catalogId })
     this.records = records
-    console.log(this.records)
   }
 
   onFileDoubleClick(r: ModusOperandiRecordProps) {
