@@ -13,6 +13,9 @@ type LocationRoute = {
   queryString: string
 }
 
+/**
+ * @deprecated
+ */
 @Injectable({
   providedIn: 'root'
 })

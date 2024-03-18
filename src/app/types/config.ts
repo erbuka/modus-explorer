@@ -1,4 +1,4 @@
-import { LocalizedText } from './item';
+import { ItemLink, LocalizedText } from './item';
 
 export interface ConfigLocale {
 	id: ConfigLocaleId;                     			// "it", "en", ...
@@ -7,7 +7,9 @@ export interface ConfigLocale {
 	translations?: { [key: string]: string } 			// Traduzioni testi statici	
 }
 
-export type LocalServerType = { type: "local" }
+export type LocalServerType = { 
+	type: "local",
+}
 
 export type ModusOperandiServerType = {
 	type: "modus-operandi",
@@ -20,13 +22,16 @@ export type ServerType = LocalServerType | ModusOperandiServerType;
 export type ConfigLocaleId = "it" | "en"
 
 export interface Config {
+	version?: number;							 // Versione configurazione
 	title: LocalizedText;           // Titolo applicazione
 	backgroundImage?: string;        // Immagine di sfondo
-	entry: string;                  // Link alla homepage
+	entry: ItemLink;                  // Link alla homepage
 	headerTemplate?: string;        // Template grafico per testata
 	headerLinks: {
 		title: LocalizedText,
-		itemId: string
+		/** @deprecated */	
+		itemId?:string,
+		link: ItemLink
 	}[]
 	internationalization: {        					// Parametri internazionalizzazione
 		defaultLocale: ConfigLocaleId,      	// Lingua di default, es "it"

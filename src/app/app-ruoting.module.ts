@@ -5,8 +5,14 @@ import { MainComponent } from './ui/main/main.component';
 import { EditorModeGuard } from './editor-mode.guard';
 import { ConfigEditorComponent } from './ui/config-editor/config-editor.component';
 import { LoginComponent } from './ui/login/login.component';
+import { MigrationComponent } from './ui/migration/migration.component';
 
 const routes: Routes = [
+  {
+    path: "migration",
+    pathMatch: "full",
+    component: MigrationComponent
+  },
   {
     path: "login",
     pathMatch: "full",

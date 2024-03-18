@@ -137,10 +137,10 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy, Item
 
   getCachedItem(slide: SlideShowItemSlide): Promise<Item> {
     if (slide.type === "item") {
-      if (!this.slideItemsCache.has(slide.itemId)) {
-        this.slideItemsCache.set(slide.itemId, this.contentProvider.getItem(slide.itemId))
+      if (!this.slideItemsCache.has(slide.itemLink.id)) {
+        this.slideItemsCache.set(slide.itemLink.id, this.contentProvider.getItem(slide.itemLink.id))
       }
-      return this.slideItemsCache.get(slide.itemId);
+      return this.slideItemsCache.get(slide.itemLink.id);
     }
     return null;
   }
@@ -160,7 +160,6 @@ export class SlideshowComponent extends State implements OnInit, OnDestroy, Item
   }
 
   clearSlide(): void {
-
     this.router.navigate(["/", this.item.id]);
   }
 

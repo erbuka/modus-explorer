@@ -11,16 +11,13 @@ import { LocalizedText } from 'src/app/types/item';
 export class DialogsComponent implements OnInit {
 
   @ViewChild("fileChooser", { static: true, read: ElementRef }) fileChooser: ElementRef;
-  @ViewChild("errorDialogTmpl", { static: true }) errorDialogTmpl: TemplateRef<ErrorEvent> = null;
   @ViewChild("textEditDialogTmpl", { static: true, read: TemplateRef }) textEditDialogTmpl: TemplateRef<TextEditEvent & { closeDialog: () => void }> = null;
-  @ViewChild("moLoginDialogTmpl", { static: true, read: TemplateRef }) moLoginDialogTmpl: TemplateRef<any> = null;
 
   private currentFileChooserEvent: FileChooserEvent = null;
 
   constructor(public context: ContextService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.initErrorDialog();
     this.initFileChooser();
     this.initTextEditor();
     // this.initMOLogin();
@@ -90,13 +87,5 @@ export class DialogsComponent implements OnInit {
 
   }
 
-  private initErrorDialog(): void {
-    this.context.onError.subscribe(e => {
-      this.dialog.open(this.errorDialogTmpl, {
-        width: "80%",
-        data: e
-      });
-    });
-  }
 
 }

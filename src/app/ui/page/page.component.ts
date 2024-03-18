@@ -40,6 +40,7 @@ export class PageComponent implements OnInit, OnDestroy, OnChanges, ItemSave {
   async save(): Promise<any> {
     await this.contentProvider.storeItem({
       type: "page",
+      version: this.item.version,
       id: this.item.id,
       title: this.item.title,
       template: this.item.template,

@@ -1,4 +1,4 @@
-import { ItemBase, LocalizedText } from './item';
+import { ItemBase, ItemLink, LocalizedText } from './item';
 
 // General
 
@@ -73,7 +73,9 @@ export type ThreeViewerItemLight = ThreeViewerItemAmbientLight | ThreeViewerItem
 
 export interface ThreeViewerItemPin extends ThreeViewerItemObject {
     layerIndex: number;
+    /** @deprecated */
     itemId?: string;
+    itemLink?: ItemLink;
     linkText?: LocalizedText;
 }
 

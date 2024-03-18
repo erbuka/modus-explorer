@@ -23,16 +23,3 @@
         <button class="ml-2" mat-raised-button (click)="data.reject(); data.closeDialog()">Cancel</button>
     </div>
 </ng-template>
-
-<ng-template #errorDialogTmpl let-data>
-    <h4 mat-dialog-title class="text-danger d-flex align-items-center">
-        <mat-icon>error_outline</mat-icon>
-        <span>Error</span>
-    </h4>
-    <mat-dialog-content class="pb-3">
-        <div [innerHtml]="data.description"></div>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-        <button mat-button [mat-dialog-close]="true">Close</button>
-    </mat-dialog-actions>
-</ng-template>

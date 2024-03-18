@@ -1,3 +1,32 @@
+<ng-template #paramsEditor let-data>
+  <div class="cn-item-input-params-editor">
+
+    <h2>Query Parameters</h2>
+
+    <div class="text-right mb-2">
+      <button mat-icon-button (click)="data.push({key:'key', value:''})">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    <div class="cn-item-input-params mb-2">
+      <div *ngFor="let item of data; index as idx">
+        <input type="text" [(ngModel)]="item.key">
+        <input type="text" [(ngModel)]="item.value">
+        <span class="cn-delete" (click)="data.splice(idx, 1)">&times;</span>  
+      </div>
+    </div>
+
+
+    <div class="text-right">
+      <button mat-raised-button mat-dialog-close>Cancel</button>
+      <button mat-raised-button color="primary" [mat-dialog-close]="true">Save</button>
+    </div>
+  </div>
+
+</ng-template>
+
+
 <ng-container *ngIf="selectedItem as item">
   <mat-chip-list>
     <mat-chip color="accent" selected *ngIf="item !== '#INVALID_REF#'">
@@ -6,13 +35,17 @@
       </ng-container>
       <ng-container *ngIf="!item.title">
         {{item.id}}
-      </ng-container> 
+      </ng-container>
     </mat-chip>
     <mat-chip *ngIf="item === '#INVALID_REF#'">#ERROR</mat-chip>
   </mat-chip-list>
 </ng-container>
 
-<input [placeholder]="placeholder" #filterInput type="text" [matAutocomplete]="itemsAuto" (input)="filterItems()" >
+<input [placeholder]="placeholder" #filterInput type="text" [matAutocomplete]="itemsAuto" (input)="filterItems()">
+
+<mat-icon class="cn-edit-params" (click)="editParams()">list</mat-icon>
+
+
 <mat-autocomplete #itemsAuto="matAutocomplete" (optionSelected)="onOptionSelected($event)">
   <mat-option *ngFor="let item of filteredItems" [value]="item.id">
     <ng-container *ngIf="item.title">
@@ -20,6 +53,6 @@
     </ng-container>
     <ng-container *ngIf="!item.title">
       {{item.id}}
-    </ng-container> 
+    </ng-container>
   </mat-option>
 </mat-autocomplete>

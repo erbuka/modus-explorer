@@ -468,7 +468,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 
 				pin.title = pinDef.title;
 				pin.description = pinDef.description || "";
-				pin.itemId = pinDef.itemId || "";
+				pin.itemLink = pinDef.itemLink;
 				pin.linkText = pinDef.linkText || "";
 
 				if (pos)
@@ -853,6 +853,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy, DoCheck, ItemSav
 		lookAt.add(this.camera.position);
 
 		let exportItem: ThreeViewerItem = {
+			version: this.item.version,
 			id: itemId,
 			type: "3d",
 			title: this.item.title,

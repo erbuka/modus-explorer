@@ -109,8 +109,8 @@
     <h2 *ngIf="activeShape.title">{{ activeShape.title }}</h2>
     <ng-container *ngIf="activeShape.description"></ng-container>
     <p *ngIf="activeShape.description" [innerHtml]="activeShape.description | cnLocalizedText"></p>
-    <p *ngIf="activeShape.itemId" class="text-right mb-0">
-      <a mat-mini-fab color="primary" [routerLink]="['/', activeShape.itemId]">
+    <p *ngIf="activeShape.itemLink" class="text-right mb-0">
+      <a mat-mini-fab color="primary" [routerLink]="['/', activeShape.itemLink.id]" [queryParams]="activeShape.itemLink.queryParams">
         <mat-icon>open_in_new</mat-icon>
       </a>
     </p>
@@ -136,7 +136,7 @@
               </mat-form-field>
               <mat-form-field class="col-12">
                 <mat-label>Linked Item</mat-label>
-                <app-item-input [(value)]="data.itemId"></app-item-input>
+                <app-item-input [(value)]="data.itemLink"></app-item-input>
               </mat-form-field>
               <mat-form-field class="col-6">
                 <mat-label>Fill Color</mat-label>

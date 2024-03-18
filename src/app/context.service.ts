@@ -67,7 +67,6 @@ export class ContextService {
 
   onTextEdit: EventEmitter<TextEditEvent> = new EventEmitter();
   onFileChoose: EventEmitter<FileChooserEvent> = new EventEmitter();
-  onError: EventEmitter<ErrorEvent> = new EventEmitter();
 
   constructor(private router: Router, private snackBar: MatSnackBar) {
 

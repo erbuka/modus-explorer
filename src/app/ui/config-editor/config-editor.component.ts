@@ -50,7 +50,7 @@ export class ConfigEditorComponent implements OnInit {
   addHeaderLink() {
     this.config.headerLinks.push({
       title: "Link",
-      itemId: null
+      link: null
     })
   }
 

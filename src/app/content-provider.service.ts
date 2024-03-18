@@ -10,11 +10,13 @@ import { computeHash, structuredClone } from './classes/utility';
 import { v4 as uuidv4 } from 'uuid';
 import getServer from 'src/server';
 import { Router } from '@angular/router';
+import { configMigration, itemMigration } from './classes/migration';
 
 export const SS_LOGIN_DATA_ID = "cn-mo-login-data";
 
 const DEFAULT_CONFIG: Config = {
-  entry: "home",
+  version: configMigration.getLatestVersion(),
+  entry: null,
   headerLinks: [],
   internationalization: {
     defaultLocale: "it",
@@ -30,6 +32,12 @@ export type ItemRef = {
 }
 
 export abstract class ContentProviderService {
+
+  /**  
+   * This flag is used to enable or disable compatibility mode, which means that items and configurations 
+   * are automatically migrated to the latest version when they are loaded.
+   * */
+  compatibilityMode: boolean = true
 
   async storeFile(data: ArrayBuffer, extension: string, item?: Item) {
     const hash = await computeHash(data);
@@ -74,7 +82,14 @@ export class LocalContentProviderService extends ContentProviderService {
   }
 
   async getConfig(): Promise<Config> {
-    return await this.httpClient.get<Config>("assets/config.json").toPromise();
+    const config = await this.httpClient.get<Config>("assets/config.json").toPromise();
+
+    if (this.compatibilityMode && !configMigration.isUpdated(config)) {
+      this.context.raiseError(`The configuration is not up to date`)
+      configMigration.migrate(config)
+    }
+
+    return config;
   }
 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
@@ -121,6 +136,11 @@ export class LocalContentProviderService extends ContentProviderService {
     }
 
     item.id = id;
+
+    if (this.compatibilityMode && !itemMigration.isUpdated(item)) {
+      this.context.raiseError(`The item ${id} is not up to date`)
+      itemMigration.migrate(item)
+    }
 
     return item;
 
@@ -291,7 +311,15 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
     if (files.length === 1) {
       const contents = new TextDecoder().decode(await this.downloadFile(files[0].id))
-      return JSON.parse(contents)
+      const config: Config = JSON.parse(contents)
+
+      if (this.compatibilityMode && !configMigration.isUpdated(config)) {
+        this.context.raiseError(`The configuration is not up to date`)
+        configMigration.migrate(config)
+      }
+
+      return config
+
     }
 
     return structuredClone(DEFAULT_CONFIG);
@@ -312,12 +340,18 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
       const decoder = new TextDecoder("utf-8")
       const promises = this.itemsList.map(item => {
+        return this.downloadFile(item.id).then(data => {
+          const itemData: Item = JSON.parse(decoder.decode(data))
+          item.title = itemData.title
+        })
+        /*
         const promise = this.downloadFile(item.id)
         promise.then(data => {
           const itemData: Item = JSON.parse(decoder.decode(data))
           item.title = itemData.title
         })
         return promise
+        */
       })
 
       await Promise.all(promises)
@@ -356,6 +390,12 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     const data = await this.downloadFile(id)
     const itemData: Item = JSON.parse(new TextDecoder("utf-8").decode(data))
     itemData.id = id
+
+    if (this.compatibilityMode && !itemMigration.isUpdated(itemData)) {
+      this.context.raiseError(`The item ${id} is not up to date`)
+      itemMigration.migrate(itemData)
+    }
+
     return itemData
   }
 
@@ -438,7 +478,7 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
       headers: { Authorization: loginData.token }
     }).toPromise()
 
-    return recordsData.data.elements.map((record: any) => ({  
+    return recordsData.data.elements.map((record: any) => ({
       id: record.id,
       type: record.type,
       thumbnail: typeof record.thumbnail === "string" ? this.getUrl(record.thumbnail) : null,

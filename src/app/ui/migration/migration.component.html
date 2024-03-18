@@ -1,0 +1,13 @@
+<div class="container py-5 cn-migration">
+  <h1>Migration</h1>
+  <div class="d-flex align-items-center">
+    <button [disabled]="busy" (click)="migrate(true)" mat-raised-button>Analyze</button>
+    <button [disabled]="busy" (click)="migrate(false)" mat-raised-button color="primary" class="ml-3">Run</button>
+    <mat-spinner class="ml-3" diameter="40" strokeWidth="2" *ngIf="busy"></mat-spinner>
+  </div>
+  <div class="cn-migration-log py-4">
+    <div class="alert mb-2" [class.alert-primary]="entry.type === 'info'" [class.alert-accent]="entry.type === 'warning'"
+    [class.alert-danger]="entry.type === 'error'"
+      *ngFor="let entry of log">{{entry.message}}</div>
+  </div>
+</div>

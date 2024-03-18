@@ -1,4 +1,4 @@
-import { ItemBase, LocalizedText } from './item';
+import { ItemBase, ItemLink, LocalizedText } from './item';
 
 export type DeepZoomItemLayerType = 'deep-image' | 'vector'
 
@@ -7,7 +7,9 @@ export interface DeepZoomItemShape {
   type: string;               // Tipo, "polygon"
   title?: LocalizedText;      // Titolo
   description?: LocalizedText; // Descrizione
+  /** @deprecated */
   itemId?: string;              // Link al click
+  itemLink?: ItemLink,                  // Link al click
   drawAttributes: {           // Parametri per il rendering            
     stroke: boolean;        // Disegnare il bordo?
     fill: boolean;          // Riempiere l'interno?           

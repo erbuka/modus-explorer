@@ -71,6 +71,7 @@ import { ModusOperandiFilePickerComponent } from './ui/file-input/modus-operandi
 import { JsonViewerComponent } from './ui/json-viewer/json-viewer.component';
 import { IotaPipe } from './iota.pipe';
 import { ModusOperandiRecordPickerComponent } from './ui/modus-operandi-record-picker/modus-operandi-record-picker.component';
+import { MigrationComponent } from './ui/migration/migration.component';
 
 
 
@@ -109,6 +110,7 @@ import { ModusOperandiRecordPickerComponent } from './ui/modus-operandi-record-p
     JsonViewerComponent,
     IotaPipe,
     ModusOperandiRecordPickerComponent,
+    MigrationComponent,
   ],
   imports: [
     BrowserModule,

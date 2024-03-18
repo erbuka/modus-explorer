@@ -1,4 +1,4 @@
-import { ItemBase, LocalizedText } from './item';
+import { ItemBase, ItemLink, LocalizedText } from './item';
 
 export type SlideShowItemMode = "normal" | "simple";  // Modalità normale/semplice
 
@@ -9,7 +9,9 @@ export type SlideShowItemSlide = {
   title?: LocalizedText,      // Titolo
   image?: string,
   video?: string,
+  /** @deprecated */
   itemId?: string,
+  itemLink?: ItemLink,      // Link a un altro item
 }
 
 // Gruppo di slide

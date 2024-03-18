@@ -1,7 +1,13 @@
-import { ItemBase, LocalizedText } from './item';
+import { ItemBase, ItemLink, LocalizedText } from './item';
 
 export type BlockListItemLink = {                        // Lista dei link
-    itemId: string,               // Percorso link      
+    /**
+     * @deprecated
+     */
+    itemId?: string,             // Percorso link      
+
+    itemLink: ItemLink,            // Percorso link
+
     title: LocalizedText,       // Titolo visualizzato
     image: string               // Percorso immagine
 }

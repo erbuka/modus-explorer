@@ -1,8 +1,14 @@
 :host {
   display: flex;
   width: 100%;
+  align-items: center;
+
+  mat-icon.cn-edit-params {
+    cursor: pointer;
+  }
 
   &>input {
+    min-width: 0;
     width: auto;
     border: 0;
     outline: 0;

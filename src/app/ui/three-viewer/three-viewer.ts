@@ -4,7 +4,7 @@ import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader';
 import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType, ThreeViewerItemPinLayer, ThreeViewerItemPin, ThreeViewerItemCollider } from 'src/app/types/three-viewer-item';
-import { Item, LocalizedText } from 'src/app/types/item';
+import { Item, ItemLink, LocalizedText } from 'src/app/types/item';
 import { ErrorEvent } from 'src/app/context.service';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computeHash } from 'src/app/classes/utility';
@@ -437,7 +437,9 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 	isThreeViewerPin: boolean = true;
 	title: LocalizedText = "";
 	description: LocalizedText = "";
+	/** @deprecated */
 	itemId: string = "";
+	itemLink: ItemLink = null;
 	linkText: LocalizedText = "";
 
 	set layer(layer: ThreeViewerPinLayer) {
@@ -469,7 +471,7 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 		return {
 			title: this.title,
 			description: this.description,
-			itemId: this.itemId,
+			itemLink: this.itemLink,
 			linkText: this.linkText,
 			position: [pos.x, pos.y, pos.z],
 			rotation: [rot.x, rot.y, rot.z],

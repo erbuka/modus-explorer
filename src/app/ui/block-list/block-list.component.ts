@@ -69,7 +69,7 @@ export class BlockListComponent implements OnInit, OnDestroy, ItemSave {
   addLink(idx?: number) {
     idx = typeof idx !== 'number' ? this.item.links.length : idx;
     const newLink: BlockListItemLink = {
-      itemId: "",
+      itemLink: null,
       title: "Title",
       image: ""
     }

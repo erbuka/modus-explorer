@@ -34,8 +34,8 @@
         </div>
         <h3>{{ selectedPin.title | cnLocalizedText }}</h3>
         <div>{{ selectedPin.description | cnLocalizedText }}</div>
-        <div *ngIf="selectedPin.itemId" class="text-right mt-2">
-            <a mat-button color="primary" [routerLink]="['/', selectedPin.itemId]">
+        <div *ngIf="selectedPin.itemLink" class="text-right mt-2">
+            <a mat-button color="primary" [routerLink]="['/', selectedPin.itemLink.id]" [queryParams]="selectedPin.itemLink.queryParams">
                 <span>{{ selectedPin.linkText | cnLocalizedText }}</span>
                 <mat-icon>arrow_forward</mat-icon>
             </a>
@@ -268,7 +268,7 @@
 
                         <mat-form-field class="d-block">
                             <mat-label>Link</mat-label>
-                            <app-item-input [(value)]="selectedObject.itemId"></app-item-input>
+                            <app-item-input [(value)]="selectedObject.itemLink"></app-item-input>
                         </mat-form-field>
                         
                         <mat-form-field class="d-block">

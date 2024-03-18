@@ -4,7 +4,7 @@ import { Location } from '@angular/common';
 
 import { ContextService } from 'src/app/context.service';
 import { Item } from 'src/app/types/item';
-import { Config, ConfigLocale } from 'src/app/types/config';
+import { ConfigLocale } from 'src/app/types/config';
 import { State, StateData } from 'src/app/classes/state';
 import { ContentProviderService } from 'src/app/content-provider.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -17,9 +17,11 @@ import { ThreeViewerItem } from 'src/app/types/three-viewer-item';
 import { DeepZoomItem } from 'src/app/types/deep-zoom-item';
 import { BehaviorSubject } from 'rxjs';
 import { PageItem } from 'src/app/types/page-item';
+import { itemMigration } from 'src/app/classes/migration';
 
 
 const DEFAULT_3D: ThreeViewerItem = {
+  version: itemMigration.getLatestVersion(),
   type: "3d",
   camera: {
     position: [0, 5, -10],
@@ -35,6 +37,7 @@ const DEFAULT_3D: ThreeViewerItem = {
 }
 
 const DEFAULT_BLOCK_LIST: BlockListItem = {
+  version: itemMigration.getLatestVersion(),
   type: "block-list",
   links: [],
   options: {
@@ -44,6 +47,7 @@ const DEFAULT_BLOCK_LIST: BlockListItem = {
 }
 
 const DEFAULT_SLIDESHOW: SlideshowItem = {
+  version: itemMigration.getLatestVersion(),
   groups: [],
   options: {
     itemAspectRatio: 1.5,
@@ -54,6 +58,7 @@ const DEFAULT_SLIDESHOW: SlideshowItem = {
 }
 
 const DEFAULT_DEEPZOOM: DeepZoomItem = {
+  version: itemMigration.getLatestVersion(),
   type: "deep-zoom",
   layers: [],
   layerGroups: [],
@@ -69,6 +74,7 @@ const DEFAULT_DEEPZOOM: DeepZoomItem = {
 }
 
 const DEFAULT_PAGE: PageItem = {
+  version: itemMigration.getLatestVersion(),
   type: "page",
   template: "",
   internalData: {},
@@ -167,7 +173,7 @@ export class MainComponent extends State implements OnInit {
         const itemId = params.get("id");
 
         if (!itemId) {
-          this.router.navigate(["/", this.context.config.entry])
+          this.router.navigate(["/", this.context.config.entry.id], { queryParams: this.context.config.entry.queryParams })
           return;
         }
 
@@ -226,7 +232,7 @@ export class MainComponent extends State implements OnInit {
   }
 
   goHome(): void {
-    this.router.navigate([this.context.config.entry]);
+    this.router.navigate([this.context.config.entry.id], { queryParams: this.context.config.entry.queryParams });
   }
 
   goBack(): void {

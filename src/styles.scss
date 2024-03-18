@@ -83,10 +83,12 @@ $theme-colors: (
 @import "scss/cn-cdk-drag-drop";
 @import "scss/cn-editor-mode";
 @import "scss/cn-file-input";
+@import "scss/cn-item-input";
 @import "scss/cn-login-form";
 @import "scss/cn-global-loading";
 @import "scss/cn-mo-file-picker";
 @import "scss/cn-mo-record-picker";
 @import "scss/cn-json-viewer";
+@import "scss/cn-migration";
 
 @import 'scss/cn-custom';
