@@ -82,14 +82,19 @@ export class LocalContentProviderService extends ContentProviderService {
   }
 
   async getConfig(): Promise<Config> {
-    const config = await this.httpClient.get<Config>("assets/config.json").toPromise();
 
-    if (this.compatibilityMode && !configMigration.isUpdated(config)) {
-      this.context.raiseError(`The configuration is not up to date`)
-      configMigration.migrate(config)
+    try {
+      const config = await this.httpClient.get<Config>("assets/config.json").toPromise();
+
+      if (this.compatibilityMode && !configMigration.isUpdated(config)) {
+        this.context.raiseError(`The configuration is not up to date`)
+        configMigration.migrate(config)
+      }
+
+      return config;
+    } catch (e) {
+      return structuredClone(DEFAULT_CONFIG);
     }
-
-    return config;
   }
 
   async putFile(fileName: string, data: ArrayBuffer, item?: Item): Promise<{ fileUrl: string }> {
@@ -119,7 +124,6 @@ export class LocalContentProviderService extends ContentProviderService {
 
   async getItem(id: string): Promise<Item> {
 
-
     let item = await this.httpClient.get<Item>(`assets/items/${id}/item.json`, {
       responseType: "json",
       headers: {
@@ -129,6 +133,8 @@ export class LocalContentProviderService extends ContentProviderService {
       }
     }).toPromise()
 
+    /* FIXME: This is a workaround to avoid the JSON schema validation for now */
+    
     let valid = this.jsonValidator.validate(ITEM_SCHEMA, item);
 
     if (!valid) {

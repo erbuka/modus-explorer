@@ -173,7 +173,7 @@ export class MainComponent extends State implements OnInit {
         const itemId = params.get("id");
 
         if (!itemId) {
-          this.router.navigate(["/", this.context.config.entry.id], { queryParams: this.context.config.entry.queryParams })
+          this.router.navigate(["/", this.context.config.entry?.id || "not-found"])
           return;
         }
 
@@ -183,12 +183,12 @@ export class MainComponent extends State implements OnInit {
           this.resetContentScrollTop()
         }
         catch (e) {
-          if ([404, 500].includes(e.status)) { // Have to handle both not found and internal server error
-            this.error = {
-              code: e.status,
-              object: e.message
-            }
-          } else throw e // Rethrow if unauthorized or other error
+          this.item = null
+          this.error = {
+            code: e.status,
+            object: e.message
+          }
+          throw e
         }
       }
     })
@@ -232,7 +232,7 @@ export class MainComponent extends State implements OnInit {
   }
 
   goHome(): void {
-    this.router.navigate([this.context.config.entry.id], { queryParams: this.context.config.entry.queryParams });
+    this.router.navigate(["/"]);
   }
 
   goBack(): void {

@@ -6,7 +6,7 @@ export type BlockListItemLink = {                        // Lista dei link
      */
     itemId?: string,             // Percorso link      
 
-    itemLink: ItemLink,            // Percorso link
+    itemLink?: ItemLink,            // Percorso link
 
     title: LocalizedText,       // Titolo visualizzato
     image: string               // Percorso immagine

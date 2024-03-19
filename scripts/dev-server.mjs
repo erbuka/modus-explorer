@@ -27,20 +27,12 @@ const argv = yargs(hideBin(process.argv)).parse();
         });
     };
 
-    /** Create starter application if it doesn't exist */
-    if (!fs.existsSync("./assets")) {
-        console.log(`${colors.green("[Dev-Server]")} - Creating starter project`);
-        try {
-            await ncpWithPromise("./starter-project/assets", "./assets");
-            //await ncpWithPromise("./starter-project/templates", "./templates");
-        }
-        catch (e) {
-            console.log(`${colors.red("[Dev-Server]")} - ${e}`);
-        }
-    }
-
     /** Development Server */
     {
+
+        fs.mkdirSync(path.resolve("./assets"), { recursive: true });
+        fs.mkdirSync(path.resolve("./assets/items"), { recursive: true });
+        fs.mkdirSync(path.resolve("./assets/files"), { recursive: true });
 
         const upload = multer({ storage: memoryStorage() })
 
@@ -53,7 +45,6 @@ const argv = yargs(hideBin(process.argv)).parse();
         app.post("/files", upload.single("file"), (req, res) => {
 
             const itemId = req.body.itemId || "__global";
-
 
             if (req.file) {
                 const dirPath = path.resolve(`./assets/files/${itemId}`);
@@ -93,36 +84,6 @@ const argv = yargs(hideBin(process.argv)).parse();
             res.json({ id: itemId });
         });
 
-        /*
-                app.delete("/assets/*", (req, res) => {
-                    let dirPath = path.resolve(path.join("./", req.url));
-        
-                    if (fs.lstatSync(dirPath).isDirectory()) {
-                        let files = path.join(dirPath, "*");
-                        rimraf(files, (error) => {
-                            if (error) {
-                                res.statusCode = 400;
-                                res.send(error);
-                            } else {
-                                res.statusCode = 200;
-                                res.send(dirPath);
-                            }
-                        });
-                    } else {
-                        res.statusCode = 400;
-                        res.send(`Not a valid directory: ${dirPath}`);
-                    }
-        
-                });
-        
-                app.post("/assets/*", express.raw({ type: ["text/html", "application/octet-stream"], limit: "512mb" }), (req, res, next) => {
-                    let filePath = path.resolve(path.join("./", req.url));
-                    fs.writeFile(filePath, req.body, () => {
-                        res.statusCode = 200;
-                        res.send();
-                    });
-                });
-        */
         // TODO: Questo è uno schifo, funziona ma va fatto meglio
         app.use("/*", (req, res) => {
             const path0 = path.resolve("./build-dev", req.originalUrl.substring(1));
@@ -132,13 +93,6 @@ const argv = yargs(hideBin(process.argv)).parse();
             else if (fs.existsSync(path1) && fs.lstatSync(path1).isFile()) res.sendFile(path1);
             else res.sendFile(path.resolve("./build-dev/index.html"));
         });
-
-        /*
-        app.use("/assets", express.static("assets"), (req, res) => {
-            res.sendFile(path.resolve("./build-dev/index.html"))
-        });
-        */
-        //app.use("/", express.static("build-dev"));
 
         app.listen(port);
 
@@ -189,11 +143,16 @@ const argv = yargs(hideBin(process.argv)).parse();
 
     /** Template Generator */
     if (argv.templates) {
+
+
+
         const dest = "./src/app/templates/templates.component.html";
 
         console.log(`${colors.green("[Dev-Server]")} - Starting template generator`);
 
         try {
+            fs.mkdirSync(path.resolve("./templates"), { recursive: true });
+
             generateJsonTemplate("./templates", function (result) {
                 let templates = result.reduce((prev, curr) => prev + `<ng-template let-data let-item="item" appTemplateDef="${curr.name}">${curr.contents}</ng-template>`, "");
                 fs.writeFileSync(path.resolve(dest), templates, { encoding: "utf-8" });

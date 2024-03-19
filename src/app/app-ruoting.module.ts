@@ -27,6 +27,7 @@ const routes: Routes = [
     path: "",
     pathMatch: "full",
     component: MainComponent,
+    canActivate: [EditorModeGuard]
   },
   {
     path: ":id",

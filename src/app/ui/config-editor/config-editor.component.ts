@@ -38,7 +38,7 @@ export class ConfigEditorComponent implements OnInit {
   async save() {
     try {
       await this.contentProvider.saveConfig(this.config)
-      await this.router.navigate(["/", this.config.entry.id])
+      await this.router.navigate(["/"])
       location.reload()
     }
     catch (e) {
