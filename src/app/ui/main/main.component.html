@@ -52,13 +52,17 @@
                 <mat-icon>home</mat-icon> <span>{{ "home" | cnLocalizedText }}</span>
             </div>
 
-            <ng-container *ngIf="context.config.headerLinks">
+            <ng-container *ngIf="context.config.headerLinks && context.config.headerLinks.length > 0">
                 <ng-container *ngFor="let itemLink of context.config.headerLinks">
                     <div [routerLink]="['/', itemLink.link.id]" [queryParams]="itemLink.link.queryParams" (click)=" toggleMobileMenu()">
                         <mat-icon>link</mat-icon> <span>{{ itemLink.title | cnLocalizedText }}</span>
                     </div>
                 </ng-container>
             </ng-container>
+            
+            <div *ngIf="isModusOperandi" (click)="logout()">
+                <mat-icon>close</mat-icon> <span>{{ "logout" | cnLocalizedText }}</span>
+            </div>
 
         </div>
 
@@ -165,8 +169,12 @@
                     <button class="mx-1" mat-icon-button (click)="goHome()">
                         <mat-icon>home</mat-icon>
                     </button>
-                    <button mat-icon-button *ngIf="context.config.headerLinks" [matMenuTriggerFor]="linksMenu">
+                    <button mat-icon-button *ngIf="context.config.headerLinks && context.config.headerLinks.length > 0" [matMenuTriggerFor]="linksMenu">
                         <mat-icon>more_vert</mat-icon>
+                    </button>
+
+                    <button class="mx-1" mat-icon-button *ngIf="isModusOperandi" (click)="logout()">
+                        <mat-icon>close</mat-icon>
                     </button>
 
                 </div>

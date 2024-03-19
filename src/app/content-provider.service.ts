@@ -280,6 +280,11 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
 
   }
 
+  async logout() {
+    localStorage.removeItem(SS_LOGIN_DATA_ID)
+    this.router.navigate(['/'])
+  }
+
   async login(username: string, password: string) {
     const data = new FormData();
     data.append("username", username.trim());

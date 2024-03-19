@@ -6,7 +6,7 @@ import { ContextService } from 'src/app/context.service';
 import { Item } from 'src/app/types/item';
 import { ConfigLocale } from 'src/app/types/config';
 import { State, StateData } from 'src/app/classes/state';
-import { ContentProviderService } from 'src/app/content-provider.service';
+import { ContentProviderService, ModusOperandiContentProviderService } from 'src/app/content-provider.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { NgForm } from '@angular/forms';
@@ -18,6 +18,7 @@ import { DeepZoomItem } from 'src/app/types/deep-zoom-item';
 import { BehaviorSubject } from 'rxjs';
 import { PageItem } from 'src/app/types/page-item';
 import { itemMigration } from 'src/app/classes/migration';
+import getServer from 'src/server';
 
 
 const DEFAULT_3D: ThreeViewerItem = {
@@ -104,7 +105,8 @@ export class MainComponent extends State implements OnInit {
   @ViewChild("appContent", { read: ElementRef }) appContentElmt: ElementRef;
 
 
-  initialized: BehaviorSubject<boolean> = new BehaviorSubject(false)
+  //initialized: BehaviorSubject<boolean> = new BehaviorSubject(false)
+  isModusOperandi = getServer().type === "modus-operandi"
   savedState: StateData = null;
   locales: ConfigLocale[] = null;
   item: Item = null;
@@ -117,6 +119,11 @@ export class MainComponent extends State implements OnInit {
 
   constructor(private route: ActivatedRoute, private router: Router, private location: Location, private contentProvider: ContentProviderService, public context: ContextService, private snackBar: MatSnackBar, private dialog: MatDialog) {
     super();
+  }
+
+  logout() {
+    if(this.isModusOperandi)
+      (this.contentProvider as ModusOperandiContentProviderService).logout()
   }
 
   // TODO: fine for now, I'm disabling it because it is not the best for performance
