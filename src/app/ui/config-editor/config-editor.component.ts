@@ -4,7 +4,6 @@ import { MatChipInputEvent, MatChipSelectionChange } from '@angular/material/chi
 import { Router } from '@angular/router';
 import { ContentProviderService } from 'src/app/content-provider.service';
 import { ContextService } from 'src/app/context.service';
-import { initialize } from 'src/app/init';
 import { Config, ConfigLocaleId } from 'src/app/types/config';
 import { getAllLocales } from 'src/app/types/locales';
 
@@ -39,7 +38,7 @@ export class ConfigEditorComponent implements OnInit {
   async save() {
     try {
       await this.contentProvider.saveConfig(this.config)
-      await this.router.navigate(["/", this.config.entry])
+      await this.router.navigate(["/", this.config.entry.id])
       location.reload()
     }
     catch (e) {

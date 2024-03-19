@@ -9,7 +9,10 @@
       </button>
     </div>
 
-    <div class="cn-item-input-params mb-2">
+    <div class="cn-item-input-params my-2">
+      <div *ngIf="data.length === 0" class="my-4 text-center justify-content-center">
+        <em>No parameters</em>
+      </div>
       <div *ngFor="let item of data; index as idx">
         <input type="text" [(ngModel)]="item.key">
         <input type="text" [(ngModel)]="item.value">
@@ -20,7 +23,7 @@
 
     <div class="text-right">
       <button mat-raised-button mat-dialog-close>Cancel</button>
-      <button mat-raised-button color="primary" [mat-dialog-close]="true">Save</button>
+      <button mat-raised-button color="primary" class="ml-2" [mat-dialog-close]="true">Save</button>
     </div>
   </div>
 
@@ -43,7 +46,7 @@
 
 <input [placeholder]="placeholder" #filterInput type="text" [matAutocomplete]="itemsAuto" (input)="filterItems()">
 
-<mat-icon class="cn-edit-params" (click)="editParams()">list</mat-icon>
+<mat-icon class="cn-edit-params" matBadgePosition="before" [matBadge]="parameterCount || ''" (click)="editParams()">list</mat-icon>
 
 
 <mat-autocomplete #itemsAuto="matAutocomplete" (optionSelected)="onOptionSelected($event)">

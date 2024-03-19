@@ -25,6 +25,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatBadgeModule } from '@angular/material/badge'
 
 import { AppComponent } from './app.component';
 import { BlockListComponent } from './ui/block-list/block-list.component';
@@ -140,6 +141,7 @@ import { MigrationComponent } from './ui/migration/migration.component';
     MatAutocompleteModule,
     MatChipsModule,
     MatProgressSpinnerModule,
+    MatBadgeModule,
   ],
   providers: [
     EditorModeGuard,

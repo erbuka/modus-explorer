@@ -22,7 +22,7 @@
       <mat-label>Locales</mat-label>
       <mat-chip-list #localesChipList>
         <ng-container *ngFor="let loc of config.internationalization.locales; first as f">
-          <mat-chip [selected]="f" (removed)="removeLocale(loc)" selectable="false">
+          <mat-chip (removed)="removeLocale(loc)">
             {{ loc }}
             <button matChipRemove>
               <mat-icon>cancel</mat-icon>

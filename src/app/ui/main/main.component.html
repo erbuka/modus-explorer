@@ -53,9 +53,9 @@
             </div>
 
             <ng-container *ngIf="context.config.headerLinks">
-                <ng-container *ngFor="let link of context.config.headerLinks">
-                    <div [routerLink]="['/', link.itemId]" (click)=" toggleMobileMenu()">
-                        <mat-icon>link</mat-icon> <span>{{ link.title | cnLocalizedText }}</span>
+                <ng-container *ngFor="let itemLink of context.config.headerLinks">
+                    <div [routerLink]="['/', itemLink.link.id]" [queryParams]="itemLink.link.queryParams" (click)=" toggleMobileMenu()">
+                        <mat-icon>link</mat-icon> <span>{{ itemLink.title | cnLocalizedText }}</span>
                     </div>
                 </ng-container>
             </ng-container>
@@ -112,9 +112,9 @@
                 <div class="d-flex align-items-center p-2">
 
                     <mat-menu #linksMenu>
-                        <ng-container *ngFor="let link of context.config.headerLinks">
-                            <button mat-menu-item [routerLink]="['/', link.itemId]">
-                                {{ link.title | cnLocalizedText }}
+                        <ng-container *ngFor="let itemLink of context.config.headerLinks">
+                            <button mat-menu-item [routerLink]="['/', itemLink.link.id]" [queryParams]="itemLink.link.queryParams">
+                                {{ itemLink.title | cnLocalizedText }}
                             </button>
                         </ng-container>
                     </mat-menu>

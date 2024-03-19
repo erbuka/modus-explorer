@@ -46,6 +46,10 @@ export class ItemInputComponent implements OnInit, OnDestroy, MatFormFieldContro
     return item ? item : "#INVALID_REF#";
   }
 
+  get parameterCount() : number {
+    return Object.entries(this.value?.queryParams || {}).length;
+  }
+
   onOptionSelected(evt: MatAutocompleteSelectedEvent) {
     const itemId = evt.option.value;
     this.inputElement.value = "";
