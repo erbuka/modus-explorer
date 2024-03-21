@@ -7,9 +7,12 @@
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
+    margin-top: $spacer*0.5;
+    margin-left: -$spacer*0.5;
+    margin-right: -$spacer*0.5;
 
     .cn-record {
-      margin: 0.5rem;
+      margin: $spacer*0.5;
       display: flex;
       align-items: center;
       cursor: pointer;

@@ -67,6 +67,7 @@ const argv = yargs(hideBin(process.argv)).parse();
                         const item = JSON.parse(fs.readFileSync(itemPath, { encoding: "utf-8" }));
                         return {
                             id: file,
+                            type: item.type,
                             title: item.title || null
                         }
                     } else return null
@@ -83,6 +84,15 @@ const argv = yargs(hideBin(process.argv)).parse();
             fs.writeFileSync(itemPath, JSON.stringify(req.body), { encoding: "utf-8" })
             res.json({ id: itemId });
         });
+
+        app.delete("/items/:id", (req, res) => {
+            const itemId = req.params.id;
+            const itemFolder = path.resolve(`./assets/items/${itemId}`)
+            const filesFolder = path.resolve(`./assets/files/${itemId}`)
+            rimraf.sync(itemFolder);
+            rimraf.sync(filesFolder);
+            res.send();
+        })
 
         // TODO: Questo è uno schifo, funziona ma va fatto meglio
         app.use("/*", (req, res) => {

@@ -19,7 +19,7 @@
 
   <div class="cn-mo-record-picker-list-wrapper">
     <div class="cn-mo-record-picker-list">
-      <div *ngFor="let r of records" class="cn-record bg-primary" (dblclick)="onFileDoubleClick(r)">
+      <div *ngFor="let r of records" class="cn-record bg-primary" (dblclick)="onFileDoubleClick(r)" matBadgeColor="accent" [matBadge]="getRefCount(r) || null">
         <img *ngIf="r.thumbnail" [src]="r.thumbnail" class="cn-thumbnail">
         <div class="cn-info">
           <div class="cn-name">{{ r.name }}</div>

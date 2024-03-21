@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
-import { ContentProviderService, ModusOperandiContentProviderService, ModusOperandiRecordProps, ModusOperandiUserGroup } from 'src/app/content-provider.service';
+import { ContentProviderService, ItemRef, ModusOperandiContentProviderService, ModusOperandiRecordProps, ModusOperandiUserGroup } from 'src/app/content-provider.service';
 import { ContextService } from 'src/app/context.service';
 
 @Component({
@@ -17,6 +17,7 @@ export class ModusOperandiRecordPickerComponent implements OnInit {
   currentPath: ModusOperandiRecordProps[] = []
   currentGroup: BehaviorSubject<ModusOperandiUserGroup> = new BehaviorSubject(null);
   groups: ModusOperandiUserGroup[] = []
+  pageItems: ItemRef[] = []
 
   private moContentProvider: ModusOperandiContentProviderService
 
@@ -31,6 +32,10 @@ export class ModusOperandiRecordPickerComponent implements OnInit {
       this.currentPath.pop()
       this.reloadRecordList()
     }
+  }
+
+  getRefCount(record: ModusOperandiRecordProps): number {
+    return this.pageItems.filter(item => item.modusOperandiRecordId === record.id).length
   }
 
   async onGroupChanged(group: ModusOperandiUserGroup) {
@@ -61,6 +66,9 @@ export class ModusOperandiRecordPickerComponent implements OnInit {
     this.currentGroup.subscribe({
       next: this.onGroupChanged.bind(this)
     })
+
+    this.moContentProvider.listItems()
+      .then(items => this.pageItems = items.filter(i => i.type === "page"))
 
     this.moContentProvider.listGroups()
       .then(groups => {

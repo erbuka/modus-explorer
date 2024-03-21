@@ -26,9 +26,12 @@ const DEFAULT_CONFIG: Config = {
 }
 
 
+// TODO: Fields shouldn't be optional
 export type ItemRef = {
   id: string,
-  title?: LocalizedText
+  type?: Item["type"],
+  title?: LocalizedText,
+  modusOperandiRecordId?: string
 }
 
 export abstract class ContentProviderService {
@@ -36,6 +39,10 @@ export abstract class ContentProviderService {
   /**  
    * This flag is used to enable or disable compatibility mode, which means that items and configurations 
    * are automatically migrated to the latest version when they are loaded.
+   * 
+   * We'll set this to false ONlY in the MigrationComponent to actually check which items and configurations are outdated.
+   * 
+   * So, while the program is working normally, compatibilityMode is set to true, and the migration is done automatically on the fly.
    * */
   compatibilityMode: boolean = true
 
@@ -52,6 +59,7 @@ export abstract class ContentProviderService {
 
   abstract listItems(): Promise<ItemRef[]>;
   abstract storeItem(item: Item): Promise<{ id: string }>;
+  abstract deleteItem(item:Item): Promise<void>;
   abstract getItem(id: string): Promise<Item>;
 
   static factory(context: ContextService, httpClient: HttpClient, jsonValidator: JsonValidator, router: Router): ContentProviderService {
@@ -77,8 +85,12 @@ export class LocalContentProviderService extends ContentProviderService {
     super();
   }
 
+  async deleteItem(item: Item): Promise<void> {
+    return this.httpClient.delete<void>(`/items/${item.id}`).toPromise()
+  }
+
   async saveConfig(config: Config): Promise<void> {
-    await this.httpClient.post<void>("/config", config).toPromise()
+    return this.httpClient.post<void>("/config", config).toPromise()
   }
 
   async getConfig(): Promise<Config> {
@@ -114,7 +126,7 @@ export class LocalContentProviderService extends ContentProviderService {
   }
 
 
-  async listItems(): Promise<{ id: string; }[]> {
+  async listItems(): Promise<ItemRef[]> {
     return this.httpClient.get<{ id: string; }[]>("/items").toPromise();
   }
 
@@ -134,7 +146,7 @@ export class LocalContentProviderService extends ContentProviderService {
     }).toPromise()
 
     /* FIXME: This is a workaround to avoid the JSON schema validation for now */
-    
+
     let valid = this.jsonValidator.validate(ITEM_SCHEMA, item);
 
     if (!valid) {
@@ -343,26 +355,26 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     return { fileUrl: this.getUrl(new URL(fileInfo[0].view).pathname) }
   }
 
-  async listItems(): Promise<{ id: string; }[]> {
+  async listItems(): Promise<ItemRef[]> {
 
     if (this.itemListNeedsUpdate) {
       const itemsFolder = await this.createOrGetFolder(this.server.baseFolderId, "items")
-      this.itemsList = await this.listFiles(itemsFolder.id)
+      this.itemsList = (await this.listFiles(itemsFolder.id)).map(f => ({
+        id: f.id,
+        title: null,
+      }))
 
       const decoder = new TextDecoder("utf-8")
       const promises = this.itemsList.map(item => {
         return this.downloadFile(item.id).then(data => {
           const itemData: Item = JSON.parse(decoder.decode(data))
           item.title = itemData.title
+          item.type = itemData.type
+
+          if (itemData.type === "page" && itemData.modusOperandiRecordId)
+            item.modusOperandiRecordId = itemData.modusOperandiRecordId
+
         })
-        /*
-        const promise = this.downloadFile(item.id)
-        promise.then(data => {
-          const itemData: Item = JSON.parse(decoder.decode(data))
-          item.title = itemData.title
-        })
-        return promise
-        */
       })
 
       await Promise.all(promises)
@@ -408,6 +420,10 @@ export class ModusOperandiContentProviderService extends ContentProviderService 
     }
 
     return itemData
+  }
+
+  async deleteItem(item: Item): Promise<void> {
+    throw new Error("Method not implemented.");  
   }
 
   getUrl(path: string) {
